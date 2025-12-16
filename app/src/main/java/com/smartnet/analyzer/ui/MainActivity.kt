@@ -2,16 +2,13 @@ package com.smartnet.analyzer.ui
 
 import ComposeSpeedTestTheme
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.Animatable
-
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartnet.analyzer.data.UIState
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
@@ -80,12 +76,14 @@ class MainActivity : ComponentActivity() {
         ping: MutableState<String>,
         floatValue: MutableState<Float>
     ) {
+
         if (currentSpeedValue > maxSpeed.value.toDoubleOrNull() ?: 0.0) {
             maxSpeed.value = currentSpeedValue.toString()
         }
-        currentSpeed.value = currentSpeedValue.toString()
+        val formattedSpeed = String.format("%.1f", currentSpeedValue)
+        currentSpeed.value = formattedSpeed
         ping.value = pingValue.toString()
-        floatValue.value = (currentSpeedValue / (maxSpeed.value.toDoubleOrNull() ?: 1.0)).toFloat()
+        floatValue.value = (formattedSpeed.toLong() / (maxSpeed.value.toDoubleOrNull() ?: 1.0)).toFloat()
     }
 
     fun measureSpeedAndPing(speedCallback: (Double) -> Unit, resultCallback: (Double, Long) -> Unit) {
@@ -147,7 +145,7 @@ class MainActivity : ComponentActivity() {
                                     val fileSize = 100 * 1024 * 1024L // 100MB in bytes
 
                                     var lastSecondBytes = 0L
-                                    val speedTimer = timer(period = 1000) { // Every 1 second
+                                    val speedTimer = timer(period = 500) { // Every 1 second
                                         val speedMBps = (lastSecondBytes / (1024.0 * 1024.0)) // Convert bytes to MB
                                         speedCallback(speedMBps)
                                         lastSecondBytes = 0L // Reset counter for next second

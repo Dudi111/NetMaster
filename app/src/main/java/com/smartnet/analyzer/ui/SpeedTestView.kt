@@ -94,6 +94,7 @@ fun Animatable<Float, AnimationVector1D>.toUiState(
     ping = "$ping ms",
     maxSpeed = "$maxSpeed Mbps",
     inProgress = false
+
 )
 
 @Composable
@@ -278,19 +279,19 @@ fun DrawScope.drawArcs(progress: Float, maxValue: Float) {
     val topLeft = Offset(50f, 50f)
     val size = Size(size.width - 100f, size.height - 100f)
 
-    fun drawBlur() {
-        for (i in 0..20) {
-            drawArc(
-                color = Green200.copy(alpha = i / 900f),
-                startAngle = startAngle,
-                sweepAngle = sweepAngle,
-                useCenter = false,
-                topLeft = topLeft,
-                size = size,
-                style = Stroke(width = 80f + (20 - i) * 20, cap = StrokeCap.Round)
-            )
-        }
-    }
+//    fun drawBlur() {
+//        for (i in 0..20) {
+//            drawArc(
+//                color = Green200.copy(alpha = i / 900f),
+//                startAngle = startAngle,
+//                sweepAngle = sweepAngle,
+//                useCenter = false,
+//                topLeft = topLeft,
+//                size = size,
+//                style = Stroke(width = 80f + (20 - i) * 20, cap = StrokeCap.Round)
+//            )
+//        }
+//    }
 
     fun drawStroke() {
         drawArc(
@@ -316,7 +317,7 @@ fun DrawScope.drawArcs(progress: Float, maxValue: Float) {
         )
     }
 
-    drawBlur()
+    //drawBlur()
     drawStroke()
     drawGradient()
 }

@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
         val pingRequest = Request.Builder()
             .url(url)
             .addHeader("User-Agent", "Mozilla/5.0")
-            .addHeader("Range", "bytes=0-1023") // ✅ Only 1 KB for ping measurement
+            .addHeader("Range", "bytes=0-1023") // Only 1 KB for ping measurement
             .build()
 
         client.newCall(pingRequest).enqueue(object : Callback {
@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                response.use { // ✅ Automatically closes response body
+                response.use { // Automatically closes response body
                     val pingEnd = System.nanoTime()
                     val pingMs = (pingEnd - pingStart) / 1_000_000 // Convert to ms
                     println("✅ Ping Successful: $pingMs ms")

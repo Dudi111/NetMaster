@@ -4,12 +4,15 @@ kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
+hiltversion = "2.57.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2025.02.00"
 materialAndroid = "1.2.1"
 okHTTPClient = "4.12.0"
+composeNavigation = "2.9.5"
+hiltNavigation = "1.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,8 +31,17 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3-android = { group = "androidx.compose.material", name = "material", version.ref = "materialAndroid" }
 com-squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHTTPClient"}
 
+#Dipendency Injection: Helt depencencis
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltversion"}
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltversion"}
+
+#compose navigation
+androidx-navigation-compose = { group  = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation"}
+androidx-hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+hiltPlugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltversion" }
 

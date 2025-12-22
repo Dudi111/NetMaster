@@ -1,4 +1,4 @@
-package com.smartnet.analyzer.ui
+package com.smartnet.analyzer.ui.speedtest
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -21,18 +21,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -44,30 +37,27 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smartnet.analyzer.R
-import com.smartnet.analyzer.common.theme.DarkColor
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.smartnet.analyzer.common.theme.DarkGradient
-import com.smartnet.analyzer.common.theme.Green200
 import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
 import com.smartnet.analyzer.common.theme.LightColor
-import com.smartnet.analyzer.common.theme.Pink
 import com.smartnet.analyzer.data.UIState
+import com.smartnet.analyzer.ui.speedtest.viewmodel.SpeedTestViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 suspend fun startDynamicAnimation(
     animation: Animatable<Float, AnimationVector1D>,
-    maxSpeed: MutableState<String>,
-    ping: MutableState<String>,
-    currentSpeed: MutableState<String>,
-    floatValue: MutableState<Float>
+    maxSpeed: MutableStateFlow<String>,
+    ping: MutableStateFlow<String>,
+    currentSpeed: MutableStateFlow<String>,
+    floatValue: MutableStateFlow<Float>
 ) {
     animation.animateTo(1f) // Normalize animation progress
     while (true) {
@@ -80,7 +70,7 @@ suspend fun startDynamicAnimation(
 
         animation.animateTo(normalizedSpeed, animationSpec = tween(500, easing = FastOutSlowInEasing))
 
-        delay(500) // Update every 500ms
+        delay(200) // Update every 500ms
     }
 }
 
@@ -90,7 +80,7 @@ fun Animatable<Float, AnimationVector1D>.toUiState(
     ping: String
 ) = UIState(
     arcValue = value,
-    speed = "$currentSpeed Mbps",
+    speed = currentSpeed,
     ping = "$ping ms",
     maxSpeed = "$maxSpeed Mbps",
     inProgress = false
@@ -99,43 +89,31 @@ fun Animatable<Float, AnimationVector1D>.toUiState(
 
 @Composable
 fun SpeedTestScreenMain(
-    animation: Animatable<Float, AnimationVector1D>,
-    maxSpeed: MutableState<String>,
-    ping: MutableState<String>,
-    currentSpeed: MutableState<String>,
-    floatValue: MutableState<Float>,
-    onClick: () -> Unit
+    speedTestViewModel: SpeedTestViewModel = hiltViewModel()
 ) {
+
+    val animation = remember { Animatable(0f) }
+
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            startDynamicAnimation(animation, maxSpeed, ping, currentSpeed, floatValue)
+            startDynamicAnimation(animation, speedTestViewModel.maxSpeed, speedTestViewModel.ping, speedTestViewModel.currentSpeed, speedTestViewModel.floatValue)
         }
     }
 
-    val uiState = animation.toUiState(maxSpeed.value, currentSpeed.value, ping.value)
-
-    SpeedTestView(
-        state = uiState,
-        onClick = onClick
-    )
-}
-
-@Composable
-fun SpeedTestView(state: UIState, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DarkGradient),
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Header()
-        SpeedIndicator(state = state, onClick = onClick)
-        AdditionalInfo(state.ping, state.maxSpeed)
-        NavigationView()
-    }
+    val uiState = animation.toUiState(speedTestViewModel.maxSpeed.value, speedTestViewModel.currentSpeed.value, speedTestViewModel.ping.value)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(DarkGradient),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Header()
+            SpeedIndicator(state = uiState, speedTestViewModel = speedTestViewModel)
+            AdditionalInfo(uiState.ping, uiState.maxSpeed)
+        }
 }
 
 @Composable
@@ -148,7 +126,7 @@ fun Header() {
 }
 
 @Composable
-fun SpeedIndicator(state: UIState, onClick: () -> Unit) {
+fun SpeedIndicator(state: UIState, speedTestViewModel: SpeedTestViewModel) {
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier
@@ -156,7 +134,7 @@ fun SpeedIndicator(state: UIState, onClick: () -> Unit) {
             .aspectRatio(1f)
     ) {
         CircularSpeedIndicator(state.arcValue, 240f)
-        StartButton(!state.inProgress, onClick)
+        StartButton(!state.inProgress, speedTestViewModel)
         SpeedValue(state.speed)
     }
 }
@@ -180,9 +158,9 @@ fun SpeedValue(value: String) {
 }
 
 @Composable
-fun StartButton(isEnabled: Boolean, onClick: () -> Unit) {
+fun StartButton(isEnabled: Boolean, speedTestViewModel: SpeedTestViewModel) {
     OutlinedButton(
-        onClick = onClick,
+        onClick = { speedTestViewModel.onStartClick() },
         modifier = Modifier.padding(bottom = 24.dp),
         enabled = isEnabled,
         shape = RoundedCornerShape(24.dp),
@@ -236,31 +214,6 @@ fun VerticalDivider() {
 }
 
 @Composable
-fun NavigationView() {
-    val items = listOf(
-        R.drawable.wifi,
-        R.drawable.person,
-        R.drawable.speed,
-        R.drawable.settings
-    )
-    val selectedItem = 2
-
-    BottomNavigation(backgroundColor = DarkColor) {
-        items.mapIndexed { index, item ->
-            BottomNavigationItem(selected = index == selectedItem,
-                onClick = { },
-                selectedContentColor = Pink,
-                unselectedContentColor = MaterialTheme.colors.onSurface,
-                icon = {
-                    Icon(painterResource(id = item), null)
-                }
-            )
-        }
-    }
-}
-
-
-@Composable
 fun CircularSpeedIndicator(value: Float, angle: Float) {
     Canvas(
         modifier = Modifier
@@ -278,20 +231,6 @@ fun DrawScope.drawArcs(progress: Float, maxValue: Float) {
 
     val topLeft = Offset(50f, 50f)
     val size = Size(size.width - 100f, size.height - 100f)
-
-//    fun drawBlur() {
-//        for (i in 0..20) {
-//            drawArc(
-//                color = Green200.copy(alpha = i / 900f),
-//                startAngle = startAngle,
-//                sweepAngle = sweepAngle,
-//                useCenter = false,
-//                topLeft = topLeft,
-//                size = size,
-//                style = Stroke(width = 80f + (20 - i) * 20, cap = StrokeCap.Round)
-//            )
-//        }
-//    }
 
     fun drawStroke() {
         drawArc(
@@ -317,7 +256,6 @@ fun DrawScope.drawArcs(progress: Float, maxValue: Float) {
         )
     }
 
-    //drawBlur()
     drawStroke()
     drawGradient()
 }

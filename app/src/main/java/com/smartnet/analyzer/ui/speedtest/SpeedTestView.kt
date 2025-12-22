@@ -59,18 +59,35 @@ suspend fun startDynamicAnimation(
     currentSpeed: MutableStateFlow<String>,
     floatValue: MutableStateFlow<Float>
 ) {
-    animation.animateTo(1f) // Normalize animation progress
+  //  animation.animateTo(1f) // Normalize animation progress
+    val speedPerLine = 0.5f
+    val totalBigLines = 9
+    val maxGaugeSpeed = (totalBigLines - 1) * speedPerLine // 4.0 Mbps
+
     while (true) {
-        val speed = currentSpeed.value.toFloatOrNull() ?: 0f // Get current speed
-        val maxSpeedValue = maxSpeed.value.toFloatOrNull() ?: 0f
 
-        // Normalize speed between 0 to 1 for animation scaling
-        val normalizedSpeed = if (maxSpeedValue > 0) speed / maxSpeedValue else 0f
-        floatValue.value = normalizedSpeed
+        val speedMbps = currentSpeed.value.toFloatOrNull() ?: 0f
 
-        animation.animateTo(normalizedSpeed, animationSpec = tween(500, easing = FastOutSlowInEasing))
+        // Clamp speed to gauge limit
+        val clampedSpeed = speedMbps.coerceIn(0f, maxGaugeSpeed)
 
-        delay(200) // Update every 500ms
+        // Normalize for animation (0f → 1f)
+        val normalizedProgress =
+            (clampedSpeed / maxGaugeSpeed).coerceIn(0f, 1f)
+
+        // Expose to UI if needed
+        floatValue.value = normalizedProgress
+
+        // Animate smoothly to correct tick
+        animation.animateTo(
+            targetValue = normalizedProgress,
+            animationSpec = tween(
+                durationMillis = 400,
+                easing = FastOutSlowInEasing
+            )
+        )
+
+        delay(300)
     }
 }
 

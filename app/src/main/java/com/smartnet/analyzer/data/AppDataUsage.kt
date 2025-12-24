@@ -1,8 +1,6 @@
 package com.smartnet.analyzer.data
 
-import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import com.smartnet.analyzer.R
 
 
 data class AppDataUsage(

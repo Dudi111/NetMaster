@@ -1,7 +1,11 @@
 package com.smartnet.analyzer.ui
 
 import ComposeSpeedTestTheme
+import android.app.AppOpsManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkColor
 import com.smartnet.analyzer.common.theme.Pink
+import com.smartnet.analyzer.ui.common.NetMasterScreen
 import com.smartnet.analyzer.ui.navHost.NetMasterScreenHolder
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -64,7 +69,9 @@ class MainActivity : ComponentActivity() {
         BottomNavigation(backgroundColor = DarkColor) {
             items.mapIndexed { index, item ->
                 BottomNavigationItem(selected = index == selectedItem,
-                    onClick = { },
+                    onClick = {
+                        onIconClick(index)
+                    },
                     selectedContentColor = Pink,
                     unselectedContentColor = MaterialTheme.colors.onSurface,
                     icon = {
@@ -73,5 +80,40 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    fun onIconClick(index: Int) {
+        when(index) {
+            1 -> {
+                navController!!.navigate(NetMasterScreen.DataUsageScreen.route)
+            }
+
+            2 -> {
+                navController!!.navigate(NetMasterScreen.SpeedTestScreen.route)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!hasUsageAccess(this)) {
+            requestUsageAccess(this)
+        }
+    }
+
+    fun hasUsageAccess(context: Context): Boolean {
+        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(),
+            context.packageName
+        )
+        return mode == AppOpsManager.MODE_ALLOWED
+    }
+
+    fun requestUsageAccess(context: Context) {
+        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }

@@ -7,6 +7,7 @@ import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -66,31 +68,32 @@ fun AppDetailsView(dataUsage: AppDataUsage) {
         .border(
             width = 1.dp,
     color = Color.Gray,
-    shape = RectangleShape
-    )
-    .padding(12.dp)
+    shape = RectangleShape)
+    .padding(12.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             bitmap = dataUsage.icon!!.toImageBitmap(),
             contentDescription = null,
             modifier = Modifier.size(40.dp)
+                .padding(5.dp)
         )
 
         Text(
             text = dataUsage.appName,
             fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color.White
         )
-        Spacer(Modifier.size(15.dp))
-//        Text(
-//            text = dataUsage.packageName,
-//            fontSize = 30.sp,
-//        )
+        Spacer(modifier = Modifier.weight(1f))
+
         Spacer(Modifier.size(15.dp))
         Text(
             text = dataUsage.totalBytes.toString(),
             fontSize = 20.sp,
-            modifier = Modifier.align(Alignment.Top)
+            textAlign = TextAlign.End,
+            color = Color.White
         )
     }
 }

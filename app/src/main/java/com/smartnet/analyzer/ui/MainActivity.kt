@@ -17,6 +17,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
@@ -64,12 +68,13 @@ class MainActivity : ComponentActivity() {
             R.drawable.speed,
             R.drawable.settings
         )
-        val selectedItem = 2
+        var selectedItem by rememberSaveable { mutableStateOf(2) }
 
         BottomNavigation(backgroundColor = DarkColor) {
             items.mapIndexed { index, item ->
                 BottomNavigationItem(selected = index == selectedItem,
                     onClick = {
+                        selectedItem = index
                         onIconClick(index)
                     },
                     selectedContentColor = Pink,

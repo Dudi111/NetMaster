@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.smartnet.analyzer.ui.common.NetMasterScreen
+import com.smartnet.analyzer.ui.datausage.DataUsageScreen
 import com.smartnet.analyzer.ui.speedtest.SpeedTestScreenMain
 
 @Composable
@@ -27,6 +28,10 @@ fun NetMasterScreenHolder(
 
         composable(NetMasterScreen.SpeedTestScreen.route) {
             SpeedTestScreenMain()
+        }
+
+        composable (NetMasterScreen.DataUsageScreen.route) {
+            DataUsageScreen()
         }
     }
 }

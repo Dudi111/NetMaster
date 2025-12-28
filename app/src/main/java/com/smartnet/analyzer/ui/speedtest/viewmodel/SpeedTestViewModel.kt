@@ -104,7 +104,7 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
                 response.use { // Automatically closes response body
                     val pingEnd = System.nanoTime()
                     val pingMs = (pingEnd - pingStart) / 1_000_000 // Convert to ms
-                    println("✅ Ping Successful: $pingMs ms")
+                    println("Ping Successful: $pingMs ms")
 
                     // Start Full Download
                     val startTime = System.nanoTime()
@@ -115,21 +115,21 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
 
                     client.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
-                            println("⚠️ Download Request Failed: ${e.message}")
+                            println("Download Request Failed: ${e.message}")
                             resultCallback(-1.0, pingMs)
                         }
 
                         override fun onResponse(call: Call, response: Response) {
-                            response.use { // ✅ Automatically closes response body
+                            response.use { //Automatically closes response body
                                 if (!response.isSuccessful) {
-                                    println("⚠️ Server Error: ${response.code}")
+                                    println("Server Error: ${response.code}")
                                     resultCallback(-1.0, pingMs)
                                     return
                                 }
 
                                 response.body?.let { responseBody ->
                                     val inputStream = responseBody.byteStream()
-                                    val buffer = ByteArray(65536) // ✅ Increased buffer size (64KB)
+                                    val buffer = ByteArray(65536) // Increased buffer size (64KB)
                                     var bytesRead: Int
                                     var totalBytes = 0L
                                     val fileSize = 100 * 1024 * 1024L // 100MB in bytes
@@ -154,13 +154,13 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
                                     val elapsedTime = (endTime - startTime) / 1_000_000_000.0 // Convert nanoseconds to seconds
                                     val finalSpeedMBps = (totalBytes / (1024.0 * 1024.0)) / elapsedTime // MB per second
 
-                                    println("✅ Download Completed: $finalSpeedMBps MB/s")
+                                    println("Download Completed: $finalSpeedMBps MB/s")
                                     resultCallback(finalSpeedMBps, pingMs)
                                 } ?: run {
-                                    println("⚠️ Response Body is Null")
+                                    println("Response Body is Null")
                                     resultCallback(-1.0, pingMs)
                                 }
-                            } // ✅ Closes response automatically
+                            } //Closes response automatically
                         }
                     })
                 }

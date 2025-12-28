@@ -14,14 +14,11 @@ import javax.inject.Inject
 import kotlin.use
 
 class DataUsageHelper @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext val context: Context
 ) {
-
-
 
     private var totalDeviceRx = 0L
     private var totalDeviceTx = 0L
-
 
     fun getTodayAppWiseMobileDataUsage(context: Context): List<AppDataUsage> {
 

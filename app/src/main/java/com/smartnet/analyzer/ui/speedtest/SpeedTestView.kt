@@ -110,7 +110,6 @@ fun SpeedTestScreenMain(
 ) {
 
     val animation = remember { Animatable(0f) }
-
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -193,7 +192,6 @@ fun StartButton(isEnabled: Boolean, speedTestViewModel: SpeedTestViewModel) {
 
 @Composable
 fun AdditionalInfo(ping: String, maxSpeed: String) {
-
     @Composable
     fun RowScope.InfoColumn(title: String, value: String) {
         Column(
@@ -280,7 +278,6 @@ fun DrawScope.drawArcs(progress: Float, maxValue: Float) {
 fun DrawScope.drawLines(progress: Float, maxValue: Float, numberOfLines: Int = 40) {
     val oneRotation = maxValue / numberOfLines
     val startValue = if (progress == 0f) 0 else floor(progress * numberOfLines).toInt() + 1
-
     for (i in startValue..numberOfLines) {
         rotate(i * oneRotation + (180 - maxValue) / 2) {
             drawLine(

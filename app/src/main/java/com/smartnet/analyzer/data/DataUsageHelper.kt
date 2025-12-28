@@ -18,6 +18,11 @@ class DataUsageHelper @Inject constructor(
 ) {
 
 
+
+    private var totalDeviceRx = 0L
+    private var totalDeviceTx = 0L
+
+
     fun getTodayAppWiseMobileDataUsage(context: Context): List<AppDataUsage> {
 
         val networkStatsManager =
@@ -116,8 +121,17 @@ class DataUsageHelper @Inject constructor(
             Logger.debug("Total sent bytes: $totalDeviceTx and total received bytes: $totalDeviceRx")
             appDataUsageMap
         } catch (e: RemoteException) {
-            Logger.warn("Exception occurred in querying network stats: ${e.message}", e)
             emptyMap()
         }
+    }
+
+    private fun getPackageNameFromUid(context: Context, uid: Int): String {
+        val packageManager = context.packageManager
+
+        // Retrieve package names associated with the UID
+        val packageNames = packageManager.getPackagesForUid(uid)
+
+        // Use the first package name if available, otherwise return an empty string
+        return packageNames?.getOrNull(0) ?: ""
     }
 }

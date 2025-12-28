@@ -79,8 +79,8 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
     fun measureSpeedAndPing(speedCallback: (Double) -> Unit, resultCallback: (Double, Long) -> Unit) {
         val url = "https://nbg1-speed.hetzner.com/100MB.bin"
         val client = OkHttpClient.Builder()
-            .protocols(listOf(Protocol.HTTP_1_1)) // ✅ Force HTTP/1.1
-            .retryOnConnectionFailure(true) // ✅ Enable retries
+            .protocols(listOf(Protocol.HTTP_1_1)) // Force HTTP/1.1
+            .retryOnConnectionFailure(true) //Enable retries
             .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
@@ -96,7 +96,7 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
 
         client.newCall(pingRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                println("⚠️ Ping Request Failed: ${e.message}")
+                println("Ping Request Failed: ${e.message}")
                 resultCallback(-1.0, -1)
             }
 

@@ -181,7 +181,6 @@ fun StartButton(isEnabled: Boolean, speedTestViewModel: SpeedTestViewModel) {
         enabled = isEnabled,
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(width = 2.dp, color = MaterialTheme.colors.onSurface),
-
         ) {
         Text(
             text = "START",

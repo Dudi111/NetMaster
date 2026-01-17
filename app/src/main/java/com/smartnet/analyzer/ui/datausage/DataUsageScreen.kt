@@ -138,102 +138,115 @@ fun Header() {
             style = MaterialTheme.typography.h6,
         )
 
-        Box {
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .clickable { expanded = true }
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = selectedRange,
-                    color = Color.White
-                    //style = MaterialTheme.typography.bodyMedium
-                )
-                Icon(
-                    imageVector = if (expanded)
-                        Icons.Default.KeyboardArrowUp
-                    else
-                        Icons.Default.KeyboardArrowDown,
-                    contentDescription = null
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Box {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable { expanded = true }
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedRange,
+                        color = Color.White
+                        //style = MaterialTheme.typography.bodyMedium
+                    )
+                    Icon(
+                        imageVector = if (expanded)
+                            Icons.Default.KeyboardArrowUp
+                        else
+                            Icons.Default.KeyboardArrowDown,
+                        contentDescription = null
+                    )
+                }
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                ranges.forEach { range ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = range,
-                                color = Color.White
-                            )
-                        },
-                        trailingIcon = {
-                            if (range == selectedRange) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    ranges.forEach { range ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = range,
+                                    color = Color.White
                                 )
+                            },
+                            trailingIcon = {
+                                if (range == selectedRange) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null
+                                    )
+                                }
+                            },
+                            onClick = {
+                                selectedRange = range
+                                expanded = false
                             }
-                        },
-                        onClick = {
-                            selectedRange = range
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
-        /* ---------- NETWORK TYPE DROPDOWN ---------- */
-        Box {
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .clickable { networkExpanded = true }
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = selectedNetwork, color = Color.White)
-                Icon(
-                    imageVector = if (networkExpanded)
-                        Icons.Default.KeyboardArrowUp
-                    else
-                        Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
-
-            DropdownMenu(
-                expanded = networkExpanded,
-                onDismissRequest = { networkExpanded = false }
-            ) {
-                networks.forEach { network ->
-                    DropdownMenuItem(
-                        text = { Text(network) },
-                        trailingIcon = {
-                            if (network == selectedNetwork) {
-                                Icon(Icons.Default.Check, null)
-                            }
-                        },
-                        onClick = {
-                            selectedNetwork = network
-                            networkExpanded = false
-                        }
+            /* ---------- NETWORK TYPE DROPDOWN ---------- */
+            Box {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable { networkExpanded = true }
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = selectedNetwork, color = Color.White)
+                    Icon(
+                        imageVector = if (networkExpanded)
+                            Icons.Default.KeyboardArrowUp
+                        else
+                            Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = Color.White
                     )
                 }
+
+                DropdownMenu(
+                    expanded = networkExpanded,
+                    onDismissRequest = { networkExpanded = false }
+                ) {
+                    networks.forEach { network ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                network,
+                                    color = Color.White
+                            ) },
+                            trailingIcon = {
+                                if (network == selectedNetwork) {
+                                    Icon(Icons.Default.Check, null)
+                                }
+                            },
+                            onClick = {
+                                selectedNetwork = network
+                                networkExpanded = false
+                            }
+                        )
+                    }
+                }
             }
+
+            Text(
+                "Total:",
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            )
         }
 
     }
-
 }
 
 fun Drawable.toImageBitmap(): ImageBitmap {

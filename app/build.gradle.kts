@@ -70,4 +70,7 @@ dependencies {
 
     //firebase
     androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
 }

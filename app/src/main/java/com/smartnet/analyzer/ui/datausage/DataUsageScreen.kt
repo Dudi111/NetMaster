@@ -1,11 +1,9 @@
 package com.smartnet.analyzer.ui.datausage
 
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,7 +55,6 @@ fun DataUsageScreen(
 ) {
 
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,21 +64,17 @@ fun DataUsageScreen(
         Header()
         LazyColumn {
             items(dataUsageViewmodel.dataList.size) { item ->
-            AppDetailsView(dataUsageViewmodel.dataList[item])
+            AppDetailsView(dataUsageViewmodel.dataList[item], dataUsageViewmodel)
            }
         }
     }
 }
 
 @Composable
-fun AppDetailsView(dataUsage: AppDataUsage) {
-    Spacer(Modifier.height(20.dp))
+fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmodel) {
+    Spacer(Modifier.height(15.dp))
     Row(
         modifier = Modifier.fillMaxSize()
-        .border(
-            width = 1.dp,
-    color = Color.Gray,
-    shape = RectangleShape)
     .padding(12.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
@@ -95,7 +88,7 @@ fun AppDetailsView(dataUsage: AppDataUsage) {
 
         Text(
             text = dataUsage.appName,
-            fontSize = 10.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
@@ -103,12 +96,17 @@ fun AppDetailsView(dataUsage: AppDataUsage) {
 
         Spacer(Modifier.size(15.dp))
         Text(
-            text = dataUsage.totalBytes.toString(),
-            fontSize = 20.sp,
+            text = dataUsageViewmodel.formatBytes(dataUsage.totalBytes),
+            fontSize = 13.sp,
             textAlign = TextAlign.End,
             color = Color.White
         )
     }
+    HorizontalDivider(
+        thickness = 0.5.dp,
+        color = Color.Gray.copy(alpha = 0.4f),
+        modifier = Modifier.padding(horizontal = 20.dp)
+    )
 }
 
 @Composable
@@ -125,9 +123,9 @@ fun Header() {
     )
     var networkExpanded by remember { mutableStateOf(false) }
 
-    var selectedNetwork by remember { mutableStateOf("Mobile data") }
+    var selectedNetwork by remember { mutableStateOf("Cellular") }
 
-    val networks = listOf("Mobile data", "Wi-Fi")
+    val networks = listOf("Cellular", "Wi-Fi")
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -139,19 +137,22 @@ fun Header() {
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(start = 6.dp),
         ) {
             Box {
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .clickable { expanded = true }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(horizontal = 6.dp, vertical = 6.dp)
+                        .width(100.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = selectedRange,
-                        color = Color.White
+                        color = Color.White,
+                        fontSize = 13.sp
                         //style = MaterialTheme.typography.bodyMedium
                     )
                     Icon(
@@ -159,7 +160,8 @@ fun Header() {
                             Icons.Default.KeyboardArrowUp
                         else
                             Icons.Default.KeyboardArrowDown,
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color.White
                     )
                 }
 
@@ -192,18 +194,23 @@ fun Header() {
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
-            /* ---------- NETWORK TYPE DROPDOWN ---------- */
+            /* ---------- Network Type Dropdown ---------- */
             Box {
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .clickable { networkExpanded = true }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(horizontal = 6.dp, vertical = 6.dp)
+                        .width(90.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = selectedNetwork, color = Color.White)
+                    Text(
+                        text = selectedNetwork,
+                        color = Color.White,
+                        fontSize = 13.sp
+                    )
                     Icon(
                         imageVector = if (networkExpanded)
                             Icons.Default.KeyboardArrowUp
@@ -240,12 +247,12 @@ fun Header() {
             }
 
             Text(
-                "Total:",
+                "Total: 120.8 GB",
                 color = Color.White,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                modifier = Modifier.padding(start = 12.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
+                fontSize = 13.sp
             )
         }
-
     }
 }
 

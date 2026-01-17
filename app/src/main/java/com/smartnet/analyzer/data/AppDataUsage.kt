@@ -10,5 +10,5 @@ data class AppDataUsage(
     val txBytes: Long
 ) {
     val totalBytes: Long
-        get() = ((rxBytes + txBytes)/1024)
+        get() = (rxBytes + txBytes)
 }

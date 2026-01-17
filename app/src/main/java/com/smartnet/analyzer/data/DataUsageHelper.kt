@@ -103,4 +103,19 @@ class DataUsageHelper @Inject constructor(
         // Use the first package name if available, otherwise return an empty string
         return packageNames?.getOrNull(0) ?: ""
     }
+
+    fun formatBytes(bytes: Long): String {
+        if (bytes <= 0) return "0 B"
+
+        val kb = 1024.0
+        val mb = kb * 1024
+        val gb = mb * 1024
+
+        return when {
+            bytes >= gb -> String.format("%.1f GB", bytes / gb)
+            bytes >= mb -> String.format("%.1f MB", bytes / mb)
+            bytes >= kb -> String.format("%.1f KB", bytes / kb)
+            else -> "$bytes B"
+        }
+    }
 }

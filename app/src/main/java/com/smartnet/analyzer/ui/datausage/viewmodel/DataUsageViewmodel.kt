@@ -8,6 +8,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.smartnet.analyzer.data.AppDataUsage
+import com.smartnet.analyzer.data.DataUsageHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
@@ -16,13 +17,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DataUsageViewmodel @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
+    private val dataUsageHelper: DataUsageHelper
 ) : ViewModel(){
 
     var dataList = mutableListOf(AppDataUsage(icon = null, txBytes = 0L, rxBytes = 0L))
 
     init {
-        dataList = getTodayAppWiseMobileDataUsage(context).toMutableList()
+        val (startTime, endTime) = getTodayStartEndMillis()
+        dataList = dataUsageHelper.getAppDataUsage(startTime, endTime).toMutableList()
+       // dataList = getTodayAppWiseMobileDataUsage(context).toMutableList()
     }
 
     fun getTodayAppWiseMobileDataUsage(context: Context): List<AppDataUsage> {

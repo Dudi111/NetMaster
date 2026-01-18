@@ -5,9 +5,12 @@ import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.NetworkCapabilities
+import android.os.Process
 import android.os.RemoteException
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import com.smartnet.analyzer.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.use
@@ -21,41 +24,35 @@ class DataUsageHelper @Inject constructor(
 
     fun getAppDataUsage(
         startTime: Long,
-        endTime: Long
+        endTime: Long,
+        networkType: Int
     ): List<AppDataUsage> {
         val networkStatsManager = context.getSystemService<NetworkStatsManager>()
         val packageManager = context.packageManager
         totalDeviceRx = 0L
         totalDeviceTx = 0L
-      //  Logger.debug("Get data usage information from $startTime to $endTime")
         return try {
             val networkStats = networkStatsManager?.querySummary(
-                NetworkCapabilities.TRANSPORT_CELLULAR,
+                networkType,
                 null,
                 startTime,
                 endTime,
             )
             val bucket = NetworkStats.Bucket()
-            val appDataUsageMap = mutableMapOf<String, Long>()
             val usageMap = mutableMapOf<Int, Pair<Long, Long>>()
             networkStats?.use {
-              //  Logger.debug("NetworkStats bucket is available to get data usage info: ${networkStats.hasNextBucket()}")
                 while (it.hasNextBucket()) {
                     try {
                         it.getNextBucket(bucket)
                         totalDeviceRx += bucket.rxBytes
                         totalDeviceTx += bucket.txBytes
                         val uid = bucket.uid
-                        Log.d("dudi","UID: $uid")
                         val prev = usageMap[uid] ?: (0L to 0L)
                         usageMap[uid] = Pair(
                             prev.first + bucket.rxBytes,
                             prev.second + bucket.txBytes
                         )
-//                        val packageName = getPackageNameFromUid(context, uid)
-//                        val totalUsage = bucket.rxBytes + bucket.txBytes
-//                        appDataUsageMap[packageName] =
-//                            appDataUsageMap.getOrDefault(packageName, 0L) + totalUsage
+
                     } catch (e: PackageManager.NameNotFoundException) {
                     }
                 }
@@ -66,7 +63,58 @@ class DataUsageHelper @Inject constructor(
 
             usageMap.forEach { (uid, bytes) ->
                 try {
-                    Log.d("dudi", "get pkg is null: ${packageManager.getPackagesForUid(uid)}")
+                    if (packageManager.getPackagesForUid(uid).isNullOrEmpty()){
+                        when(uid) {
+                            Process.ROOT_UID, Process.SYSTEM_UID -> {
+                                appList.add(
+                                    AppDataUsage(
+                                        packageName = "",
+                                        appName = "System and Root",
+                                        icon = ContextCompat.getDrawable(context, R.drawable.ic_setting),
+                                        rxBytes = bytes.first,
+                                        txBytes = bytes.second
+                                    )
+                                )
+                                return@forEach
+                            }
+
+                            -5 -> {
+                                appList.add(
+                                    AppDataUsage(
+                                        packageName = "",
+                                        appName = "Tethering & Hotspot",
+                                        icon = ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.ic_hotspot
+                                        ),
+                                        rxBytes = bytes.first,
+                                        txBytes = bytes.second
+                                    )
+                                )
+                                return@forEach
+                            }
+
+                            -4 -> {
+                                appList.add(
+                                    AppDataUsage(
+                                        packageName = "",
+                                        appName = "Removed apps and user",
+                                        icon = ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.ic_delete
+                                        ),
+                                        rxBytes = bytes.first,
+                                        txBytes = bytes.second
+                                    )
+                                )
+                                return@forEach
+                            }
+                            else -> {
+                                Log.d("dudi","Blank UID: $uid , total bytes: ${bytes.first + bytes.second}")
+                                return@forEach
+                            }
+                        }
+                    }
                     val packages = packageManager.getPackagesForUid(uid) ?: return@forEach
                     for (pkg in packages) {
                         val appInfo = packageManager.getApplicationInfo(pkg, 0)
@@ -91,31 +139,6 @@ class DataUsageHelper @Inject constructor(
             return appList.sortedByDescending { it.totalBytes }
         } catch (e: RemoteException) {
             emptyList()
-        }
-    }
-
-    private fun getPackageNameFromUid(context: Context, uid: Int): String {
-        val packageManager = context.packageManager
-
-        // Retrieve package names associated with the UID
-        val packageNames = packageManager.getPackagesForUid(uid)
-
-        // Use the first package name if available, otherwise return an empty string
-        return packageNames?.getOrNull(0) ?: ""
-    }
-
-    fun formatBytes(bytes: Long): String {
-        if (bytes <= 0) return "0 B"
-
-        val kb = 1024.0
-        val mb = kb * 1024
-        val gb = mb * 1024
-
-        return when {
-            bytes >= gb -> String.format("%.1f GB", bytes / gb)
-            bytes >= mb -> String.format("%.1f MB", bytes / mb)
-            bytes >= kb -> String.format("%.1f KB", bytes / kb)
-            else -> "$bytes B"
         }
     }
 }

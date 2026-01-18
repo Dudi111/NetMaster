@@ -132,7 +132,6 @@ fun Header(
 
     var expanded by remember { mutableStateOf(false) }
     var selectedRange by remember { mutableStateOf(dataUsageViewmodel.dateRanges[2]) }
-
     var networkExpanded by remember { mutableStateOf(false) }
     var selectedNetwork by remember { mutableStateOf(dataUsageViewmodel.networkType[0]) }
 
@@ -198,6 +197,7 @@ fun Header(
                             onClick = {
                                 selectedRange = range
                                 expanded = false
+                                dataUsageViewmodel.onDateNetworkChange(range, selectedNetwork)
                             }
                         )
                     }
@@ -250,6 +250,7 @@ fun Header(
                             onClick = {
                                 selectedNetwork = network
                                 networkExpanded = false
+                                dataUsageViewmodel.onDateNetworkChange(selectedRange,network)
                             }
                         )
                     }
@@ -257,7 +258,7 @@ fun Header(
             }
 
             Text(
-                "Total: 120.8 GB",
+                "Total: ${dataUsageViewmodel.totalUsage}",
                 color = Color.White,
                 modifier = Modifier.padding(start = 12.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
                 fontSize = 13.sp

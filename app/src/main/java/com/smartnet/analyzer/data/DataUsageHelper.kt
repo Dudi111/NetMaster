@@ -57,7 +57,7 @@ class DataUsageHelper @Inject constructor(
                 try {
                     if (packageManager.getPackagesForUid(uid).isNullOrEmpty()){
                         when(uid) {
-                            Process.ROOT_UID, Process.SYSTEM_UID -> {
+                            Process.SYSTEM_UID -> {
                                 appList.add(
                                     AppDataUsage(
                                         packageName = "",
@@ -90,7 +90,7 @@ class DataUsageHelper @Inject constructor(
                                 appList.add(
                                     AppDataUsage(
                                         packageName = "",
-                                        appName = "Removed apps and user",
+                                        appName = "Removed UID usage",
                                         icon = ContextCompat.getDrawable(
                                             context,
                                             R.drawable.ic_delete
@@ -130,6 +130,7 @@ class DataUsageHelper @Inject constructor(
             }
             return appList.sortedByDescending { it.totalBytes }
         } catch (e: RemoteException) {
+            Log.d("dudi","Error while getting data usage: $e")
             emptyList()
         }
     }

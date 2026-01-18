@@ -1,6 +1,5 @@
 package com.smartnet.analyzer.ui.datausage.viewmodel
 
-import android.app.AppOpsManager
 import android.content.Context
 import android.net.NetworkCapabilities
 import android.util.Log
@@ -21,7 +20,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
-import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -75,26 +73,6 @@ class DataUsageViewmodel @Inject constructor(
         }
     }
 
-    fun getTodayStartEndMillis(): Pair<Long, Long> {
-        val cal = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val start = cal.timeInMillis
-
-        cal.apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }
-        val end = cal.timeInMillis
-
-        return start to end
-    }
-
     fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
 
@@ -110,16 +88,6 @@ class DataUsageViewmodel @Inject constructor(
         }
     }
 
-    fun hasUsageAccess(context: Context): Boolean {
-        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = appOps.checkOpNoThrow(
-            AppOpsManager.OPSTR_GET_USAGE_STATS,
-            android.os.Process.myUid(),
-            context.packageName
-        )
-        Log.d("dudi","mode: $mode")
-        return mode == AppOpsManager.MODE_ALLOWED
-    }
 
     fun getTimeRange(
         type: String,

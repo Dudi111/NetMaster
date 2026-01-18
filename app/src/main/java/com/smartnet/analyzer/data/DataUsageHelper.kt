@@ -3,8 +3,6 @@ package com.smartnet.analyzer.data
 import android.app.usage.NetworkStats
 import android.app.usage.NetworkStatsManager
 import android.content.Context
-import android.content.pm.PackageManager
-import android.net.NetworkCapabilities
 import android.os.Process
 import android.os.RemoteException
 import android.util.Log
@@ -19,9 +17,6 @@ class DataUsageHelper @Inject constructor(
     @ApplicationContext val context: Context
 ) {
 
-    private var totalDeviceRx = 0L
-    private var totalDeviceTx = 0L
-
     fun getAppDataUsage(
         startTime: Long,
         endTime: Long,
@@ -29,8 +24,6 @@ class DataUsageHelper @Inject constructor(
     ): List<AppDataUsage> {
         val networkStatsManager = context.getSystemService<NetworkStatsManager>()
         val packageManager = context.packageManager
-        totalDeviceRx = 0L
-        totalDeviceTx = 0L
         return try {
             val networkStats = networkStatsManager?.querySummary(
                 networkType,
@@ -44,8 +37,6 @@ class DataUsageHelper @Inject constructor(
                 while (it.hasNextBucket()) {
                     try {
                         it.getNextBucket(bucket)
-                        totalDeviceRx += bucket.rxBytes
-                        totalDeviceTx += bucket.txBytes
                         val uid = bucket.uid
                         val prev = usageMap[uid] ?: (0L to 0L)
                         usageMap[uid] = Pair(
@@ -53,7 +44,8 @@ class DataUsageHelper @Inject constructor(
                             prev.second + bucket.txBytes
                         )
 
-                    } catch (e: PackageManager.NameNotFoundException) {
+                    } catch (e: Exception) {
+                        Log.d("dudi","Error while getting buckets: $e")
                     }
                 }
                 it.close()

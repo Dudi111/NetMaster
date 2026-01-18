@@ -54,14 +54,13 @@ fun DataUsageScreen(
      dataUsageViewmodel: DataUsageViewmodel = hiltViewModel()
 ) {
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkGradient)
     ) {
 
-        Header()
+        Header(dataUsageViewmodel)
         LazyColumn {
             items(dataUsageViewmodel.dataList.size) { item ->
             AppDetailsView(dataUsageViewmodel.dataList[item], dataUsageViewmodel)
@@ -110,22 +109,16 @@ fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmod
 }
 
 @Composable
-fun Header() {
+fun Header(
+    dataUsageViewmodel: DataUsageViewmodel
+) {
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedRange by remember { mutableStateOf("Today") }
+    var selectedRange by remember { mutableStateOf(dataUsageViewmodel.dateRanges[2]) }
 
-    val ranges = listOf(
-        "This month",
-        "This week",
-        "Today",
-        "Yesterday"
-    )
     var networkExpanded by remember { mutableStateOf(false) }
+    var selectedNetwork by remember { mutableStateOf(dataUsageViewmodel.networkType[0]) }
 
-    var selectedNetwork by remember { mutableStateOf("Cellular") }
-
-    val networks = listOf("Cellular", "Wi-Fi")
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -169,7 +162,7 @@ fun Header() {
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    ranges.forEach { range ->
+                    dataUsageViewmodel.dateRanges.forEach { range ->
                         DropdownMenuItem(
                             text = {
                                 Text(
@@ -225,7 +218,7 @@ fun Header() {
                     expanded = networkExpanded,
                     onDismissRequest = { networkExpanded = false }
                 ) {
-                    networks.forEach { network ->
+                    dataUsageViewmodel.networkType.forEach { network ->
                         DropdownMenuItem(
                             text = {
                                 Text(
@@ -264,5 +257,3 @@ fun Drawable.toImageBitmap(): ImageBitmap {
     draw(canvas)
     return bitmap.asImageBitmap()
 }
-
-

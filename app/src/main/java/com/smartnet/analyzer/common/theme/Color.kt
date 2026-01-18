@@ -16,6 +16,8 @@ val DarkColor = Color(0xFF101522)
 val DarkColor2 = Color(0xFF202532)
 val LightColor = Color(0xFF414D66)
 val LightColor2 = Color(0xFF626F88)
+val colorAccent = Color(0xFF56347E)
+val transparent = Color(0x00000000)
 
 val GreenGradient = Brush.linearGradient(
     colors = listOf(Green300, Green200),

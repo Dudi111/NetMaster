@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,14 +30,17 @@ import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkColor
 import com.smartnet.analyzer.common.theme.Pink
 import com.smartnet.analyzer.ui.common.NetMasterScreen
+import com.smartnet.analyzer.ui.common.RoundCornerDialogView
 import com.smartnet.analyzer.ui.navHost.NetMasterScreenHolder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-
     private var navController: NavHostController? = null
+
+    var dialogState = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -56,6 +60,7 @@ class MainActivity : ComponentActivity() {
                         NetMasterScreenHolder(navController!!)
                     }
                 }
+                dialogInit(navController!!)
             }
         }
     }
@@ -99,11 +104,40 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (!hasUsageAccess(this)) {
-            requestUsageAccess(this)
+    @Composable
+    fun dialogInit(navController: NavHostController) {
+       // LaunchedEffect(key1 = dialogState.value) {}
+
+        if (dialogState.value) {
+            RoundCornerDialogView(
+                R.string.data_usage_perm,
+                R.string.setting_btn,
+                R.string.btn_cancel,
+                dialogState,
+                mutableStateOf(true),
+                onOkClick = {
+                    Log.d("dudi", "ok clicked")
+                    requestUsageAccess(this)
+                    dialogState.value = false
+                },
+                onCancelClick = {
+                    Log.d("dudi", "cancel clicked")
+                    navController.navigate(NetMasterScreen.SpeedTestScreen.route)
+                    dialogState.value = false
+                }
+            )
         }
+    }
+
+    override fun onResume() {
+        if (!hasUsageAccess(this)) {
+            Log.d("dudi","data usage perm not granted")
+            dialogState.value = true
+        } else {
+            Log.d("dudi","data usage perm not granted")
+            dialogState.value = false
+        }
+        super.onResume()
     }
 
     fun hasUsageAccess(context: Context): Boolean {
@@ -113,6 +147,7 @@ class MainActivity : ComponentActivity() {
             android.os.Process.myUid(),
             context.packageName
         )
+        Log.d("dudi","mode: $mode")
         return mode == AppOpsManager.MODE_ALLOWED
     }
 

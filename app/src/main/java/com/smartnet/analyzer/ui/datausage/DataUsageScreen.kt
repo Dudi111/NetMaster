@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,11 +50,23 @@ import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.ui.datausage.viewmodel.DataUsageViewmodel
 import androidx.core.graphics.createBitmap
+import com.smartnet.analyzer.ui.MainActivity
+import com.smartnet.analyzer.ui.common.MyProgressBar
 
 @Composable
 fun DataUsageScreen(
      dataUsageViewmodel: DataUsageViewmodel = hiltViewModel()
 ) {
+
+    val context = LocalContext.current as MainActivity
+    LaunchedEffect(Unit) {
+        if (context.hasUsageAccess(context)) {
+            dataUsageViewmodel.progressState.value = true
+            dataUsageViewmodel.getDataUsage()
+        } else {
+            context.dialogState.value = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -61,11 +75,14 @@ fun DataUsageScreen(
     ) {
 
         Header(dataUsageViewmodel)
-        LazyColumn {
-            items(dataUsageViewmodel.dataList.size) { item ->
-            AppDetailsView(dataUsageViewmodel.dataList[item], dataUsageViewmodel)
-           }
+        if (dataUsageViewmodel.uiState.value) {
+            LazyColumn {
+                items(dataUsageViewmodel.dataList.size) { item ->
+                    AppDetailsView(dataUsageViewmodel.dataList[item], dataUsageViewmodel)
+                }
+            }
         }
+        MyProgressBar(dataUsageViewmodel.progressState, "Loading...")
     }
 }
 

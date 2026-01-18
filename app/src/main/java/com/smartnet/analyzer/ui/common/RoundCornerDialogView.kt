@@ -40,7 +40,7 @@ fun RoundCornerDialogView(
     onCancelClick: () -> Unit = onOkClick
 ) {
     Dialog(
-        onDismissRequest = { openDialogCustom.value = false },
+        onDismissRequest = { !openDialogCustom.value },
         content = {
             val systemUiController = rememberSystemUiController()
             systemUiController.isNavigationBarVisible = false // Navigation bar

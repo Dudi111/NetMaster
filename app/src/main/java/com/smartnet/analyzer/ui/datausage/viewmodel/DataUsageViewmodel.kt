@@ -1,12 +1,19 @@
 package com.smartnet.analyzer.ui.datausage.viewmodel
 
+import android.app.AppOpsManager
 import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.data.DataUsageHelper
 import com.smartnet.analyzer.utils.Constants
+import com.smartnet.analyzer.utils.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -14,9 +21,12 @@ import javax.inject.Inject
 @HiltViewModel
 class DataUsageViewmodel @Inject constructor(
     @ApplicationContext context: Context,
-    private val dataUsageHelper: DataUsageHelper
+    private val dataUsageHelper: DataUsageHelper,
+    @IoDispatcher var ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(){
 
+    var progressState = mutableStateOf(false)
+    var uiState = mutableStateOf(false)
     var dataList = mutableListOf(AppDataUsage(icon = null, txBytes = 0L, rxBytes = 0L))
 
     val dateRanges = listOf(
@@ -27,9 +37,18 @@ class DataUsageViewmodel @Inject constructor(
     )
     val networkType = listOf(Constants.NETWORK_TYPE_CELLULAR, Constants.NETWORK_TYPE_WIFI)
 
-    init {
+//    init {
+//        val (startTime, endTime) = getTodayStartEndMillis()
+//        dataList = dataUsageHelper.getAppDataUsage(startTime, endTime).toMutableList()
+//    }
+
+    fun getDataUsage() {
         val (startTime, endTime) = getTodayStartEndMillis()
-        dataList = dataUsageHelper.getAppDataUsage(startTime, endTime).toMutableList()
+        viewModelScope.launch(ioDispatcher) {
+            dataList = dataUsageHelper.getAppDataUsage(startTime, endTime).toMutableList()
+            progressState.value = false
+            uiState.value= true
+        }
     }
 
     fun getTodayStartEndMillis(): Pair<Long, Long> {
@@ -65,5 +84,16 @@ class DataUsageViewmodel @Inject constructor(
             bytes >= kb -> String.format("%.2f KB", bytes / kb)
             else -> "$bytes B"
         }
+    }
+
+    fun hasUsageAccess(context: Context): Boolean {
+        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(),
+            context.packageName
+        )
+        Log.d("dudi","mode: $mode")
+        return mode == AppOpsManager.MODE_ALLOWED
     }
 }

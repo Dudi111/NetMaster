@@ -1,5 +1,7 @@
 package com.smartnet.analyzer.ui.charts.viewmodel
 
+import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.smartnet.analyzer.data.DataUsageHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +14,30 @@ class ChartViewmodel @Inject constructor(
 ): ViewModel() {
 
 
+
+    init {
+        var dailyDataUsage = getDailyDataUsage().map { bytesToMb(it) }
+
+    }
+
+    fun bytesToMb(bytes: Long): Float {
+        return bytes / (1024f * 1024f)
+    }
+
+    fun getDailyDataUsage(): MutableList<Long> {
+        val dailyDataUsage = mutableListOf<Long>()
+        val range = getDailyTimeRanges()
+        range.forEach { it ->
+            val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
+
+            val wifiUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
+
+            Log.d("dudi", "range 1st : ${it.first} , range 2nd: ${it.second}")
+            Log.d("dudi", "sim usage: $simUsage , wifi usage: $wifiUsage")
+            dailyDataUsage.add(simUsage + wifiUsage)
+        }
+            return dailyDataUsage
+    }
 
     fun getDailyTimeRanges(): List<Pair<Long, Long>> {
         val ranges = mutableListOf<Pair<Long, Long>>()

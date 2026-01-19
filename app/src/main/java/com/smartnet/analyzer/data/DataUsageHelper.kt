@@ -17,12 +17,13 @@ class DataUsageHelper @Inject constructor(
     @ApplicationContext val context: Context
 ) {
 
+    private val networkStatsManager = context.getSystemService<NetworkStatsManager>()
+
     fun getAppDataUsage(
         startTime: Long,
         endTime: Long,
         networkType: Int
     ): List<AppDataUsage> {
-        val networkStatsManager = context.getSystemService<NetworkStatsManager>()
         val packageManager = context.packageManager
         return try {
             val networkStats = networkStatsManager?.querySummary(
@@ -45,7 +46,7 @@ class DataUsageHelper @Inject constructor(
                         )
 
                     } catch (e: Exception) {
-                        Log.d("dudi","Error while getting buckets: $e")
+                        Log.d("dudi", "Error while getting buckets: $e")
                     }
                 }
                 it.close()
@@ -55,14 +56,17 @@ class DataUsageHelper @Inject constructor(
 
             usageMap.forEach { (uid, bytes) ->
                 try {
-                    if (packageManager.getPackagesForUid(uid).isNullOrEmpty()){
-                        when(uid) {
+                    if (packageManager.getPackagesForUid(uid).isNullOrEmpty()) {
+                        when (uid) {
                             Process.SYSTEM_UID -> {
                                 appList.add(
                                     AppDataUsage(
                                         packageName = "",
                                         appName = "System and Root",
-                                        icon = ContextCompat.getDrawable(context, R.drawable.ic_setting),
+                                        icon = ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.ic_setting
+                                        ),
                                         rxBytes = bytes.first,
                                         txBytes = bytes.second
                                     )
@@ -101,8 +105,12 @@ class DataUsageHelper @Inject constructor(
                                 )
                                 return@forEach
                             }
+
                             else -> {
-                                Log.d("dudi","Blank UID: $uid , total bytes: ${bytes.first + bytes.second}")
+                                Log.d(
+                                    "dudi",
+                                    "Blank UID: $uid , total bytes: ${bytes.first + bytes.second}"
+                                )
                                 return@forEach
                             }
                         }
@@ -112,7 +120,6 @@ class DataUsageHelper @Inject constructor(
                         val appInfo = packageManager.getApplicationInfo(pkg, 0)
                         val appName = packageManager.getApplicationLabel(appInfo).toString()
                         val icon = packageManager.getApplicationIcon(appInfo)
-                      //  Log.d("dudi","app info: $appInfo , name: $appName , and icon: $icon")
 
                         appList.add(
                             AppDataUsage(
@@ -125,13 +132,42 @@ class DataUsageHelper @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
-                    Log.d("dudi","Error while getting names: $e")
+                    Log.d("dudi", "Error while getting names: $e")
                 }
             }
             return appList.sortedByDescending { it.totalBytes }
         } catch (e: RemoteException) {
-            Log.d("dudi","Error while getting data usage: $e")
+            Log.d("dudi", "Error while getting data usage: $e")
             emptyList()
+        }
+    }
+
+    fun getDayWiseDataUsage(
+        startTime: Long,
+        endTime: Long,
+        networkType: Int
+    ): Long {
+
+        var totalUsage = 0L
+        try {
+            val networkStats = networkStatsManager?.querySummary(
+                networkType,
+                null,
+                startTime,
+                endTime,
+            )
+            val bucket = NetworkStats.Bucket()
+            networkStats?.use {
+                while (it.hasNextBucket()) {
+                    it.getNextBucket(bucket)
+                    totalUsage += bucket.rxBytes + bucket.txBytes
+                }
+                it.close()
+            }
+            return totalUsage
+        } catch (e: RemoteException) {
+            Log.d("dudi", "Error while getting data usage: $e")
+            return totalUsage
         }
     }
 }

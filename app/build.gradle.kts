@@ -75,4 +75,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.1")
+
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
 }

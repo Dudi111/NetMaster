@@ -1,4 +1,4 @@
-package com.smartnet.analyzer.ui.signalanalyzer
+package com.smartnet.analyzer.ui.charts
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,13 +8,14 @@ import androidx.compose.ui.Modifier
 import com.smartnet.analyzer.common.theme.DarkGradient
 
 @Composable
-fun SignalAnalyzer() {
+fun DataUsageChartScreen() {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkGradient)
     ) {
+
 
     }
 }

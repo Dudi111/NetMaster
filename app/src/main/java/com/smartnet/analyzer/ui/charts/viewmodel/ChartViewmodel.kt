@@ -15,10 +15,11 @@ class ChartViewmodel @Inject constructor(
 
 
 
-    init {
-        var dailyDataUsage = getDailyDataUsage().map { bytesToMb(it) }
 
-    }
+    var dailyDataUsage: List<Float> = getDailyDataUsage().map { bytesToMb(it) }
+
+
+
 
     fun bytesToMb(bytes: Long): Float {
         return bytes / (1024f * 1024f)

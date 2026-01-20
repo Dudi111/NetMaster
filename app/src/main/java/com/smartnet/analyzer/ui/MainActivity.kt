@@ -101,6 +101,10 @@ class MainActivity : ComponentActivity() {
             2 -> {
                 navController!!.navigate(NetMasterScreen.SpeedTestScreen.route)
             }
+
+            3 -> {
+                navController!!.navigate(NetMasterScreen.ChartScreen.route)
+            }
         }
     }
 

@@ -76,6 +76,7 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.1")
 
-    implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m3)
+    implementation("com.patrykandpatrick.vico:core:2.4.1")
+    implementation("com.patrykandpatrick.vico:compose:2.4.1")
+    implementation("com.patrykandpatrick.vico:compose-m3:2.4.1")
 }

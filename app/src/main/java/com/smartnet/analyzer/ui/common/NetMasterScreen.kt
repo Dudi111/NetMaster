@@ -9,4 +9,5 @@ sealed class NetMasterScreen (
 
     object SpeedTestScreen: NetMasterScreen(route = ScreenId.SPEED_TEST,  TestTags.TEST_TAG_SPEED_TEST)
     object DataUsageScreen: NetMasterScreen(route = ScreenId.DATA_USAGE, TestTags.TEST_TAG_DATA_USAGE)
+    object ChartScreen: NetMasterScreen(route = ScreenId.CHART_SCREEN, TestTags.TEST_TAG_DATA_USAGE)
 }

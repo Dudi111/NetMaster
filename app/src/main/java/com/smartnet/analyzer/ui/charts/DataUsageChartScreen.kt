@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -85,9 +86,9 @@ fun DataUsageChartScreen(
         Box(
             modifier = Modifier.fillMaxWidth()
                 .wrapContentHeight()
-                .padding(vertical = 10.dp, horizontal = 20.dp)
+                .padding(vertical = 7.dp, horizontal = 7.dp)
                 .background(color = DarkColor2, shape = RoundedCornerShape(10.dp))
-                .border(2.dp, color = Color.White, shape = RoundedCornerShape(10.dp)),
+                .border(1.dp, color = Color.White, shape = RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.TopCenter
         ) {
 
@@ -121,7 +122,7 @@ fun DataUsageChartScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
-                    .padding(5.dp)
+                    .padding(top = 20.dp)
             )
         }
         Row(
@@ -141,7 +142,8 @@ fun DataUsageChartScreen(
 
             NetworkSwitcher(
                 selected = selectedNetwork,
-                onSelectedChange = { selectedNetwork = it }
+                onSelectedChange = { selectedNetwork = it },
+                modifier = Modifier.width(150.dp)
             )
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -189,7 +191,7 @@ fun NetworkSwitcher(
                 text = "Wi-Fi",
                 selected = selected == NETWORK_TYPE_WIFI,
                 onClick = { onSelectedChange(NETWORK_TYPE_WIFI) },
-                modifier = Modifier.weight(1f)
+               modifier = Modifier.weight(1f)
             )
         }
     }

@@ -3,17 +3,22 @@ package com.smartnet.analyzer.ui.charts
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -81,12 +86,13 @@ fun DataUsageChartScreen(
             modifier = Modifier.fillMaxWidth()
                 .wrapContentHeight()
                 .padding(vertical = 10.dp, horizontal = 20.dp)
-                .background(color = DarkColor2, shape = RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center
+                .background(color = DarkColor2, shape = RoundedCornerShape(10.dp))
+                .border(2.dp, color = Color.White, shape = RoundedCornerShape(10.dp)),
+            contentAlignment = Alignment.TopCenter
         ) {
 
             Text(
-                text = "This month usage",
+                text = "This month usage (wifi + cellular)",
                 modifier = Modifier.padding(7.dp),
                 style = MaterialTheme.typography.body1,
                 color = white,
@@ -118,11 +124,35 @@ fun DataUsageChartScreen(
                     .padding(5.dp)
             )
         }
-        NetworkSwitcher(
-            selected = selectedNetwork,
-            onSelectedChange = { selectedNetwork = it },
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Divider(
+                modifier = Modifier.weight(1f),
+                color = Color.White.copy(alpha = 0.3f),
+                thickness = 1.dp
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            NetworkSwitcher(
+                selected = selectedNetwork,
+                onSelectedChange = { selectedNetwork = it }
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Divider(
+                modifier = Modifier.weight(1f),
+                color = Color.White.copy(alpha = 0.3f),
+                thickness = 1.dp
+            )
+        }
+
     }
 }
 
@@ -143,8 +173,8 @@ fun NetworkSwitcher(
 ) {
     Box(
         modifier = modifier
-            .height(44.dp)
-            .clip(RoundedCornerShape(22.dp))
+            .height(40.dp)
+            .clip(RoundedCornerShape(20.dp))
             .background(Color(0xFF2A2A2A))
             .padding(4.dp)
     ) {
@@ -185,7 +215,7 @@ private fun NetworkOption(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center

@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias (libs.plugins.hiltPlugin)
-    id("kotlin-kapt")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -45,7 +45,7 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     //navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation)
@@ -76,7 +76,7 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.1")
 
-    implementation("com.patrykandpatrick.vico:core:2.4.1")
-    implementation("com.patrykandpatrick.vico:compose:2.4.1")
-    implementation("com.patrykandpatrick.vico:compose-m3:2.4.1")
+    implementation("com.patrykandpatrick.vico:core:2.0.2")
+    implementation("com.patrykandpatrick.vico:compose:2.0.2")
+    implementation("com.patrykandpatrick.vico:compose-m3:2.0.2")
 }

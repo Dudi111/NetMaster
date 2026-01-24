@@ -14,6 +14,7 @@ val Green500 = Color(0xFF07A312)
 
 val DarkColor = Color(0xFF101522)
 val DarkColor2 = Color(0xFF202532)
+val LightDarkColor = Color(0xFF242833)
 val LightColor = Color(0xFF414D66)
 val LightColor2 = Color(0xFF626F88)
 val colorAccent = Color(0xFF56347E)

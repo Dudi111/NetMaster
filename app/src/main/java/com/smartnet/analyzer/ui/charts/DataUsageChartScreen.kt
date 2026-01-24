@@ -47,6 +47,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.smartnet.analyzer.common.theme.DarkColor2
 import com.smartnet.analyzer.common.theme.DarkGradient
+import com.smartnet.analyzer.common.theme.LightDarkColor
 import com.smartnet.analyzer.common.theme.white
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
@@ -95,8 +96,8 @@ fun DataUsageChartScreen(
             modifier = Modifier.fillMaxWidth()
                 .wrapContentHeight()
                 .padding(vertical = 7.dp, horizontal = 7.dp)
-                .background(color = DarkColor2, shape = RoundedCornerShape(10.dp))
-                .border(1.dp, color = Color.White, shape = RoundedCornerShape(10.dp)),
+                .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.TopCenter
         ) {
 
@@ -136,7 +137,7 @@ fun DataUsageChartScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 20.dp),
+                .padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -168,6 +169,10 @@ fun DataUsageChartScreen(
 
         Box(
             modifier = Modifier.fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 7.dp, horizontal = 7.dp)
+                .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
         ) {
             CartesianChartHost(
                 chart = rememberCartesianChart(
@@ -191,7 +196,7 @@ fun DataUsageChartScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
-                    .padding(top = 20.dp)
+                    .padding(top = 10.dp)
             )
         }
 

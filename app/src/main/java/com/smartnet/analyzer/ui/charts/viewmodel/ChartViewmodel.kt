@@ -16,10 +16,6 @@ class ChartViewmodel @Inject constructor(
 
     var dailyDataUsage: List<Float> = getDailyDataUsageBytes().map { bytesToMb(it) }
 
-    var networkSpecificDataUsage: List<Float> = getNetworkType(NETWORK_TYPE_CELLULAR).map { bytesToMb(it) }.toMutableList()
-
-
-
     fun bytesToMb(bytes: Long): Float {
         return bytes / (1024f * 1024f)
     }
@@ -31,7 +27,7 @@ class ChartViewmodel @Inject constructor(
     fun getDailyDataUsageBytes(): MutableList<Long> {
         val dailyDataUsage = mutableListOf<Long>()
         val range = getDailyTimeRanges()
-        range.forEach { it ->
+        range.forEach {
             val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
 
             val wifiUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
@@ -47,7 +43,7 @@ class ChartViewmodel @Inject constructor(
         return if (networkType == NETWORK_TYPE_CELLULAR) {
             val cellUsage = mutableListOf<Long>()
             val range = getDailyTimeRanges()
-            range.forEach { it ->
+            range.forEach {
                 val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
                 cellUsage.add(simUsage)
             }
@@ -55,7 +51,7 @@ class ChartViewmodel @Inject constructor(
         } else {
             val wifiUsage = mutableListOf<Long>()
             val range = getDailyTimeRanges()
-            range.forEach { it ->
+            range.forEach {
                 val usage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
                 wifiUsage.add(usage)
             }

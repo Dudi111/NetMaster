@@ -4,6 +4,7 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.smartnet.analyzer.data.DataUsageHelper
+import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Calendar
 import javax.inject.Inject
@@ -15,9 +16,16 @@ class ChartViewmodel @Inject constructor(
 
     var dailyDataUsage: List<Float> = getDailyDataUsageBytes().map { bytesToMb(it) }
 
+    var networkSpecificDataUsage: List<Float> = getNetworkType(NETWORK_TYPE_CELLULAR).map { bytesToMb(it) }.toMutableList()
+
+
 
     fun bytesToMb(bytes: Long): Float {
         return bytes / (1024f * 1024f)
+    }
+
+    fun updateNetworkUsage(networkType: String): List<Float> {
+        return getNetworkType(networkType).map { bytesToMb(it) }
     }
 
     fun getDailyDataUsageBytes(): MutableList<Long> {
@@ -34,6 +42,27 @@ class ChartViewmodel @Inject constructor(
         }
             return dailyDataUsage
     }
+
+    fun getNetworkType(networkType: String): List<Long> {
+        return if (networkType == NETWORK_TYPE_CELLULAR) {
+            val cellUsage = mutableListOf<Long>()
+            val range = getDailyTimeRanges()
+            range.forEach { it ->
+                val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
+                cellUsage.add(simUsage)
+            }
+            cellUsage
+        } else {
+            val wifiUsage = mutableListOf<Long>()
+            val range = getDailyTimeRanges()
+            range.forEach { it ->
+                val usage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
+                wifiUsage.add(usage)
+            }
+            wifiUsage
+        }
+    }
+
 
     fun getDailyTimeRanges(): List<Pair<Long, Long>> {
         val ranges = mutableListOf<Pair<Long, Long>>()

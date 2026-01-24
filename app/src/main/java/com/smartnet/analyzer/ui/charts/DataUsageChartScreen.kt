@@ -66,12 +66,25 @@ fun DataUsageChartScreen(
     ) {
 
         val modelProducer = remember { CartesianChartModelProducer() }
+        val modelProducer2 = remember { CartesianChartModelProducer() }
         var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
 
-        LaunchedEffect(chartViewmodel.dailyDataUsage) {
+        LaunchedEffect(selectedNetwork) {
             modelProducer.runTransaction {
                 columnSeries {
                     series(chartViewmodel.dailyDataUsage)
+                }
+            }
+
+            val data: List<Float> = when (selectedNetwork) {
+                NETWORK_TYPE_CELLULAR -> chartViewmodel.updateNetworkUsage(selectedNetwork)
+                NETWORK_TYPE_WIFI -> chartViewmodel.updateNetworkUsage(selectedNetwork)
+                else -> emptyList()
+            }
+
+            modelProducer2.runTransaction {
+                columnSeries {
+                    series(data)
                 }
             }
         }
@@ -137,7 +150,10 @@ fun DataUsageChartScreen(
 
             NetworkSwitcher(
                 selected = selectedNetwork,
-                onSelectedChange = { selectedNetwork = it },
+                onSelectedChange = {
+                    selectedNetwork = it
+                    chartViewmodel.getNetworkType(it)
+                                   },
                 modifier = Modifier.width(150.dp)
             )
 
@@ -147,6 +163,35 @@ fun DataUsageChartScreen(
                 modifier = Modifier.weight(1f),
                 color = Color.White.copy(alpha = 0.3f),
                 thickness = 1.dp
+            )
+        }
+
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            CartesianChartHost(
+                chart = rememberCartesianChart(
+                    rememberColumnCartesianLayer(),
+                    startAxis = VerticalAxis.rememberStart(
+                        valueFormatter = { _, value, _ ->
+                            if (value >= 1024)
+                                String.format("%.1f GB", value / 1024f)
+                            else
+                                "${value.toInt()} MB"
+                        }
+                    ),
+                    bottomAxis = HorizontalAxis.rememberBottom(
+                        valueFormatter = { _, value, _ ->
+                            "Day ${(value.toInt() + 1)}"
+                        }
+                    )
+                ),
+                modelProducer = modelProducer2,
+                scrollState = rememberVicoScrollState(scrollEnabled = false),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(top = 20.dp)
             )
         }
 

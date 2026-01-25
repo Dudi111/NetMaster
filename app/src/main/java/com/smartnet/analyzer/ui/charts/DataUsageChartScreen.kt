@@ -51,7 +51,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,12 +71,10 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.smartnet.analyzer.R
-import com.smartnet.analyzer.common.theme.DarkColor2
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
 import com.smartnet.analyzer.common.theme.white
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
-import com.smartnet.analyzer.ui.datausage.toImageBitmap
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
 
@@ -101,12 +101,21 @@ fun DataUsageChartScreen(
 
         LaunchedEffect(
                 selectedNetwork,
-            selectedApp
+            selectedApp,
+            pagerState.currentPage
         ) {
             Log.d("selectedapp","third value: ${selectedApp.third}")
+
+            val overallUsage: List<Float> = when(pagerState.currentPage) {
+                0 -> chartViewmodel.getDailyDataUsageBytes(chartViewmodel.getDailyTimeRanges())
+
+                1 -> chartViewmodel.getDailyDataUsageBytes(chartViewmodel.getLastMonthStartEndMillis())
+
+                else -> emptyList()
+            }
             modelProducer.runTransaction {
                 columnSeries {
-                    series(chartViewmodel.dailyDataUsage)
+                    series(overallUsage)
                 }
             }
 
@@ -132,11 +141,9 @@ fun DataUsageChartScreen(
             }
         }
 
-        Header()
-
         LazyColumn {
             item {
-
+                Header(chartViewmodel)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -147,18 +154,6 @@ fun DataUsageChartScreen(
                 ) {
 
                     Column {
-
-                        // 🔹 Title (changes with page)
-                        Text(
-                            text = if (pagerState.currentPage == 0)
-                                "This month usage (Wi-Fi + Cellular)"
-                            else
-                                "Last month usage (Wi-Fi + Cellular)",
-                            modifier = Modifier.padding(7.dp),
-                            color = white,
-                            fontSize = 10.sp,
-                            textAlign = TextAlign.Center
-                        )
 
                         // 🔹 Sliding Charts
                         HorizontalPager(
@@ -225,7 +220,7 @@ fun DataUsageChartScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 8.dp),
+                                .padding(bottom = 8.dp, top = 10.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             repeat(2) { index ->
@@ -245,49 +240,6 @@ fun DataUsageChartScreen(
                         }
                     }
                 }
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                        .padding(vertical = 7.dp, horizontal = 7.dp)
-//                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-//                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-//                    contentAlignment = Alignment.TopCenter
-//                ) {
-//
-//                    Text(
-//                        text = "This month usage (wifi + cellular)",
-//                        modifier = Modifier.padding(7.dp),
-//                        style = MaterialTheme.typography.body1,
-//                        color = white,
-//                        fontSize = 10.sp,
-//                        textAlign = TextAlign.Center
-//                    )
-//                    CartesianChartHost(
-//                        chart = rememberCartesianChart(
-//                            rememberColumnCartesianLayer(),
-//                            startAxis = VerticalAxis.rememberStart(
-//                                valueFormatter = { _, value, _ ->
-//                                    if (value >= 1024)
-//                                        String.format("%.1f GB", value / 1024f)
-//                                    else
-//                                        "${value.toInt()} MB"
-//                                }
-//                            ),
-//                            bottomAxis = HorizontalAxis.rememberBottom(
-//                                valueFormatter = { _, value, _ ->
-//                                    "Day ${(value.toInt() + 1)}"
-//                                }
-//                            )
-//                        ),
-//                        modelProducer = modelProducer,
-//                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(280.dp)
-//                            .padding(top = 20.dp)
-//                    )
-//                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -329,30 +281,46 @@ fun DataUsageChartScreen(
                         .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
                 ) {
-                    CartesianChartHost(
-                        chart = rememberCartesianChart(
-                            rememberColumnCartesianLayer(),
-                            startAxis = VerticalAxis.rememberStart(
-                                valueFormatter = { _, value, _ ->
-                                    if (value >= 1024)
-                                        String.format("%.1f GB", value / 1024f)
-                                    else
-                                        "${value.toInt()} MB"
-                                }
+
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
+                                "Total Cellular usage for ${chartViewmodel.overallUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}"
+                            else
+                                "Total Wifi usage for ${chartViewmodel.overallUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}",
+                            modifier = Modifier.padding(7.dp),
+                            color = white,
+                            fontSize = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+
+                        CartesianChartHost(
+                            chart = rememberCartesianChart(
+                                rememberColumnCartesianLayer(),
+                                startAxis = VerticalAxis.rememberStart(
+                                    valueFormatter = { _, value, _ ->
+                                        if (value >= 1024)
+                                            String.format("%.1f GB", value / 1024f)
+                                        else
+                                            "${value.toInt()} MB"
+                                    }
+                                ),
+                                bottomAxis = HorizontalAxis.rememberBottom(
+                                    valueFormatter = { _, value, _ ->
+                                        "Day ${(value.toInt() + 1)}"
+                                    }
+                                )
                             ),
-                            bottomAxis = HorizontalAxis.rememberBottom(
-                                valueFormatter = { _, value, _ ->
-                                    "Day ${(value.toInt() + 1)}"
-                                }
-                            )
-                        ),
-                        modelProducer = modelProducer2,
-                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(280.dp)
-                            .padding(top = 10.dp)
-                    )
+                            modelProducer = modelProducer2,
+                            scrollState = rememberVicoScrollState(scrollEnabled = false),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(280.dp)
+                                .padding(top = 10.dp)
+                        )
+                    }
                 }
 
                 Row(
@@ -474,12 +442,75 @@ fun DataUsageChartScreen(
 }
 
 @Composable
-fun Header() {
-    Text(
-        text = "Usage overview",
-        modifier = Modifier.padding(top = 52.dp, bottom = 16.dp),
-        style = MaterialTheme.typography.h6
-    )
+fun Header(
+    chartViewmodel: ChartViewmodel
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(DarkGradient),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = chartViewmodel.overallUsageDetail.value.first,
+            modifier = Modifier.padding(top = 50.dp, bottom = 5.dp),
+            style = MaterialTheme.typography.h6
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 7.dp, horizontal = 7.dp)
+                .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .background(LightDarkColor),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = chartViewmodel.overallUsageDetail.value.second,
+                    modifier = Modifier.padding(top= 10.dp),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        lineHeight = 24.sp,
+                        letterSpacing = 0.15.sp,
+                        color = white
+                    )
+                )
+
+                Text(
+                    text = "Total Data Used",
+                    modifier = Modifier.padding(5.dp),
+                    style =  TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp,
+                     //   lineHeight = 24.sp,
+                        letterSpacing = 0.15.sp,
+                        color = white
+                    )
+                )
+
+                Text(
+                    text = "WIFI + CELLULAR",
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp,
+                       // lineHeight = 24.sp,
+                        letterSpacing = 0.15.sp,
+                        color = white
+                    )
+                )
+            }
+        }
+    }
 }
 
 @Composable

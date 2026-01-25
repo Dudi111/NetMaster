@@ -1,0 +1,28 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#3A3A3A"
+        android:pathData="M3,3h18v18H3z" />
+
+    <!-- App grid icon -->
+    <path
+        android:fillColor="#B0B0B0"
+        android:pathData="M7,7h4v4H7z" />
+
+    <path
+        android:fillColor="#B0B0B0"
+        android:pathData="M13,7h4v4h-4z" />
+
+    <path
+        android:fillColor="#B0B0B0"
+        android:pathData="M7,13h4v4H7z" />
+
+    <path
+        android:fillColor="#B0B0B0"
+        android:pathData="M13,13h4v4h-4z" />
+</vector>

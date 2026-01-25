@@ -2,6 +2,7 @@ package com.smartnet.analyzer.ui.charts
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,12 +15,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,10 +37,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
@@ -45,11 +57,13 @@ import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkColor2
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
 import com.smartnet.analyzer.common.theme.white
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
+import com.smartnet.analyzer.ui.datausage.toImageBitmap
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
 
@@ -59,6 +73,7 @@ fun DataUsageChartScreen(
     chartViewmodel: ChartViewmodel = hiltViewModel()
 ) {
 
+    var expanded by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,114 +107,193 @@ fun DataUsageChartScreen(
 
         Header()
 
-        Box(
-            modifier = Modifier.fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 7.dp, horizontal = 7.dp)
-                .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.TopCenter
-        ) {
+        LazyColumn {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 7.dp, horizontal = 7.dp)
+                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.TopCenter
+                ) {
 
-            Text(
-                text = "This month usage (wifi + cellular)",
-                modifier = Modifier.padding(7.dp),
-                style = MaterialTheme.typography.body1,
-                color = white,
-                fontSize = 10.sp,
-                textAlign = TextAlign.Center
-            )
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    rememberColumnCartesianLayer(),
-                    startAxis = VerticalAxis.rememberStart(
-                        valueFormatter = { _, value, _ ->
-                            if (value >= 1024)
-                                String.format("%.1f GB", value / 1024f)
-                            else
-                                "${value.toInt()} MB"
-                        }
-                    ),
-                    bottomAxis = HorizontalAxis.rememberBottom(
-                        valueFormatter = { _, value, _ ->
-                            "Day ${(value.toInt() + 1)}"
-                        }
+                    Text(
+                        text = "This month usage (wifi + cellular)",
+                        modifier = Modifier.padding(7.dp),
+                        style = MaterialTheme.typography.body1,
+                        color = white,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Center
                     )
-                ),
-                modelProducer = modelProducer,
-                scrollState = rememberVicoScrollState(scrollEnabled = false),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp)
-                    .padding(top = 20.dp)
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Divider(
-                modifier = Modifier.weight(1f),
-                color = Color.White.copy(alpha = 0.3f),
-                thickness = 1.dp
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            NetworkSwitcher(
-                selected = selectedNetwork,
-                onSelectedChange = {
-                    selectedNetwork = it
-                    chartViewmodel.getNetworkType(it)
-                                   },
-                modifier = Modifier.width(150.dp)
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Divider(
-                modifier = Modifier.weight(1f),
-                color = Color.White.copy(alpha = 0.3f),
-                thickness = 1.dp
-            )
-        }
-
-        Box(
-            modifier = Modifier.fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 7.dp, horizontal = 7.dp)
-                .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-        ) {
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    rememberColumnCartesianLayer(),
-                    startAxis = VerticalAxis.rememberStart(
-                        valueFormatter = { _, value, _ ->
-                            if (value >= 1024)
-                                String.format("%.1f GB", value / 1024f)
-                            else
-                                "${value.toInt()} MB"
-                        }
-                    ),
-                    bottomAxis = HorizontalAxis.rememberBottom(
-                        valueFormatter = { _, value, _ ->
-                            "Day ${(value.toInt() + 1)}"
-                        }
+                    CartesianChartHost(
+                        chart = rememberCartesianChart(
+                            rememberColumnCartesianLayer(),
+                            startAxis = VerticalAxis.rememberStart(
+                                valueFormatter = { _, value, _ ->
+                                    if (value >= 1024)
+                                        String.format("%.1f GB", value / 1024f)
+                                    else
+                                        "${value.toInt()} MB"
+                                }
+                            ),
+                            bottomAxis = HorizontalAxis.rememberBottom(
+                                valueFormatter = { _, value, _ ->
+                                    "Day ${(value.toInt() + 1)}"
+                                }
+                            )
+                        ),
+                        modelProducer = modelProducer,
+                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(280.dp)
+                            .padding(top = 20.dp)
                     )
-                ),
-                modelProducer = modelProducer2,
-                scrollState = rememberVicoScrollState(scrollEnabled = false),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp)
-                    .padding(top = 10.dp)
-            )
-        }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
+                    Divider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.White.copy(alpha = 0.3f),
+                        thickness = 1.dp
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    NetworkSwitcher(
+                        selected = selectedNetwork,
+                        onSelectedChange = {
+                            selectedNetwork = it
+                            chartViewmodel.getNetworkType(it)
+                        },
+                        modifier = Modifier.width(150.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Divider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.White.copy(alpha = 0.3f),
+                        thickness = 1.dp
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 7.dp, horizontal = 7.dp)
+                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+                ) {
+                    CartesianChartHost(
+                        chart = rememberCartesianChart(
+                            rememberColumnCartesianLayer(),
+                            startAxis = VerticalAxis.rememberStart(
+                                valueFormatter = { _, value, _ ->
+                                    if (value >= 1024)
+                                        String.format("%.1f GB", value / 1024f)
+                                    else
+                                        "${value.toInt()} MB"
+                                }
+                            ),
+                            bottomAxis = HorizontalAxis.rememberBottom(
+                                valueFormatter = { _, value, _ ->
+                                    "Day ${(value.toInt() + 1)}"
+                                }
+                            )
+                        ),
+                        modelProducer = modelProducer2,
+                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(280.dp)
+                            .padding(top = 10.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "App data usage",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
+
+                    Divider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.White.copy(alpha = 0.3f),
+                        thickness = 1.dp
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 7.dp, horizontal = 7.dp)
+                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = chartViewmodel.selectedApp.value.first?.let {
+                                BitmapPainter(it.toBitmap().asImageBitmap())
+                            } ?: painterResource(R.drawable.ic_default_app),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(5.dp)
+                        )
+
+                        Text(
+                            text = chartViewmodel.selectedApp.value.second,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding( start = 5.dp)
+                        )
+
+                        Icon(
+                            imageVector = if (expanded)
+                                Icons.Default.KeyboardArrowUp
+                            else
+                                Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.padding(3.dp)
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "Total:",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.padding(5.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

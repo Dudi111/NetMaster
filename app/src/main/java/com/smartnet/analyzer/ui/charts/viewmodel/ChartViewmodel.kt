@@ -1,20 +1,31 @@
 package com.smartnet.analyzer.ui.charts.viewmodel
 
+import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.smartnet.analyzer.data.DataUsageHelper
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class ChartViewmodel @Inject constructor(
+    @ApplicationContext val context: Context,
     private val dataUsageHelper: DataUsageHelper,
 ): ViewModel() {
 
     var dailyDataUsage: List<Float> = getDailyDataUsageBytes().map { bytesToMb(it) }
+
+    var selectedApp = mutableStateOf(Pair(Drawable.createFromPath(""),"Select App"))
+
+    var userAppList = getUserInstalledApps(context)
 
     fun bytesToMb(bytes: Long): Float {
         return bytes / (1024f * 1024f)
@@ -87,6 +98,36 @@ class ChartViewmodel @Inject constructor(
         }
 
         return ranges
+    }
+
+    fun getUserInstalledApps(context: Context): List<Triple<Drawable, String, Int>> {
+        val pm = context.packageManager
+        val apps = mutableListOf<Triple<Drawable, String, Int>>()
+
+        val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+
+        for (appInfo in installedApps) {
+
+            // ❌ Exclude system apps
+            if ((appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) continue
+
+            // Optional: Exclude updated system apps
+            if ((appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) continue
+
+            val appName = pm.getApplicationLabel(appInfo).toString()
+            val icon = pm.getApplicationIcon(appInfo)
+            val uid = appInfo.uid
+
+            apps.add(
+                Triple(
+                    first = icon,
+                    second = appName,
+                    third = uid,
+                )
+            )
+        }
+
+        return apps.sortedBy { it.second.lowercase() }
     }
 
 }

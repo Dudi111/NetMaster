@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable
 
 data class AppDataUsage(
     val icon: Drawable? ,
-    val packageName: String = "",
+    val uid: Int = 0,
     val appName: String = "",
     val rxBytes: Long,
     val txBytes: Long

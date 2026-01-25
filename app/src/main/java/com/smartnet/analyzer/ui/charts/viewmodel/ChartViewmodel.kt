@@ -11,9 +11,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartnet.analyzer.R
+import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.data.DataUsageHelper
+import com.smartnet.analyzer.utils.Constants.DATA_USAGE_TODAY
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
-import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
+import com.smartnet.analyzer.utils.GlobalFunctions.getTimeRange
 import com.smartnet.analyzer.utils.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,14 +39,18 @@ class ChartViewmodel @Inject constructor(
 
     var dialogState = mutableStateOf(false)
     var overallUsageDetail = mutableStateOf(Pair("", ""))
+    var networkUsageDetail = mutableStateOf(Pair("", ""))
     var selectedApp = mutableStateOf(Triple(ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!, second = "Select app", third = 0))
     var selectedAppIndex = mutableStateOf(-1)
-    var userAppList = getUserInstalledApps(context)
+    var userAppList: List<AppDataUsage>? = null
     var appWiseTotalUsage = mutableStateOf("0")
     var networkUsage = mutableStateOf("0")
 
-    private val _overallDataUsage = MutableStateFlow<List<Float>>(emptyList())
-    val overallDatalUsage: StateFlow<List<Float>> = _overallDataUsage
+    private val _thisMonthOverallDataUsage = MutableStateFlow<List<Float>>(emptyList())
+    val thisMonthOverallDatalUsage: StateFlow<List<Float>> = _thisMonthOverallDataUsage
+
+    private val _lastMonthOverallDataUsage = MutableStateFlow<List<Float>>(emptyList())
+    val lastMonthOverallDatalUsage: StateFlow<List<Float>> = _lastMonthOverallDataUsage
 
     private val _networkDataUsage = MutableStateFlow<List<Float>>(emptyList())
     val networkDataUsage: StateFlow<List<Float>> = _networkDataUsage
@@ -52,23 +58,25 @@ class ChartViewmodel @Inject constructor(
 
     private val _appWiseDataUsage = MutableStateFlow<List<Float>>(emptyList())
     val appWiseDataUsage: StateFlow<List<Float>> = _appWiseDataUsage
-    init {
-        viewModelScope.launch(ioDispatcher){
 
+    init {
+        loadThisMonthOverallUsage()
+        loadNetworkUsage(NETWORK_TYPE_CELLULAR)
+        loadLastMonthOverallUsage()
+        loadAppList()
+    }
+
+    fun loadThisMonthOverallUsage() {
+        viewModelScope.launch(ioDispatcher) {
+                val data = getDailyDataUsageBytes(getDailyTimeRanges())
+            _thisMonthOverallDataUsage.emit(data)
         }
     }
 
-    fun loadOverallUsage(
-        page: Int,
-    ) {
+    fun loadLastMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
-            val data = when (page) {
-                0 -> getDailyDataUsageBytes(getDailyTimeRanges())
-                1 -> getDailyDataUsageBytes(getLastMonthStartEndMillis())
-                else -> emptyList()
-            }
-
-            _overallDataUsage.emit(data)
+            val data =getDailyDataUsageBytes(getLastMonthStartEndMillis())
+            _lastMonthOverallDataUsage.emit(data)
         }
     }
 
@@ -92,18 +100,28 @@ class ChartViewmodel @Inject constructor(
         return bytes / (1024f * 1024f)
     }
 
-    fun getDailyDataUsageBytes(range: List<Pair<Long, Long>>): List<Float> {
+    fun loadAppList() {
+        viewModelScope.launch(ioDispatcher) {
+            val (startTime, endTime) = getTimeRange(DATA_USAGE_TODAY)
+            userAppList = dataUsageHelper.getAppDataUsage(startTime, endTime, NetworkCapabilities.TRANSPORT_CELLULAR)
+        }
+    }
 
+    fun onConfirmClick(index: Int) {
+        selectedApp.value =
+            Triple(userAppList!![index].icon!!, userAppList!![index].appName, userAppList!![index].uid)
+        selectedAppIndex.value = index
+        loadAppWiseUsage(userAppList!![selectedAppIndex.value].uid)
+        dialogState.value = false
+    }
+
+    fun getDailyDataUsageBytes(range: List<Pair<Long, Long>>): List<Float> {
         var total = 0L
         val dailyDataUsage = mutableListOf<Long>()
-        //val range = getDailyTimeRanges()
         range.forEach {
             val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
-
             val wifiUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
 
-            Log.d("dudi", "range 1st : ${it.first} , range 2nd: ${it.second}")
-            Log.d("dudi", "sim usage: $simUsage , wifi usage: $wifiUsage")
             dailyDataUsage.add(simUsage + wifiUsage)
             total += (simUsage + wifiUsage)
         }
@@ -208,16 +226,14 @@ class ChartViewmodel @Inject constructor(
     }
 
     fun getAppDataUsage(uid: Int): List<Float> {
+        Log.d("dudi","getting app wise data usage: $uid")
         var total = 0L
         val dailyDataUsage = mutableListOf<Long>()
         val range = getDailyTimeRanges()
         range.forEach {
             val simUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_CELLULAR, uid, it.first, it.second)
-
             val wifiUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_WIFI, uid, it.first, it.second)
 
-            Log.d("dudi", "range 1st : ${it.first} , range 2nd: ${it.second}")
-            Log.d("dudi", "sim usage: $simUsage , wifi usage: $wifiUsage")
             dailyDataUsage.add(simUsage + wifiUsage)
             total += (simUsage + wifiUsage)
         }

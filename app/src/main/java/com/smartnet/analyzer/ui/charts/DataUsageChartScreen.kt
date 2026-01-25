@@ -39,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,13 +48,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,46 +96,71 @@ fun DataUsageChartScreen(
         val modelProducer2 = remember { CartesianChartModelProducer() }
         val modelProducer3 = remember { CartesianChartModelProducer() }
         var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
-        var selectedApp by remember { chartViewmodel.selectedApp }
+
+        val appWiseUsageState by chartViewmodel.appWiseDataUsage.collectAsState()
+        val networkUsageState by chartViewmodel.networkDataUsage.collectAsState()
+        val overallUsageState by chartViewmodel.thisMonthOverallDatalUsage.collectAsState()
+        val lastMonthUsageState by chartViewmodel.lastMonthOverallDatalUsage.collectAsState()
 
         LaunchedEffect(
-                selectedNetwork,
-            selectedApp,
-            pagerState.currentPage
+            appWiseUsageState,
         ) {
-            Log.d("selectedapp","third value: ${selectedApp.third}")
-
-            val overallUsage: List<Float> = when(pagerState.currentPage) {
-                0 -> chartViewmodel.getDailyDataUsageBytes(chartViewmodel.getDailyTimeRanges())
-
-                1 -> chartViewmodel.getDailyDataUsageBytes(chartViewmodel.getLastMonthStartEndMillis())
-
-                else -> emptyList()
-            }
-            modelProducer.runTransaction {
-                columnSeries {
-                    series(overallUsage)
-                }
-            }
-
-            val data: List<Float> = when (selectedNetwork) {
-                NETWORK_TYPE_CELLULAR -> chartViewmodel.updateNetworkUsage(selectedNetwork)
-                NETWORK_TYPE_WIFI -> chartViewmodel.updateNetworkUsage(selectedNetwork)
-                else -> emptyList()
-            }
-
-            modelProducer2.runTransaction {
-                columnSeries {
-                    series(data)
-                }
-            }
-
-            if (selectedApp.third != 0) {
-                val data2 = chartViewmodel.getAppDataUsage(selectedApp.third)
+            Log.d("launched effect","model producer 3 run")
+            if (chartViewmodel.selectedAppIndex.value != -1) {
                 modelProducer3.runTransaction {
                     columnSeries {
-                        series(data2)
+                        series(chartViewmodel.appWiseDataUsage.value)
                     }
+                }
+            }
+        }
+
+        LaunchedEffect(
+            networkUsageState,
+        ) {
+            Log.d("launched effect", "model producer 2 run")
+            if (chartViewmodel.networkDataUsage.value.size != 0) {
+                modelProducer2.runTransaction {
+                    columnSeries {
+                        series(chartViewmodel.networkDataUsage.value)
+                    }
+                }
+            }
+        }
+        LaunchedEffect(
+            overallUsageState
+        ) {
+            Log.d("launched effect", "model producer 1 run")
+            if (chartViewmodel.thisMonthOverallDatalUsage.value.size != 0) {
+                modelProducer.runTransaction {
+                    columnSeries {
+                        series(chartViewmodel.thisMonthOverallDatalUsage.value)
+                    }
+                }
+            }
+        }
+
+        LaunchedEffect(
+            lastMonthUsageState
+        ) {
+            Log.d("launched effect", "model producer 1 run")
+            if (chartViewmodel.lastMonthOverallDatalUsage.value.size != 0) {
+                modelProducer.runTransaction {
+                    columnSeries {
+                        series(chartViewmodel.lastMonthOverallDatalUsage.value)
+                    }
+
+                }
+            }
+        }
+
+        LaunchedEffect(pagerState.currentPage) {
+            when(pagerState.currentPage) {
+                0 -> {
+                    chartViewmodel.loadThisMonthOverallUsage()
+                }
+                1 -> {
+                    chartViewmodel.loadLastMonthOverallUsage()
                 }
             }
         }
@@ -229,11 +253,8 @@ fun DataUsageChartScreen(
                                         .padding(4.dp)
                                         .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
                                         .background(
-                                            color = if (pagerState.currentPage == index)
-                                                Color.White
-                                            else
-                                                Color.Gray,
-                                            shape = CircleShape
+                                            color = if (pagerState.currentPage == index) Color.White
+                                            else Color.Gray, shape = CircleShape
                                         )
                                 )
                             }
@@ -259,7 +280,7 @@ fun DataUsageChartScreen(
                         selected = selectedNetwork,
                         onSelectedChange = {
                             selectedNetwork = it
-                            chartViewmodel.getNetworkType(it)
+                            chartViewmodel.loadNetworkUsage(it)
                         },
                         modifier = Modifier.width(150.dp)
                     )
@@ -287,9 +308,9 @@ fun DataUsageChartScreen(
                     ) {
                         Text(
                             text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
-                                "Total Cellular usage for ${chartViewmodel.overallUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}"
+                                "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}"
                             else
-                                "Total Wifi usage for ${chartViewmodel.overallUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}",
+                                "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}",
                             modifier = Modifier.padding(7.dp),
                             color = white,
                             fontSize = 10.sp,
@@ -381,7 +402,8 @@ fun DataUsageChartScreen(
                                 Icons.Default.KeyboardArrowDown,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.padding(3.dp)
+                            modifier = Modifier
+                                .padding(3.dp)
                                 .clickable {
                                     chartViewmodel.dialogState.value = true
                                 }
@@ -394,13 +416,14 @@ fun DataUsageChartScreen(
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                             textAlign = TextAlign.End,
-                            modifier = Modifier.padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 10.dp)
+                            modifier = Modifier
+                                .padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 10.dp)
                                 .align(Alignment.CenterVertically)
                         )
                     }
                 }
 
-                if (selectedApp.third != 0) {
+                if (chartViewmodel.selectedApp.value.third != 0) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -579,15 +602,13 @@ private fun NetworkOption(
 
 @Composable
 fun DialogInit(
-    chartViewmodel: ChartViewmodel
+    chartViewmodel: ChartViewmodel,
 ) {
     if (chartViewmodel.dialogState.value) {
         AppSelectionDialog(
             chartViewmodel = chartViewmodel,
-            selectedApp = chartViewmodel.userAppList[0].third,
             onConfirm = {
-                chartViewmodel.selectedApp.value = chartViewmodel.userAppList[it]
-                chartViewmodel.dialogState.value = false
+                chartViewmodel.onConfirmClick(chartViewmodel.selectedAppIndex.value)
             },
             onDismiss = {
                 chartViewmodel.dialogState.value = false
@@ -599,11 +620,9 @@ fun DialogInit(
 @Composable
 fun AppSelectionDialog(
     chartViewmodel: ChartViewmodel,
-    selectedApp: Int,
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit
 ) {
-    val selected = remember { chartViewmodel.selectedAppIndex }
     Dialog(onDismissRequest = onDismiss) {
 
         Surface(
@@ -632,17 +651,17 @@ fun AppSelectionDialog(
                         .weight(1f)
                         .padding(horizontal = 8.dp)
                 ) {
-                    items(chartViewmodel.userAppList.size) { app ->
+                    items(chartViewmodel.userAppList!!.size) { index ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                               // .clickable { onAppSelected(app) }
+                                 .clickable { chartViewmodel.selectedAppIndex.value = index }
                                 .padding(vertical = 10.dp, horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = selected.value == app,
-                                onClick = { chartViewmodel.selectedAppIndex.value = app },
+                                selected = chartViewmodel.selectedAppIndex.value == index,
+                                onClick = { chartViewmodel.selectedAppIndex.value = index },
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = Color(0xFF0A66FF),
                                     unselectedColor = Color.Gray
@@ -650,7 +669,7 @@ fun AppSelectionDialog(
                             )
 
                             Text(
-                                text = chartViewmodel.userAppList[app].second,
+                                text = chartViewmodel.userAppList!![index].appName,
                                 color = Color.White,
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(start = 8.dp)
@@ -675,8 +694,8 @@ fun AppSelectionDialog(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     TextButton(
-                        onClick = { onConfirm(selected.value) },
-                        enabled = selectedApp != 0
+                        onClick = { onConfirm(chartViewmodel.selectedAppIndex.value) },
+                        enabled = chartViewmodel.selectedAppIndex.value != -1
                     ) {
                         Text("OK", color = Color(0xFF0A66FF))
                     }

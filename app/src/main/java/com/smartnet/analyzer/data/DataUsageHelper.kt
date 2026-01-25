@@ -61,7 +61,7 @@ class DataUsageHelper @Inject constructor(
                             Process.SYSTEM_UID -> {
                                 appList.add(
                                     AppDataUsage(
-                                        packageName = "",
+                                        uid = uid,
                                         appName = "System and Root",
                                         icon = ContextCompat.getDrawable(
                                             context,
@@ -77,7 +77,7 @@ class DataUsageHelper @Inject constructor(
                             -5 -> {
                                 appList.add(
                                     AppDataUsage(
-                                        packageName = "",
+                                        uid = uid,
                                         appName = "Tethering & Hotspot",
                                         icon = ContextCompat.getDrawable(
                                             context,
@@ -93,7 +93,7 @@ class DataUsageHelper @Inject constructor(
                             -4 -> {
                                 appList.add(
                                     AppDataUsage(
-                                        packageName = "",
+                                        uid = uid,
                                         appName = "Removed UID usage",
                                         icon = ContextCompat.getDrawable(
                                             context,
@@ -123,7 +123,7 @@ class DataUsageHelper @Inject constructor(
 
                         appList.add(
                             AppDataUsage(
-                                packageName = pkg,
+                                uid = uid,
                                 appName = appName,
                                 icon = icon,
                                 rxBytes = bytes.first,

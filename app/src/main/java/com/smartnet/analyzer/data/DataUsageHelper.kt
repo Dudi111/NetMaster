@@ -170,4 +170,32 @@ class DataUsageHelper @Inject constructor(
             return totalUsage
         }
     }
+
+    fun getUidDataUsage(
+        networkType: Int,
+        uid: Int,
+        startTime: Long,
+        endTime: Long
+    ): Long {
+
+        var totalBytes = 0L
+
+        val stats = networkStatsManager!!.queryDetailsForUid(
+            networkType,
+            null,          // ✅ subscriberId MUST be null in user apps
+            startTime,
+            endTime,
+            uid
+        )
+
+        val bucket = NetworkStats.Bucket()
+        while (stats.hasNextBucket()) {
+            stats.getNextBucket(bucket)
+            totalBytes += bucket.rxBytes + bucket.txBytes
+        }
+
+        stats.close()
+
+        return totalBytes
+    }
 }

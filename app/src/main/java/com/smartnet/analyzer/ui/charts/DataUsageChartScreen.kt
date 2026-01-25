@@ -1,11 +1,13 @@
 package com.smartnet.analyzer.ui.charts
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,11 +16,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -27,6 +33,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -81,11 +92,18 @@ fun DataUsageChartScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        val pagerState = rememberPagerState(pageCount = { 2 })
         val modelProducer = remember { CartesianChartModelProducer() }
         val modelProducer2 = remember { CartesianChartModelProducer() }
+        val modelProducer3 = remember { CartesianChartModelProducer() }
         var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
+        var selectedApp by remember { chartViewmodel.selectedApp }
 
-        LaunchedEffect(selectedNetwork) {
+        LaunchedEffect(
+                selectedNetwork,
+            selectedApp
+        ) {
+            Log.d("selectedapp","third value: ${selectedApp.third}")
             modelProducer.runTransaction {
                 columnSeries {
                     series(chartViewmodel.dailyDataUsage)
@@ -103,55 +121,173 @@ fun DataUsageChartScreen(
                     series(data)
                 }
             }
+
+            if (selectedApp.third != 0) {
+                val data2 = chartViewmodel.getAppDataUsage(selectedApp.third)
+                modelProducer3.runTransaction {
+                    columnSeries {
+                        series(data2)
+                    }
+                }
+            }
         }
 
         Header()
 
         LazyColumn {
             item {
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .padding(vertical = 7.dp, horizontal = 7.dp)
                         .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-                    contentAlignment = Alignment.TopCenter
+                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp))
                 ) {
 
-                    Text(
-                        text = "This month usage (wifi + cellular)",
-                        modifier = Modifier.padding(7.dp),
-                        style = MaterialTheme.typography.body1,
-                        color = white,
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Center
-                    )
-                    CartesianChartHost(
-                        chart = rememberCartesianChart(
-                            rememberColumnCartesianLayer(),
-                            startAxis = VerticalAxis.rememberStart(
-                                valueFormatter = { _, value, _ ->
-                                    if (value >= 1024)
-                                        String.format("%.1f GB", value / 1024f)
-                                    else
-                                        "${value.toInt()} MB"
+                    Column {
+
+                        // 🔹 Title (changes with page)
+                        Text(
+                            text = if (pagerState.currentPage == 0)
+                                "This month usage (Wi-Fi + Cellular)"
+                            else
+                                "Last month usage (Wi-Fi + Cellular)",
+                            modifier = Modifier.padding(7.dp),
+                            color = white,
+                            fontSize = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+
+                        // 🔹 Sliding Charts
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(280.dp)
+                        ) { page ->
+
+                            when (page) {
+                                0 -> {
+                                    // ✅ This month chart
+                                    CartesianChartHost(
+                                        chart = rememberCartesianChart(
+                                            rememberColumnCartesianLayer(),
+                                            startAxis = VerticalAxis.rememberStart(
+                                                valueFormatter = { _, value, _ ->
+                                                    if (value >= 1024)
+                                                        String.format("%.1f GB", value / 1024f)
+                                                    else
+                                                        "${value.toInt()} MB"
+                                                }
+                                            ),
+                                            bottomAxis = HorizontalAxis.rememberBottom(
+                                                valueFormatter = { _, value, _ ->
+                                                    "Day ${(value.toInt() + 1)}"
+                                                }
+                                            )
+                                        ),
+                                        modelProducer = modelProducer,
+                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+                                        modifier = Modifier.fillMaxSize()
+                                    )
                                 }
-                            ),
-                            bottomAxis = HorizontalAxis.rememberBottom(
-                                valueFormatter = { _, value, _ ->
-                                    "Day ${(value.toInt() + 1)}"
+
+                                1 -> {
+                                    // ✅ Last month chart
+                                    CartesianChartHost(
+                                        chart = rememberCartesianChart(
+                                            rememberColumnCartesianLayer(),
+                                            startAxis = VerticalAxis.rememberStart(
+                                                valueFormatter = { _, value, _ ->
+                                                    if (value >= 1024)
+                                                        String.format("%.1f GB", value / 1024f)
+                                                    else
+                                                        "${value.toInt()} MB"
+                                                }
+                                            ),
+                                            bottomAxis = HorizontalAxis.rememberBottom(
+                                                valueFormatter = { _, value, _ ->
+                                                    "Day ${(value.toInt() + 1)}"
+                                                }
+                                            )
+                                        ),
+                                        modelProducer = modelProducer,
+                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+                                        modifier = Modifier.fillMaxSize()
+                                    )
                                 }
-                            )
-                        ),
-                        modelProducer = modelProducer,
-                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(280.dp)
-                            .padding(top = 20.dp)
-                    )
+                            }
+                        }
+
+                        // 🔹 Pager Indicator (Dots)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            repeat(2) { index ->
+                                Box(
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
+                                        .background(
+                                            color = if (pagerState.currentPage == index)
+                                                Color.White
+                                            else
+                                                Color.Gray,
+                                            shape = CircleShape
+                                        )
+                                )
+                            }
+                        }
+                    }
                 }
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                        .padding(vertical = 7.dp, horizontal = 7.dp)
+//                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+//                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+//                    contentAlignment = Alignment.TopCenter
+//                ) {
+//
+//                    Text(
+//                        text = "This month usage (wifi + cellular)",
+//                        modifier = Modifier.padding(7.dp),
+//                        style = MaterialTheme.typography.body1,
+//                        color = white,
+//                        fontSize = 10.sp,
+//                        textAlign = TextAlign.Center
+//                    )
+//                    CartesianChartHost(
+//                        chart = rememberCartesianChart(
+//                            rememberColumnCartesianLayer(),
+//                            startAxis = VerticalAxis.rememberStart(
+//                                valueFormatter = { _, value, _ ->
+//                                    if (value >= 1024)
+//                                        String.format("%.1f GB", value / 1024f)
+//                                    else
+//                                        "${value.toInt()} MB"
+//                                }
+//                            ),
+//                            bottomAxis = HorizontalAxis.rememberBottom(
+//                                valueFormatter = { _, value, _ ->
+//                                    "Day ${(value.toInt() + 1)}"
+//                                }
+//                            )
+//                        ),
+//                        modelProducer = modelProducer,
+//                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(280.dp)
+//                            .padding(top = 20.dp)
+//                    )
+//                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -278,22 +414,62 @@ fun DataUsageChartScreen(
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.padding(3.dp)
+                                .clickable {
+                                    chartViewmodel.dialogState.value = true
+                                }
                         )
 
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "Total:",
+                            text = "Total: ${chartViewmodel.appWiseTotalUsage.value}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                             textAlign = TextAlign.End,
-                            modifier = Modifier.padding(5.dp)
+                            modifier = Modifier.padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 10.dp)
                                 .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
+
+                if (selectedApp.third != 0) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(vertical = 7.dp, horizontal = 7.dp)
+                            .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+                            .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+                    ) {
+                        CartesianChartHost(
+                            chart = rememberCartesianChart(
+                                rememberColumnCartesianLayer(),
+                                startAxis = VerticalAxis.rememberStart(
+                                    valueFormatter = { _, value, _ ->
+                                        if (value >= 1024)
+                                            String.format("%.1f GB", value / 1024f)
+                                        else
+                                            "${value.toInt()} MB"
+                                    }
+                                ),
+                                bottomAxis = HorizontalAxis.rememberBottom(
+                                    valueFormatter = { _, value, _ ->
+                                        "Day ${(value.toInt() + 1)}"
+                                    }
+                                )
+                            ),
+                            modelProducer = modelProducer3,
+                            scrollState = rememberVicoScrollState(scrollEnabled = false),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(280.dp)
+                                .padding(top = 10.dp)
                         )
                     }
                 }
             }
         }
+        DialogInit(chartViewmodel)
     }
 }
 
@@ -367,5 +543,114 @@ private fun NetworkOption(
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+@Composable
+fun DialogInit(
+    chartViewmodel: ChartViewmodel
+) {
+    if (chartViewmodel.dialogState.value) {
+        AppSelectionDialog(
+            chartViewmodel = chartViewmodel,
+            selectedApp = chartViewmodel.userAppList[0].third,
+            onConfirm = {
+                chartViewmodel.selectedApp.value = chartViewmodel.userAppList[it]
+                chartViewmodel.dialogState.value = false
+            },
+            onDismiss = {
+                chartViewmodel.dialogState.value = false
+            }
+        )
+    }
+}
+
+@Composable
+fun AppSelectionDialog(
+    chartViewmodel: ChartViewmodel,
+    selectedApp: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    val selected = remember { chartViewmodel.selectedAppIndex }
+    Dialog(onDismissRequest = onDismiss) {
+
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = Color(0xFF1E1E1E),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 500.dp) // 🔑 makes dialog scrollable
+        ) {
+            Column {
+
+                // 🔹 Title
+                Text(
+                    text = "Select App",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                Divider(color = Color.Gray.copy(alpha = 0.4f))
+
+                // 🔹 Scrollable App List
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                ) {
+                    items(chartViewmodel.userAppList.size) { app ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                               // .clickable { onAppSelected(app) }
+                                .padding(vertical = 10.dp, horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = selected.value == app,
+                                onClick = { chartViewmodel.selectedAppIndex.value = app },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = Color(0xFF0A66FF),
+                                    unselectedColor = Color.Gray
+                                )
+                            )
+
+                            Text(
+                                text = chartViewmodel.userAppList[app].second,
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    }
+                }
+
+                Divider(color = Color.Gray.copy(alpha = 0.4f))
+
+                // 🔹 Buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel", color = Color.Gray)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    TextButton(
+                        onClick = { onConfirm(selected.value) },
+                        enabled = selectedApp != 0
+                    ) {
+                        Text("OK", color = Color(0xFF0A66FF))
+                    }
+                }
+            }
+        }
     }
 }

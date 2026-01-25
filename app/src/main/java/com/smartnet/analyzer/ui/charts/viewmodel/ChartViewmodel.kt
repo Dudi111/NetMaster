@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.data.DataUsageHelper
+import com.smartnet.analyzer.data.MonthlyUsage
 import com.smartnet.analyzer.utils.Constants.DATA_USAGE_TODAY
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.GlobalFunctions.getTimeRange
@@ -38,8 +40,8 @@ class ChartViewmodel @Inject constructor(
 ): ViewModel() {
 
     var dialogState = mutableStateOf(false)
-    var overallUsageDetail = mutableStateOf(Pair("", ""))
-    var networkUsageDetail = mutableStateOf(Pair("", ""))
+    var overallUsageDetail = mutableStateOf(MonthlyUsage("",""))
+    var networkUsageDetail = mutableStateOf(MonthlyUsage("",""))
     var selectedApp = mutableStateOf(Triple(ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!, second = "Select app", third = 0))
     var selectedAppIndex = mutableStateOf(-1)
     var userAppList: List<AppDataUsage>? = null
@@ -125,43 +127,35 @@ class ChartViewmodel @Inject constructor(
             dailyDataUsage.add(simUsage + wifiUsage)
             total += (simUsage + wifiUsage)
         }
-            getMonthYearFromMillis(range.first().first, total)
+            getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
             return dailyDataUsage.map { bytesToMb(it) }
     }
 
-    fun getMonthYearFromMillis(timeInMillis: Long, total: Long) {
+    fun getMonthYearFromMillis(timeInMillis: Long, total: Long, state: MutableState<MonthlyUsage>) {
         val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
         val month =  Instant.ofEpochMilli(timeInMillis)
             .atZone(ZoneId.systemDefault())
             .format(formatter)
 
         val usage = formatBytes(total)
-        overallUsageDetail.value = Pair(month, usage)
+        state.value = MonthlyUsage(month, usage)
     }
 
     fun getNetworkType(networkType: String): List<Float> {
         var total = 0L
-        return if (networkType == NETWORK_TYPE_CELLULAR) {
-            val cellUsage = mutableListOf<Long>()
-            val range = getDailyTimeRanges()
+        val range = getDailyTimeRanges()
+        val usage = mutableListOf<Long>()
             range.forEach {
-                val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
-                total += simUsage
-                cellUsage.add(simUsage)
+                    val networkUsage = dataUsageHelper.getDayWiseDataUsage(
+                        startTime = it.first,
+                        endTime = it.second,
+                        networkType = if (networkType == NETWORK_TYPE_CELLULAR) NetworkCapabilities.TRANSPORT_CELLULAR else NetworkCapabilities.TRANSPORT_WIFI
+                    )
+                    total += networkUsage
+                usage.add(networkUsage)
             }
-            networkUsage.value = formatBytes(total)
-            cellUsage.map { bytesToMb(it) }
-        } else {
-            val wifiUsage = mutableListOf<Long>()
-            val range = getDailyTimeRanges()
-            range.forEach {
-                val usage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
-                total += usage
-                wifiUsage.add(usage)
-            }
-            networkUsage.value = formatBytes(total)
-            wifiUsage.map { bytesToMb(it) }
-        }
+        getMonthYearFromMillis(range.first().first, total, networkUsageDetail)
+        return usage.map { bytesToMb(it) }
     }
 
 

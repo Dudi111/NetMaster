@@ -308,9 +308,9 @@ fun DataUsageChartScreen(
                     ) {
                         Text(
                             text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
-                                "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}"
+                                "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}"
                             else
-                                "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.first}: ${chartViewmodel.networkUsage.value}",
+                                "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}",
                             modifier = Modifier.padding(7.dp),
                             color = white,
                             fontSize = 10.sp,
@@ -476,7 +476,7 @@ fun Header(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = chartViewmodel.overallUsageDetail.value.first,
+            text = chartViewmodel.overallUsageDetail.value.month,
             modifier = Modifier.padding(top = 50.dp, bottom = 5.dp),
             style = MaterialTheme.typography.h6
         )
@@ -497,7 +497,7 @@ fun Header(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = chartViewmodel.overallUsageDetail.value.second,
+                    text = chartViewmodel.overallUsageDetail.value.total,
                     modifier = Modifier.padding(top= 10.dp),
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,

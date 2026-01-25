@@ -177,25 +177,24 @@ class DataUsageHelper @Inject constructor(
         startTime: Long,
         endTime: Long
     ): Long {
-
         var totalBytes = 0L
 
-        val stats = networkStatsManager!!.queryDetailsForUid(
+        val stats = networkStatsManager!!.querySummary(
             networkType,
-            null,          // ✅ subscriberId MUST be null in user apps
+            null,
             startTime,
             endTime,
-            uid
         )
 
         val bucket = NetworkStats.Bucket()
         while (stats.hasNextBucket()) {
             stats.getNextBucket(bucket)
-            totalBytes += bucket.rxBytes + bucket.txBytes
+            val uid1 = bucket.uid
+            if (uid1 == uid) {
+                totalBytes += bucket.rxBytes + bucket.txBytes
+            }
         }
-
         stats.close()
-
         return totalBytes
     }
 }

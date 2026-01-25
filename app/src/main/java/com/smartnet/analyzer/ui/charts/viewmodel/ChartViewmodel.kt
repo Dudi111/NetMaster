@@ -1,9 +1,6 @@
 package com.smartnet.analyzer.ui.charts.viewmodel
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -17,6 +14,7 @@ import com.smartnet.analyzer.data.DataUsageHelper
 import com.smartnet.analyzer.data.MonthlyUsage
 import com.smartnet.analyzer.utils.Constants.DATA_USAGE_TODAY
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
+import com.smartnet.analyzer.utils.GlobalFunctions.formatBytes
 import com.smartnet.analyzer.utils.GlobalFunctions.getTimeRange
 import com.smartnet.analyzer.utils.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +27,9 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,7 +46,6 @@ class ChartViewmodel @Inject constructor(
     var selectedAppIndex = mutableStateOf(-1)
     var userAppList: List<AppDataUsage>? = null
     var appWiseTotalUsage = mutableStateOf("0")
-    var networkUsage = mutableStateOf("0")
 
     private val _thisMonthOverallDataUsage = MutableStateFlow<List<Float>>(emptyList())
     val thisMonthOverallDatalUsage: StateFlow<List<Float>> = _thisMonthOverallDataUsage
@@ -194,7 +193,9 @@ class ChartViewmodel @Inject constructor(
         var total = 0L
         val dailyDataUsage = mutableListOf<Long>()
         val range = getDailyTimeRanges()
+
         range.forEach {
+            Log.d("dudi","range start: ${it.first} , end range: ${it.second}")
             val simUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_CELLULAR, uid, it.first, it.second)
             val wifiUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_WIFI, uid, it.first, it.second)
 
@@ -203,21 +204,6 @@ class ChartViewmodel @Inject constructor(
         }
         appWiseTotalUsage.value = formatBytes(total)
         return dailyDataUsage.map { bytesToMb(it) }
-    }
-
-    fun formatBytes(bytes: Long): String {
-        if (bytes <= 0) return "0 B"
-
-        val kb = 1024.0
-        val mb = kb * 1024
-        val gb = mb * 1024
-
-        return when {
-            bytes >= gb -> String.format("%.2f GB", bytes / gb)
-            bytes >= mb -> String.format("%.2f MB", bytes / mb)
-            bytes >= kb -> String.format("%.2f KB", bytes / kb)
-            else -> "$bytes B"
-        }
     }
 
     fun getLastMonthStartEndMillis(): List<Pair<Long, Long>> {
@@ -255,5 +241,15 @@ class ChartViewmodel @Inject constructor(
         }
 
         return ranges
+    }
+
+    fun getCurrentMonthShortName(
+        millis: Long = System.currentTimeMillis()
+    ): String {
+        val locale: Locale = Locale.getDefault()
+        return Instant.ofEpochMilli(millis)
+            .atZone(ZoneId.systemDefault())
+            .month
+            .getDisplayName(TextStyle.SHORT, locale)
     }
 }

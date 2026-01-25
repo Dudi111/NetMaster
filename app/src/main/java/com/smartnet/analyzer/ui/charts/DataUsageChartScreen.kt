@@ -76,6 +76,8 @@ import com.smartnet.analyzer.common.theme.white
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -119,7 +121,7 @@ fun DataUsageChartScreen(
             networkUsageState,
         ) {
             Log.d("launched effect", "model producer 2 run")
-            if (chartViewmodel.networkDataUsage.value.size != 0) {
+            if (chartViewmodel.networkDataUsage.value.isNotEmpty()) {
                 modelProducer2.runTransaction {
                     columnSeries {
                         series(chartViewmodel.networkDataUsage.value)
@@ -131,7 +133,7 @@ fun DataUsageChartScreen(
             overallUsageState
         ) {
             Log.d("launched effect", "model producer 1 run")
-            if (chartViewmodel.thisMonthOverallDatalUsage.value.size != 0) {
+            if (chartViewmodel.thisMonthOverallDatalUsage.value.isNotEmpty()) {
                 modelProducer.runTransaction {
                     columnSeries {
                         series(chartViewmodel.thisMonthOverallDatalUsage.value)
@@ -144,7 +146,7 @@ fun DataUsageChartScreen(
             lastMonthUsageState
         ) {
             Log.d("launched effect", "model producer 1 run")
-            if (chartViewmodel.lastMonthOverallDatalUsage.value.size != 0) {
+            if (chartViewmodel.lastMonthOverallDatalUsage.value.isNotEmpty()) {
                 modelProducer.runTransaction {
                     columnSeries {
                         series(chartViewmodel.lastMonthOverallDatalUsage.value)
@@ -189,7 +191,7 @@ fun DataUsageChartScreen(
 
                             when (page) {
                                 0 -> {
-                                    // ✅ This month chart
+                                    // This month chart
                                     CartesianChartHost(
                                         chart = rememberCartesianChart(
                                             rememberColumnCartesianLayer(),
@@ -203,7 +205,7 @@ fun DataUsageChartScreen(
                                             ),
                                             bottomAxis = HorizontalAxis.rememberBottom(
                                                 valueFormatter = { _, value, _ ->
-                                                    "Day ${(value.toInt() + 1)}"
+                                                    "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                                                 }
                                             )
                                         ),
@@ -214,7 +216,7 @@ fun DataUsageChartScreen(
                                 }
 
                                 1 -> {
-                                    // ✅ Last month chart
+                                    // Last month chart
                                     CartesianChartHost(
                                         chart = rememberCartesianChart(
                                             rememberColumnCartesianLayer(),
@@ -228,7 +230,14 @@ fun DataUsageChartScreen(
                                             ),
                                             bottomAxis = HorizontalAxis.rememberBottom(
                                                 valueFormatter = { _, value, _ ->
-                                                    "Day ${(value.toInt() + 1)}"
+                                                    "${chartViewmodel.getCurrentMonthShortName(
+                                                        ZonedDateTime.now()
+                                                            .minusMonths(1)
+                                                            .withDayOfMonth(1)
+                                                            .toLocalDate()
+                                                            .atStartOfDay(ZoneId.systemDefault())
+                                                            .toInstant()
+                                                            .toEpochMilli())} ${(value.toInt() + 1)}"
                                                 }
                                             )
                                         ),
@@ -330,7 +339,7 @@ fun DataUsageChartScreen(
                                 ),
                                 bottomAxis = HorizontalAxis.rememberBottom(
                                     valueFormatter = { _, value, _ ->
-                                        "Day ${(value.toInt() + 1)}"
+                                        "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                                     }
                                 )
                             ),
@@ -445,7 +454,7 @@ fun DataUsageChartScreen(
                                 ),
                                 bottomAxis = HorizontalAxis.rememberBottom(
                                     valueFormatter = { _, value, _ ->
-                                        "Day ${(value.toInt() + 1)}"
+                                        "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                                     }
                                 )
                             ),
@@ -454,7 +463,7 @@ fun DataUsageChartScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(280.dp)
-                                .padding(top = 10.dp)
+                                .padding(top = 10.dp, bottom = 10.dp)
                         )
                     }
                 }

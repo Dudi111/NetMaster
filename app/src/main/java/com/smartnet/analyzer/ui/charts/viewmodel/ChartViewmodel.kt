@@ -194,36 +194,6 @@ class ChartViewmodel @Inject constructor(
         return ranges
     }
 
-    fun getUserInstalledApps(context: Context): List<Triple<Drawable, String, Int>> {
-        val pm = context.packageManager
-        val apps = mutableListOf<Triple<Drawable, String, Int>>()
-        apps.add(Triple(ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!, second = "Select app", third = 0))
-
-        val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-
-        for (appInfo in installedApps) {
-
-            // ❌ Exclude system apps
-            if ((appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) continue
-
-            // Optional: Exclude updated system apps
-            if ((appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) continue
-
-            val appName = pm.getApplicationLabel(appInfo).toString()
-            val icon = pm.getApplicationIcon(appInfo)
-            val uid = appInfo.uid
-
-            apps.add(
-                Triple(
-                    first = icon,
-                    second = appName,
-                    third = uid,
-                )
-            )
-        }
-
-        return apps.sortedBy { it.second.lowercase() }
-    }
 
     fun getAppDataUsage(uid: Int): List<Float> {
         Log.d("dudi","getting app wise data usage: $uid")

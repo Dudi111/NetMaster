@@ -63,12 +63,17 @@ import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.common.Fill
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
@@ -192,9 +197,17 @@ fun DataUsageChartScreen(
                             when (page) {
                                 0 -> {
                                     // This month chart
+
                                     CartesianChartHost(
                                         chart = rememberCartesianChart(
-                                            rememberColumnCartesianLayer(),
+                                            rememberLineCartesianLayer(
+                                                lineProvider = LineCartesianLayer.LineProvider.series(
+                                                    LineCartesianLayer.Line(
+                                                        fill = LineCartesianLayer.LineFill.single(
+                                                            fill(Color.Blue))
+                                                    )
+                                                )
+                                            ),
                                             startAxis = VerticalAxis.rememberStart(
                                                 valueFormatter = { _, value, _ ->
                                                     if (value >= 1024)
@@ -213,6 +226,29 @@ fun DataUsageChartScreen(
                                         scrollState = rememberVicoScrollState(scrollEnabled = false),
                                         modifier = Modifier.fillMaxSize()
                                     )
+
+
+//                                    CartesianChartHost(
+//                                        chart = rememberCartesianChart(
+//                                            rememberColumnCartesianLayer(),
+//                                            startAxis = VerticalAxis.rememberStart(
+//                                                valueFormatter = { _, value, _ ->
+//                                                    if (value >= 1024)
+//                                                        String.format("%.1f GB", value / 1024f)
+//                                                    else
+//                                                        "${value.toInt()} MB"
+//                                                }
+//                                            ),
+//                                            bottomAxis = HorizontalAxis.rememberBottom(
+//                                                valueFormatter = { _, value, _ ->
+//                                                    "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+//                                                }
+//                                            )
+//                                        ),
+//                                        modelProducer = modelProducer,
+//                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+//                                        modifier = Modifier.fillMaxSize()
+//                                    )
                                 }
 
                                 1 -> {

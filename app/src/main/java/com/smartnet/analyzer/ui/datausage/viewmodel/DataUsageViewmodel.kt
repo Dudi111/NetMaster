@@ -46,6 +46,8 @@ class DataUsageViewmodel @Inject constructor(
     var totalUsage by mutableStateOf("")
         private set
 
+
+
     fun updateTotalUsage() {
         val totalBytes = dataList.sumOf { it.totalBytes }
         totalUsage = formatBytes(totalBytes)

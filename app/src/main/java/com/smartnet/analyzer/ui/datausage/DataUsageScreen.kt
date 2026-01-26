@@ -86,6 +86,8 @@ fun DataUsageScreen(
     }
 }
 
+
+
 @Composable
 fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmodel) {
     Spacer(Modifier.height(15.dp))

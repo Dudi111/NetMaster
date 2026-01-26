@@ -5,9 +5,12 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.data.DataUsageHelper
@@ -60,6 +63,8 @@ class ChartViewmodel @Inject constructor(
     private val _appWiseDataUsage = MutableStateFlow<List<Float>>(emptyList())
     val appWiseDataUsage: StateFlow<List<Float>> = _appWiseDataUsage
 
+    val modelProducer = CartesianChartModelProducer()
+
     init {
         loadThisMonthOverallUsage()
         loadNetworkUsage(NETWORK_TYPE_CELLULAR)
@@ -70,6 +75,11 @@ class ChartViewmodel @Inject constructor(
     fun loadThisMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
                 val data = getDailyDataUsageBytes(getDailyTimeRanges())
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(data)
+                }
+            }
             _thisMonthOverallDataUsage.emit(data)
         }
     }

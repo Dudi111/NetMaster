@@ -50,12 +50,6 @@ class ChartViewmodel @Inject constructor(
     var userAppList: List<AppDataUsage>? = null
     var appWiseTotalUsage = mutableStateOf("0")
 
-    private val _thisMonthOverallDataUsage = MutableStateFlow<List<Float>>(emptyList())
-    val thisMonthOverallDatalUsage: StateFlow<List<Float>> = _thisMonthOverallDataUsage
-
-    private val _lastMonthOverallDataUsage = MutableStateFlow<List<Float>>(emptyList())
-    val lastMonthOverallDatalUsage: StateFlow<List<Float>> = _lastMonthOverallDataUsage
-
     private val _networkDataUsage = MutableStateFlow<List<Float>>(emptyList())
     val networkDataUsage: StateFlow<List<Float>> = _networkDataUsage
 
@@ -80,14 +74,17 @@ class ChartViewmodel @Inject constructor(
                     series(data)
                 }
             }
-            _thisMonthOverallDataUsage.emit(data)
         }
     }
 
     fun loadLastMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
             val data =getDailyDataUsageBytes(getLastMonthStartEndMillis())
-            _lastMonthOverallDataUsage.emit(data)
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(data)
+                }
+            }
         }
     }
 

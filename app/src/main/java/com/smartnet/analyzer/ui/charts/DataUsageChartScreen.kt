@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -77,409 +78,841 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @SuppressLint("DefaultLocale")
+//@Composable
+//fun DataUsageChartScreen(
+//    chartViewmodel: ChartViewmodel = hiltViewModel()
+//) {
+//
+//    var expanded by remember { mutableStateOf(false) }
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(DarkGradient),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//
+//        val pagerState = rememberPagerState(pageCount = { 2 })
+//        var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
+//
+//        LaunchedEffect(pagerState.currentPage) {
+//            when (pagerState.currentPage) {
+//                0 -> {
+//                    chartViewmodel.getMonthYearFromMillis(
+//                        System.currentTimeMillis(),
+//                        chartViewmodel.thisMonthTotalUsage,
+//                        chartViewmodel.overallUsageDetail
+//                    )
+//                }
+//
+//                1 -> {
+//                    chartViewmodel.getMonthYearFromMillis(
+//                        ZonedDateTime.now().minusMonths(1).withDayOfMonth(1)
+//                            .toInstant().toEpochMilli(),
+//                        chartViewmodel.lastMonthTotalUsage,
+//                        chartViewmodel.overallUsageDetail
+//                    )
+//                }
+//            }
+//        }
+//
+//        LazyColumn {
+//            item {
+//                Header(chartViewmodel)
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                        .padding(vertical = 7.dp, horizontal = 7.dp)
+//                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+//                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp))
+//                ) {
+//
+//                    Column {
+//
+//                        //Sliding Charts
+//                        HorizontalPager(
+//                            state = pagerState,
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(280.dp)
+//                        ) { page ->
+//
+//                            when (page) {
+//                                0 -> {
+//                                    // This month chart
+//                                    CartesianChartHost(
+//                                        chart = rememberCartesianChart(
+//                                            rememberLineCartesianLayer(
+//                                                lineProvider = LineCartesianLayer.LineProvider.series(
+//                                                    LineCartesianLayer.Line(
+//                                                        fill = LineCartesianLayer.LineFill.single(
+//                                                            fill(Color(0xFF1E88E5)) // Material Blue 600
+//                                                        ),
+//                                                        areaFill = LineCartesianLayer.AreaFill.single(
+//                                                            fill(Color(0xFF1E88E5).copy(alpha = 0.15f))
+//                                                        ),
+//                                                        pointConnector = LineCartesianLayer.PointConnector.cubic(),
+//                                                    )
+//                                                )
+//                                            ),
+//
+//                                            // ─── Vertical axis ───
+//                                            startAxis = VerticalAxis.rememberStart(
+//                                                itemPlacer = VerticalAxis.ItemPlacer.step(
+//                                                    step = { 256.0 } // nice MB steps
+//                                                ),
+//                                                valueFormatter = { _, value, _ ->
+//                                                    when {
+//                                                        value >= 1024f -> String.format(
+//                                                            "%.0f GB",
+//                                                            value / 1024f
+//                                                        )
+//
+//                                                        value > 0f -> "${value.toInt()} MB"
+//                                                        else -> "0"
+//                                                    }
+//                                                },
+//                                                guideline = null
+//                                            ),
+//
+//                                            // ─── Bottom axis ───
+//                                            bottomAxis = HorizontalAxis.rememberBottom(
+//                                                labelRotationDegrees = 0f,
+//                                                // itemPlacer = HorizontalAxis.ItemPlacer.step(1),
+//                                                valueFormatter = { _, value, _ ->
+//                                                    "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+//                                                }
+//                                            )
+//                                        ),
+//
+//                                        modelProducer = chartViewmodel.thisMonthModelProducer,
+//                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+//
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .height(260.dp)
+//                                    )
+//                                }
+//
+//                                1 -> {
+//                                    // Last month chart
+//                                    CartesianChartHost(
+//                                        chart = rememberCartesianChart(
+//                                            rememberLineCartesianLayer(
+//                                                lineProvider = LineCartesianLayer.LineProvider.series(
+//                                                    LineCartesianLayer.Line(
+//                                                        fill = LineCartesianLayer.LineFill.single(
+//                                                            fill(Color(0xFF1E88E5)) // Material Blue 600
+//                                                        ),
+//                                                        areaFill = LineCartesianLayer.AreaFill.single(
+//                                                            fill(Color(0xFF1E88E5).copy(alpha = 0.15f))
+//                                                        ),
+//                                                        pointConnector = LineCartesianLayer.PointConnector.cubic(),
+//                                                    )
+//                                                )
+//                                            ),
+//
+//                                            // ─── Vertical axis ───
+//                                            startAxis = VerticalAxis.rememberStart(
+//                                                itemPlacer = VerticalAxis.ItemPlacer.step(
+//                                                    step = { 256.0 } // nice MB steps
+//                                                ),
+//                                                valueFormatter = { _, value, _ ->
+//                                                    when {
+//                                                        value >= 1024f -> String.format("%.0f GB", value / 1024f)
+//                                                        value > 0f -> "${value.toInt()} MB"
+//                                                        else -> "0"
+//                                                    }
+//                                                },
+//                                                guideline = null // cleaner look
+//                                            ),
+//
+//                                            // ─── Bottom axis ───
+//                                            bottomAxis = HorizontalAxis.rememberBottom(
+//                                                labelRotationDegrees = 0f,
+//                                                // itemPlacer = HorizontalAxis.ItemPlacer.step(1),
+//                                                valueFormatter = { _, value, _ ->
+//                                                    "${
+//                                                        chartViewmodel.getCurrentMonthShortName(
+//                                                            ZonedDateTime.now()
+//                                                                .minusMonths(1)
+//                                                                .withDayOfMonth(1)
+//                                                                .toLocalDate()
+//                                                                .atStartOfDay(ZoneId.systemDefault())
+//                                                                .toInstant()
+//                                                                .toEpochMilli()
+//                                                        )
+//                                                    } ${(value.toInt() + 1)}"
+//                                                }
+//                                            )
+//                                        ),
+//
+//                                        modelProducer = chartViewmodel.lastMonthModelProducer,
+//                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
+//
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .height(260.dp)
+//                                    )
+//                                }
+//                            }
+//                        }
+//
+//                        // 🔹 Pager Indicator (Dots)
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(bottom = 8.dp, top = 10.dp),
+//                            horizontalArrangement = Arrangement.Center
+//                        ) {
+//                            repeat(2) { index ->
+//                                Box(
+//                                    modifier = Modifier
+//                                        .padding(4.dp)
+//                                        .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
+//                                        .background(
+//                                            color = if (pagerState.currentPage == index) Color.White
+//                                            else Color.Gray, shape = CircleShape
+//                                        )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 10.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//
+//                    HorizontalDivider(
+//                        modifier = Modifier.weight(1f),
+//                        thickness = 1.dp,
+//                        color = Color.White.copy(alpha = 0.3f)
+//                    )
+//
+//                    Spacer(modifier = Modifier.width(10.dp))
+//
+//                    NetworkSwitcher(
+//                        selected = selectedNetwork,
+//                        onSelectedChange = {
+//                            selectedNetwork = it
+//                            chartViewmodel.loadNetworkUsage(it)
+//                        },
+//                        modifier = Modifier.width(150.dp)
+//                    )
+//
+//                    Spacer(modifier = Modifier.width(10.dp))
+//
+//                    HorizontalDivider(
+//                        modifier = Modifier.weight(1f),
+//                        thickness = 1.dp,
+//                        color = Color.White.copy(alpha = 0.3f)
+//                    )
+//                }
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                        .padding(vertical = 7.dp, horizontal = 7.dp)
+//                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+//                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+//                ) {
+//
+//                    Column(
+//                        modifier = Modifier.fillMaxSize()
+//                    ) {
+//                        Text(
+//                            text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
+//                                "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}"
+//                            else
+//                                "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}",
+//                            modifier = Modifier.padding(7.dp),
+//                            color = white,
+//                            fontSize = 10.sp,
+//                            textAlign = TextAlign.Center
+//                        )
+//
+//                        CartesianChartHost(
+//                            chart = rememberCartesianChart(
+//                                rememberColumnCartesianLayer(),
+//                                startAxis = VerticalAxis.rememberStart(
+//                                    valueFormatter = { _, value, _ ->
+//                                        if (value >= 1024)
+//                                            String.format("%.1f GB", value / 1024f)
+//                                        else
+//                                            "${value.toInt()} MB"
+//                                    }
+//                                ),
+//                                bottomAxis = HorizontalAxis.rememberBottom(
+//                                    valueFormatter = { _, value, _ ->
+//                                        "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+//                                    }
+//                                )
+//                            ),
+//                            modelProducer = chartViewmodel.networkWiseModelProducer,
+//                            scrollState = rememberVicoScrollState(scrollEnabled = false),
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(280.dp)
+//                                .padding(top = 10.dp)
+//                        )
+//                    }
+//                }
+//
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(top = 15.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(
+//                        text = "App data usage",
+//                        color = Color.White,
+//                        fontSize = 12.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        modifier = Modifier.padding(end = 10.dp)
+//                    )
+//
+//                    HorizontalDivider(
+//                        modifier = Modifier.weight(1f),
+//                        thickness = 1.dp,
+//                        color = Color.White.copy(alpha = 0.3f)
+//                    )
+//                }
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                        .padding(vertical = 7.dp, horizontal = 7.dp)
+//                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+//                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+//                ) {
+//                    Row(
+//                        modifier = Modifier.fillMaxSize(),
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Image(
+//                            painter = chartViewmodel.selectedApp.value.first.let {
+//                                BitmapPainter(it.toBitmap().asImageBitmap())
+//                            },
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .size(40.dp)
+//                                .padding(5.dp)
+//                        )
+//
+//                        Text(
+//                            text = chartViewmodel.selectedApp.value.second,
+//                            fontSize = 14.sp,
+//                            fontWeight = FontWeight.Bold,
+//                            color = Color.White,
+//                            modifier = Modifier.padding( start = 5.dp)
+//                        )
+//
+//                        Icon(
+//                            imageVector = if (expanded)
+//                                Icons.Default.KeyboardArrowUp
+//                            else
+//                                Icons.Default.KeyboardArrowDown,
+//                            contentDescription = null,
+//                            tint = Color.White,
+//                            modifier = Modifier
+//                                .padding(3.dp)
+//                                .clickable {
+//                                    chartViewmodel.dialogState.value = true
+//                                }
+//                        )
+//
+//                        Spacer(modifier = Modifier.weight(1f))
+//                        Text(
+//                            text = "Total: ${chartViewmodel.appWiseTotalUsage.value}",
+//                            fontSize = 14.sp,
+//                            fontWeight = FontWeight.Bold,
+//                            color = Color.White,
+//                            textAlign = TextAlign.End,
+//                            modifier = Modifier
+//                                .padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 10.dp)
+//                                .align(Alignment.CenterVertically)
+//                        )
+//                    }
+//                }
+//
+//                if (chartViewmodel.selectedApp.value.third != 0) {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .wrapContentHeight()
+//                            .padding(vertical = 7.dp, horizontal = 7.dp)
+//                            .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
+//                            .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
+//                    ) {
+//                        CartesianChartHost(
+//                            chart = rememberCartesianChart(
+//                                rememberColumnCartesianLayer(),
+//                                startAxis = VerticalAxis.rememberStart(
+//                                    valueFormatter = { _, value, _ ->
+//                                        if (value >= 1024)
+//                                            String.format("%.1f GB", value / 1024f)
+//                                        else
+//                                            "${value.toInt()} MB"
+//                                    }
+//                                ),
+//                                bottomAxis = HorizontalAxis.rememberBottom(
+//                                    valueFormatter = { _, value, _ ->
+//                                        "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+//                                    }
+//                                )
+//                            ),
+//                            modelProducer = chartViewmodel.appWiseModelProducer,
+//                            scrollState = rememberVicoScrollState(scrollEnabled = false),
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(280.dp)
+//                                .padding(top = 10.dp, bottom = 10.dp)
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//        DialogInit(chartViewmodel)
+//    }
+//}
+
 @Composable
 fun DataUsageChartScreen(
     chartViewmodel: ChartViewmodel = hiltViewModel()
 ) {
-
     var expanded by remember { mutableStateOf(false) }
+    var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
+    val pagerState = rememberPagerState(pageCount = { 2 })
+
+    LaunchedEffect(pagerState.currentPage) {
+        when (pagerState.currentPage) {
+            0 -> {
+                chartViewmodel.getMonthYearFromMillis(
+                    System.currentTimeMillis(),
+                    chartViewmodel.thisMonthTotalUsage,
+                    chartViewmodel.overallUsageDetail
+                )
+            }
+            1 -> {
+                chartViewmodel.getMonthYearFromMillis(
+                    ZonedDateTime.now().minusMonths(1).withDayOfMonth(1)
+                        .toInstant().toEpochMilli(),
+                    chartViewmodel.lastMonthTotalUsage,
+                    chartViewmodel.overallUsageDetail
+                )
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkGradient),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        val pagerState = rememberPagerState(pageCount = { 2 })
-        var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
-
-        LaunchedEffect(pagerState.currentPage) {
-            when (pagerState.currentPage) {
-                0 -> {
-                    chartViewmodel.getMonthYearFromMillis(
-                        System.currentTimeMillis(),
-                        chartViewmodel.thisMonthTotalUsage,
-                        chartViewmodel.overallUsageDetail
-                    )
-                }
-
-                1 -> {
-                    chartViewmodel.getMonthYearFromMillis(
-                        ZonedDateTime.now().minusMonths(1).withDayOfMonth(1)
-                            .toInstant().toEpochMilli(),
-                        chartViewmodel.lastMonthTotalUsage,
-                        chartViewmodel.overallUsageDetail
-                    )
-                }
-            }
-        }
-
         LazyColumn {
             item {
                 Header(chartViewmodel)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 7.dp, horizontal = 7.dp)
-                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp))
-                ) {
 
-                    Column {
+                MonthPagerSection(chartViewmodel, pagerState)
 
-                        //Sliding Charts
-                        HorizontalPager(
-                            state = pagerState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(280.dp)
-                        ) { page ->
-
-                            when (page) {
-                                0 -> {
-                                    // This month chart
-                                    CartesianChartHost(
-                                        chart = rememberCartesianChart(
-                                            rememberLineCartesianLayer(
-                                                lineProvider = LineCartesianLayer.LineProvider.series(
-                                                    LineCartesianLayer.Line(
-                                                        fill = LineCartesianLayer.LineFill.single(
-                                                            fill(Color(0xFF1E88E5)) // Material Blue 600
-                                                        ),
-                                                        areaFill = LineCartesianLayer.AreaFill.single(
-                                                            fill(Color(0xFF1E88E5).copy(alpha = 0.15f))
-                                                        ),
-                                                        pointConnector = LineCartesianLayer.PointConnector.cubic(),
-                                                    )
-                                                )
-                                            ),
-
-                                            // ─── Vertical axis ───
-                                            startAxis = VerticalAxis.rememberStart(
-                                                itemPlacer = VerticalAxis.ItemPlacer.step(
-                                                    step = { 256.0 } // nice MB steps
-                                                ),
-                                                valueFormatter = { _, value, _ ->
-                                                    when {
-                                                        value >= 1024f -> String.format(
-                                                            "%.0f GB",
-                                                            value / 1024f
-                                                        )
-
-                                                        value > 0f -> "${value.toInt()} MB"
-                                                        else -> "0"
-                                                    }
-                                                },
-                                                guideline = null
-                                            ),
-
-                                            // ─── Bottom axis ───
-                                            bottomAxis = HorizontalAxis.rememberBottom(
-                                                labelRotationDegrees = 0f,
-                                                // itemPlacer = HorizontalAxis.ItemPlacer.step(1),
-                                                valueFormatter = { _, value, _ ->
-                                                    "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-                                                }
-                                            )
-                                        ),
-
-                                        modelProducer = chartViewmodel.thisMonthModelProducer,
-                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(260.dp)
-                                    )
-                                }
-
-                                1 -> {
-                                    // Last month chart
-                                    CartesianChartHost(
-                                        chart = rememberCartesianChart(
-                                            rememberLineCartesianLayer(
-                                                lineProvider = LineCartesianLayer.LineProvider.series(
-                                                    LineCartesianLayer.Line(
-                                                        fill = LineCartesianLayer.LineFill.single(
-                                                            fill(Color(0xFF1E88E5)) // Material Blue 600
-                                                        ),
-                                                        areaFill = LineCartesianLayer.AreaFill.single(
-                                                            fill(Color(0xFF1E88E5).copy(alpha = 0.15f))
-                                                        ),
-                                                        pointConnector = LineCartesianLayer.PointConnector.cubic(),
-                                                    )
-                                                )
-                                            ),
-
-                                            // ─── Vertical axis ───
-                                            startAxis = VerticalAxis.rememberStart(
-                                                itemPlacer = VerticalAxis.ItemPlacer.step(
-                                                    step = { 256.0 } // nice MB steps
-                                                ),
-                                                valueFormatter = { _, value, _ ->
-                                                    when {
-                                                        value >= 1024f -> String.format("%.0f GB", value / 1024f)
-                                                        value > 0f -> "${value.toInt()} MB"
-                                                        else -> "0"
-                                                    }
-                                                },
-                                                guideline = null // cleaner look
-                                            ),
-
-                                            // ─── Bottom axis ───
-                                            bottomAxis = HorizontalAxis.rememberBottom(
-                                                labelRotationDegrees = 0f,
-                                                // itemPlacer = HorizontalAxis.ItemPlacer.step(1),
-                                                valueFormatter = { _, value, _ ->
-                                                    "${
-                                                        chartViewmodel.getCurrentMonthShortName(
-                                                            ZonedDateTime.now()
-                                                                .minusMonths(1)
-                                                                .withDayOfMonth(1)
-                                                                .toLocalDate()
-                                                                .atStartOfDay(ZoneId.systemDefault())
-                                                                .toInstant()
-                                                                .toEpochMilli()
-                                                        )
-                                                    } ${(value.toInt() + 1)}"
-                                                }
-                                            )
-                                        ),
-
-                                        modelProducer = chartViewmodel.lastMonthModelProducer,
-                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(260.dp)
-                                    )
-                                }
-                            }
-                        }
-
-                        // 🔹 Pager Indicator (Dots)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp, top = 10.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            repeat(2) { index ->
-                                Box(
-                                    modifier = Modifier
-                                        .padding(4.dp)
-                                        .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
-                                        .background(
-                                            color = if (pagerState.currentPage == index) Color.White
-                                            else Color.Gray, shape = CircleShape
-                                        )
-                                )
-                            }
-                        }
+                NetworkSwitcherSection(
+                    selectedNetwork = selectedNetwork,
+                    onNetworkChange = {
+                        selectedNetwork = it
+                        chartViewmodel.loadNetworkUsage(it)
                     }
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                )
 
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        thickness = 1.dp,
-                        color = Color.White.copy(alpha = 0.3f)
-                    )
+                NetworkWiseChartSection(chartViewmodel, selectedNetwork)
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                AppUsageHeader()
 
-                    NetworkSwitcher(
-                        selected = selectedNetwork,
-                        onSelectedChange = {
-                            selectedNetwork = it
-                            chartViewmodel.loadNetworkUsage(it)
-                        },
-                        modifier = Modifier.width(150.dp)
-                    )
+                SelectedAppSection(chartViewmodel, expanded)
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        thickness = 1.dp,
-                        color = Color.White.copy(alpha = 0.3f)
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 7.dp, horizontal = 7.dp)
-                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-                ) {
-
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Text(
-                            text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
-                                "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}"
-                            else
-                                "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}",
-                            modifier = Modifier.padding(7.dp),
-                            color = white,
-                            fontSize = 10.sp,
-                            textAlign = TextAlign.Center
-                        )
-
-                        CartesianChartHost(
-                            chart = rememberCartesianChart(
-                                rememberColumnCartesianLayer(),
-                                startAxis = VerticalAxis.rememberStart(
-                                    valueFormatter = { _, value, _ ->
-                                        if (value >= 1024)
-                                            String.format("%.1f GB", value / 1024f)
-                                        else
-                                            "${value.toInt()} MB"
-                                    }
-                                ),
-                                bottomAxis = HorizontalAxis.rememberBottom(
-                                    valueFormatter = { _, value, _ ->
-                                        "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-                                    }
-                                )
-                            ),
-                            modelProducer = chartViewmodel.networkWiseModelProducer,
-                            scrollState = rememberVicoScrollState(scrollEnabled = false),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(280.dp)
-                                .padding(top = 10.dp)
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 15.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "App data usage",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(end = 10.dp)
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        thickness = 1.dp,
-                        color = Color.White.copy(alpha = 0.3f)
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 7.dp, horizontal = 7.dp)
-                        .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                        .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = chartViewmodel.selectedApp.value.first.let {
-                                BitmapPainter(it.toBitmap().asImageBitmap())
-                            },
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(5.dp)
-                        )
-
-                        Text(
-                            text = chartViewmodel.selectedApp.value.second,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            modifier = Modifier.padding( start = 5.dp)
-                        )
-
-                        Icon(
-                            imageVector = if (expanded)
-                                Icons.Default.KeyboardArrowUp
-                            else
-                                Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier
-                                .padding(3.dp)
-                                .clickable {
-                                    chartViewmodel.dialogState.value = true
-                                }
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = "Total: ${chartViewmodel.appWiseTotalUsage.value}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            textAlign = TextAlign.End,
-                            modifier = Modifier
-                                .padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 10.dp)
-                                .align(Alignment.CenterVertically)
-                        )
-                    }
-                }
-
-                if (chartViewmodel.selectedApp.value.third != 0) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(vertical = 7.dp, horizontal = 7.dp)
-                            .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                            .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp)),
-                    ) {
-                        CartesianChartHost(
-                            chart = rememberCartesianChart(
-                                rememberColumnCartesianLayer(),
-                                startAxis = VerticalAxis.rememberStart(
-                                    valueFormatter = { _, value, _ ->
-                                        if (value >= 1024)
-                                            String.format("%.1f GB", value / 1024f)
-                                        else
-                                            "${value.toInt()} MB"
-                                    }
-                                ),
-                                bottomAxis = HorizontalAxis.rememberBottom(
-                                    valueFormatter = { _, value, _ ->
-                                        "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-                                    }
-                                )
-                            ),
-                            modelProducer = chartViewmodel.appWiseModelProducer,
-                            scrollState = rememberVicoScrollState(scrollEnabled = false),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(280.dp)
-                                .padding(top = 10.dp, bottom = 10.dp)
-                        )
-                    }
-                }
+                AppWiseChartSection(chartViewmodel)
             }
         }
         DialogInit(chartViewmodel)
     }
 }
+
+@Composable
+private fun MonthPagerSection(
+    chartViewmodel: ChartViewmodel,
+    pagerState: PagerState
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(7.dp)
+            .background(LightDarkColor, RoundedCornerShape(10.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+    ) {
+        Column {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+            ) { page ->
+                if (page == 0) {
+                    ThisMonthChart(chartViewmodel)
+                } else {
+                    LastMonthChart(chartViewmodel)
+                }
+            }
+
+            PagerIndicator(pagerState)
+        }
+    }
+}
+
+@Composable
+fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(
+                lineProvider = LineCartesianLayer.LineProvider.series(
+                    LineCartesianLayer.Line(
+                        fill = LineCartesianLayer.LineFill.single(
+                            fill(Color(0xFF1E88E5))
+                        ),
+                        areaFill = LineCartesianLayer.AreaFill.single(
+                            fill(Color(0xFF1E88E5).copy(alpha = 0.15f))
+                        ),
+                        pointConnector = LineCartesianLayer.PointConnector.cubic(),
+                    )
+                )
+            ),
+
+            startAxis = VerticalAxis.rememberStart(
+                itemPlacer = VerticalAxis.ItemPlacer.step(
+                    step = { 256.0 }
+                ),
+                valueFormatter = { _, value, _ ->
+                    when {
+                        value >= 1024f -> String.format("%.0f GB", value / 1024f)
+                        value > 0f -> "${value.toInt()} MB"
+                        else -> "0"
+                    }
+                },
+                guideline = null
+            ),
+
+            bottomAxis = HorizontalAxis.rememberBottom(
+                labelRotationDegrees = 0f,
+                valueFormatter = { _, value, _ ->
+                    "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+                }
+            )
+        ),
+
+        modelProducer = chartViewmodel.thisMonthModelProducer,
+        scrollState = rememberVicoScrollState(scrollEnabled = false),
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+    )
+}
+
+
+@Composable
+fun LastMonthChart(chartViewmodel: ChartViewmodel) {
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(
+                lineProvider = LineCartesianLayer.LineProvider.series(
+                    LineCartesianLayer.Line(
+                        fill = LineCartesianLayer.LineFill.single(
+                            fill(Color(0xFF1E88E5))
+                        ),
+                        areaFill = LineCartesianLayer.AreaFill.single(
+                            fill(Color(0xFF1E88E5).copy(alpha = 0.15f))
+                        ),
+                        pointConnector = LineCartesianLayer.PointConnector.cubic(),
+                    )
+                )
+            ),
+
+            startAxis = VerticalAxis.rememberStart(
+                itemPlacer = VerticalAxis.ItemPlacer.step(
+                    step = { 256.0 }
+                ),
+                valueFormatter = { _, value, _ ->
+                    when {
+                        value >= 1024f -> String.format("%.0f GB", value / 1024f)
+                        value > 0f -> "${value.toInt()} MB"
+                        else -> "0"
+                    }
+                },
+                guideline = null
+            ),
+
+            bottomAxis = HorizontalAxis.rememberBottom(
+                labelRotationDegrees = 0f,
+                valueFormatter = { _, value, _ ->
+                    "${
+                        chartViewmodel.getCurrentMonthShortName(
+                            ZonedDateTime.now()
+                                .minusMonths(1)
+                                .withDayOfMonth(1)
+                                .toLocalDate()
+                                .atStartOfDay(ZoneId.systemDefault())
+                                .toInstant()
+                                .toEpochMilli()
+                        )
+                    } ${(value.toInt() + 1)}"
+                }
+            )
+        ),
+
+        modelProducer = chartViewmodel.lastMonthModelProducer,
+        scrollState = rememberVicoScrollState(scrollEnabled = false),
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+    )
+}
+
+
+@Composable
+private fun PagerIndicator(pagerState: PagerState) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        repeat(2) { index ->
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
+                    .background(
+                        if (pagerState.currentPage == index) Color.White else Color.Gray,
+                        CircleShape
+                    )
+            )
+        }
+    }
+}
+
+@Composable
+private fun NetworkSwitcherSection(
+    selectedNetwork: String,
+    onNetworkChange: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = Color.White.copy(alpha = 0.3f)
+        )
+
+        Spacer(Modifier.width(10.dp))
+
+        NetworkSwitcher(
+            selected = selectedNetwork,
+            onSelectedChange = onNetworkChange,
+            modifier = Modifier.width(150.dp)
+        )
+
+        Spacer(Modifier.width(10.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = Color.White.copy(alpha = 0.3f)
+        )
+    }
+}
+
+
+@Composable
+private fun NetworkWiseChartSection(
+    chartViewmodel: ChartViewmodel,
+    selectedNetwork: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(7.dp)
+            .background(LightDarkColor, RoundedCornerShape(10.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+    ) {
+        Column {
+            Text(
+                text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
+                    "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}"
+                else
+                    "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}",
+                modifier = Modifier.padding(7.dp),
+                color = white,
+                fontSize = 10.sp,
+                textAlign = TextAlign.Center
+            )
+
+            CartesianChartHost(
+                chart = rememberCartesianChart(
+                    rememberColumnCartesianLayer(),
+                    startAxis = VerticalAxis.rememberStart(
+                        valueFormatter = { _, value, _ ->
+                            if (value >= 1024) String.format("%.1f GB", value / 1024f)
+                            else "${value.toInt()} MB"
+                        }
+                    ),
+                    bottomAxis = HorizontalAxis.rememberBottom(
+                        valueFormatter = { _, value, _ ->
+                            "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+                        }
+                    )
+                ),
+                modelProducer = chartViewmodel.networkWiseModelProducer,
+                scrollState = rememberVicoScrollState(scrollEnabled = false),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(top = 10.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppUsageHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "App data usage",
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = Color.White.copy(alpha = 0.3f)
+        )
+    }
+}
+
+@Composable
+private fun SelectedAppSection(
+    chartViewmodel: ChartViewmodel,
+    expanded: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(7.dp)
+            .background(LightDarkColor, RoundedCornerShape(10.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = BitmapPainter(
+                    chartViewmodel.selectedApp.value.first.toBitmap().asImageBitmap()
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(40.dp).padding(5.dp)
+            )
+
+            Text(
+                text = chartViewmodel.selectedApp.value.second,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(start = 5.dp)
+            )
+
+            Icon(
+                imageVector = if (expanded)
+                    Icons.Default.KeyboardArrowUp
+                else
+                    Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier
+                    .padding(3.dp)
+                    .clickable { chartViewmodel.dialogState.value = true }
+            )
+
+            Spacer(Modifier.weight(1f))
+
+            Text(
+                text = "Total: ${chartViewmodel.appWiseTotalUsage.value}",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(end = 10.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
+    if (chartViewmodel.selectedApp.value.third != 0) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(7.dp)
+                .background(LightDarkColor, RoundedCornerShape(10.dp))
+                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+        ) {
+            CartesianChartHost(
+                chart = rememberCartesianChart(
+                    rememberColumnCartesianLayer(),
+                    startAxis = VerticalAxis.rememberStart(
+                        valueFormatter = { _, value, _ ->
+                            if (value >= 1024) String.format("%.1f GB", value / 1024f)
+                            else "${value.toInt()} MB"
+                        }
+                    ),
+                    bottomAxis = HorizontalAxis.rememberBottom(
+                        valueFormatter = { _, value, _ ->
+                            "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
+                        }
+                    )
+                ),
+                modelProducer = chartViewmodel.appWiseModelProducer,
+                scrollState = rememberVicoScrollState(scrollEnabled = false),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(vertical = 10.dp)
+            )
+        }
+    }
+}
+
 
 @Composable
 fun Header(
@@ -495,7 +928,8 @@ fun Header(
         Text(
             text = chartViewmodel.overallUsageDetail.value.month,
             modifier = Modifier.padding(top = 50.dp, bottom = 5.dp),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.White
         )
 
         Box(

@@ -41,9 +41,14 @@ class ChartViewmodel @Inject constructor(
     private val dataUsageHelper: DataUsageHelper,
 ) : ViewModel() {
 
+    //state to show dialog
     var dialogState = mutableStateOf(false)
+
+    //state to update monthly usage
     var overallUsageDetail = mutableStateOf(MonthlyUsage("", ""))
+    //state to update network wise usage
     var networkUsageDetail = mutableStateOf(MonthlyUsage("", ""))
+    //state holding the selected app
     var selectedApp = mutableStateOf(
         Triple(
             ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!,
@@ -51,16 +56,19 @@ class ChartViewmodel @Inject constructor(
             third = 0
         )
     )
+    // selected app index
     var selectedAppIndex = mutableIntStateOf(-1)
+    //list of all the apps
     var userAppList: List<AppDataUsage>? = null
+    //state showing the total usage of selected app
     var appWiseTotalUsage = mutableStateOf("0")
 
     var thisMonthTotalUsage = 0L
     var lastMonthTotalUsage = 0L
 
-    val modelProducer = CartesianChartModelProducer()
-    val modelProducer2 = CartesianChartModelProducer()
-    val modelProducer3 = CartesianChartModelProducer()
+    val thisMonthModelProducer = CartesianChartModelProducer()
+    val networkWiseModelProducer = CartesianChartModelProducer()
+    val appWiseModelProducer = CartesianChartModelProducer()
     val lastMonthModelProducer = CartesianChartModelProducer()
 
 
@@ -78,7 +86,7 @@ class ChartViewmodel @Inject constructor(
     fun loadThisMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
             val data = getDailyDataUsageBytes(getDailyRangesForMonth())
-            modelProducer.runTransaction {
+            thisMonthModelProducer.runTransaction {
                 lineSeries {
                     series(data)
                 }
@@ -122,7 +130,7 @@ class ChartViewmodel @Inject constructor(
             }
             getMonthYearFromMillis(range.first().first, total, networkUsageDetail)
             val data = usage.map { bytesToMb(it) }
-            modelProducer2.runTransaction {
+            networkWiseModelProducer.runTransaction {
                 columnSeries {
                     series(data)
                 }
@@ -161,7 +169,7 @@ class ChartViewmodel @Inject constructor(
             }
             appWiseTotalUsage.value = formatBytes(total)
             val data = dailyDataUsage.map { bytesToMb(it) }
-            modelProducer3.runTransaction {
+            appWiseModelProducer.runTransaction {
                 columnSeries {
                     series(data)
                 }

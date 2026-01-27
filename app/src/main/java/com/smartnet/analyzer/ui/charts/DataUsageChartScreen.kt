@@ -186,7 +186,7 @@ fun DataUsageChartScreen(
                                             )
                                         ),
 
-                                        modelProducer = chartViewmodel.modelProducer,
+                                        modelProducer = chartViewmodel.thisMonthModelProducer,
                                         scrollState = rememberVicoScrollState(scrollEnabled = false),
 
                                         modifier = Modifier
@@ -353,7 +353,7 @@ fun DataUsageChartScreen(
                                     }
                                 )
                             ),
-                            modelProducer = chartViewmodel.modelProducer2,
+                            modelProducer = chartViewmodel.networkWiseModelProducer,
                             scrollState = rememberVicoScrollState(scrollEnabled = false),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -468,7 +468,7 @@ fun DataUsageChartScreen(
                                     }
                                 )
                             ),
-                            modelProducer = chartViewmodel.modelProducer3,
+                            modelProducer = chartViewmodel.appWiseModelProducer,
                             scrollState = rememberVicoScrollState(scrollEnabled = false),
                             modifier = Modifier
                                 .fillMaxWidth()

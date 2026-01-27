@@ -23,8 +23,6 @@ import com.smartnet.analyzer.utils.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -50,16 +48,10 @@ class ChartViewmodel @Inject constructor(
     var userAppList: List<AppDataUsage>? = null
     var appWiseTotalUsage = mutableStateOf("0")
 
-    private val _networkDataUsage = MutableStateFlow<List<Float>>(emptyList())
-    val networkDataUsage: StateFlow<List<Float>> = _networkDataUsage
-
-
-    private val _appWiseDataUsage = MutableStateFlow<List<Float>>(emptyList())
-    val appWiseDataUsage: StateFlow<List<Float>> = _appWiseDataUsage
-
     val modelProducer = CartesianChartModelProducer()
     val modelProducer2 = CartesianChartModelProducer()
     val modelProducer3 = CartesianChartModelProducer()
+    val lastMonthModelProducer = CartesianChartModelProducer()
 
     init {
         loadThisMonthOverallUsage()
@@ -67,6 +59,7 @@ class ChartViewmodel @Inject constructor(
         loadLastMonthOverallUsage()
         loadAppList()
     }
+
 
     fun loadThisMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
@@ -82,7 +75,7 @@ class ChartViewmodel @Inject constructor(
     fun loadLastMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
             val data =getDailyDataUsageBytes(getLastMonthStartEndMillis())
-            modelProducer.runTransaction {
+            lastMonthModelProducer.runTransaction {
                 lineSeries {
                     series(data)
                 }
@@ -93,8 +86,21 @@ class ChartViewmodel @Inject constructor(
     fun loadNetworkUsage(
         networkType: String,
     ) {
+        var total = 0L
+        val range = getDailyTimeRanges()
+        val usage = mutableListOf<Long>()
         viewModelScope.launch(ioDispatcher) {
-            val data = getNetworkType(networkType)
+            range.forEach {
+                val networkUsage = dataUsageHelper.getDayWiseDataUsage(
+                    startTime = it.first,
+                    endTime = it.second,
+                    networkType = if (networkType == NETWORK_TYPE_CELLULAR) NetworkCapabilities.TRANSPORT_CELLULAR else NetworkCapabilities.TRANSPORT_WIFI
+                )
+                total += networkUsage
+                usage.add(networkUsage)
+            }
+            getMonthYearFromMillis(range.first().first, total, networkUsageDetail)
+            val data = usage.map { bytesToMb(it) }
             modelProducer2.runTransaction {
                 columnSeries {
                     series(data)
@@ -106,8 +112,21 @@ class ChartViewmodel @Inject constructor(
     fun loadAppWiseUsage(
         uid: Int,
     ) {
+        var total = 0L
+        val dailyDataUsage = mutableListOf<Long>()
+        val range = getDailyTimeRanges()
         viewModelScope.launch(ioDispatcher) {
-            val data = getAppDataUsage(uid)
+            Log.d("dudi","getting app wise data usage: $uid")
+            range.forEach {
+                Log.d("dudi","range start: ${it.first} , end range: ${it.second}")
+                val simUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_CELLULAR, uid, it.first, it.second)
+                val wifiUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_WIFI, uid, it.first, it.second)
+
+                dailyDataUsage.add(simUsage + wifiUsage)
+                total += (simUsage + wifiUsage)
+            }
+            appWiseTotalUsage.value = formatBytes(total)
+            val data = dailyDataUsage.map { bytesToMb(it) }
             modelProducer3.runTransaction {
                 columnSeries {
                     series(data)

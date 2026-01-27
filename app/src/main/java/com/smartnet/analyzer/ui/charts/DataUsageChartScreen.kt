@@ -187,7 +187,6 @@ fun DataUsageChartScreen(
 
                                 1 -> {
                                     // Last month chart
-
                                     CartesianChartHost(
                                         chart = rememberCartesianChart(
                                             rememberLineCartesianLayer(
@@ -239,7 +238,7 @@ fun DataUsageChartScreen(
                                             )
                                         ),
 
-                                        modelProducer = chartViewmodel.modelProducer,
+                                        modelProducer = chartViewmodel.lastMonthModelProducer,
                                         scrollState = rememberVicoScrollState(scrollEnabled = false),
 
                                         modifier = Modifier

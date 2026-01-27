@@ -25,16 +25,16 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,7 +48,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,7 +67,6 @@ import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
-import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
 import com.smartnet.analyzer.common.theme.white
@@ -287,10 +285,10 @@ fun DataUsageChartScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.weight(1f),
-                        color = Color.White.copy(alpha = 0.3f),
-                        thickness = 1.dp
+                        thickness = 1.dp,
+                        color = Color.White.copy(alpha = 0.3f)
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
@@ -306,10 +304,10 @@ fun DataUsageChartScreen(
 
                     Spacer(modifier = Modifier.width(10.dp))
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.weight(1f),
-                        color = Color.White.copy(alpha = 0.3f),
-                        thickness = 1.dp
+                        thickness = 1.dp,
+                        color = Color.White.copy(alpha = 0.3f)
                     )
                 }
 
@@ -377,10 +375,10 @@ fun DataUsageChartScreen(
                         modifier = Modifier.padding(end = 10.dp)
                     )
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.weight(1f),
-                        color = Color.White.copy(alpha = 0.3f),
-                        thickness = 1.dp
+                        thickness = 1.dp,
+                        color = Color.White.copy(alpha = 0.3f)
                     )
                 }
 
@@ -397,9 +395,9 @@ fun DataUsageChartScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = chartViewmodel.selectedApp.value.first?.let {
+                            painter = chartViewmodel.selectedApp.value.first.let {
                                 BitmapPainter(it.toBitmap().asImageBitmap())
-                            } ?: painterResource(R.drawable.ic_default_app),
+                            },
                             contentDescription = null,
                             modifier = Modifier
                                 .size(40.dp)
@@ -497,7 +495,7 @@ fun Header(
         Text(
             text = chartViewmodel.overallUsageDetail.value.month,
             modifier = Modifier.padding(top = 50.dp, bottom = 5.dp),
-            style = MaterialTheme.typography.h6
+            style = MaterialTheme.typography.bodyLarge
         )
 
         Box(
@@ -627,7 +625,7 @@ fun DialogInit(
         AppSelectionDialog(
             chartViewmodel = chartViewmodel,
             onConfirm = {
-                chartViewmodel.onConfirmClick(chartViewmodel.selectedAppIndex.value)
+                chartViewmodel.onConfirmClick(chartViewmodel.selectedAppIndex.intValue)
             },
             onDismiss = {
                 chartViewmodel.dialogState.value = false
@@ -662,7 +660,7 @@ fun AppSelectionDialog(
                     modifier = Modifier.padding(16.dp)
                 )
 
-                Divider(color = Color.Gray.copy(alpha = 0.4f))
+                HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f))
 
                 // 🔹 Scrollable App List
                 LazyColumn(
@@ -674,13 +672,13 @@ fun AppSelectionDialog(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { chartViewmodel.selectedAppIndex.value = index }
+                                .clickable { chartViewmodel.selectedAppIndex.intValue = index }
                                 .padding(vertical = 10.dp, horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = chartViewmodel.selectedAppIndex.value == index,
-                                onClick = { chartViewmodel.selectedAppIndex.value = index },
+                                selected = chartViewmodel.selectedAppIndex.intValue == index,
+                                onClick = { chartViewmodel.selectedAppIndex.intValue = index },
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = Color(0xFF0A66FF),
                                     unselectedColor = Color.Gray
@@ -697,7 +695,7 @@ fun AppSelectionDialog(
                     }
                 }
 
-                Divider(color = Color.Gray.copy(alpha = 0.4f))
+                HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f))
 
                 // 🔹 Buttons
                 Row(
@@ -713,8 +711,8 @@ fun AppSelectionDialog(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     TextButton(
-                        onClick = { onConfirm(chartViewmodel.selectedAppIndex.value) },
-                        enabled = chartViewmodel.selectedAppIndex.value != -1
+                        onClick = { onConfirm(chartViewmodel.selectedAppIndex.intValue) },
+                        enabled = chartViewmodel.selectedAppIndex.intValue != -1
                     ) {
                         Text("OK", color = Color(0xFF0A66FF))
                     }

@@ -5,11 +5,11 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.data.AppDataUsage
@@ -58,6 +58,8 @@ class ChartViewmodel @Inject constructor(
     val appWiseDataUsage: StateFlow<List<Float>> = _appWiseDataUsage
 
     val modelProducer = CartesianChartModelProducer()
+    val modelProducer2 = CartesianChartModelProducer()
+    val modelProducer3 = CartesianChartModelProducer()
 
     init {
         loadThisMonthOverallUsage()
@@ -92,7 +94,12 @@ class ChartViewmodel @Inject constructor(
         networkType: String,
     ) {
         viewModelScope.launch(ioDispatcher) {
-            _networkDataUsage.emit(getNetworkType(networkType))
+            val data = getNetworkType(networkType)
+            modelProducer2.runTransaction {
+                columnSeries {
+                    series(data)
+                }
+            }
         }
     }
 
@@ -100,7 +107,12 @@ class ChartViewmodel @Inject constructor(
         uid: Int,
     ) {
         viewModelScope.launch(ioDispatcher) {
-            _appWiseDataUsage.emit(getAppDataUsage(uid))
+            val data = getAppDataUsage(uid)
+            modelProducer3.runTransaction {
+                columnSeries {
+                    series(data)
+                }
+            }
         }
     }
 

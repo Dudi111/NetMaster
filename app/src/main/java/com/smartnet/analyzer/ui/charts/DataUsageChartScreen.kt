@@ -1,7 +1,6 @@
 package com.smartnet.analyzer.ui.charts
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +38,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,9 +67,6 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
-import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkGradient
@@ -98,63 +93,7 @@ fun DataUsageChartScreen(
     ) {
 
         val pagerState = rememberPagerState(pageCount = { 2 })
-        val modelProducer2 = remember { CartesianChartModelProducer() }
-        val modelProducer3 = remember { CartesianChartModelProducer() }
         var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
-
-        val appWiseUsageState by chartViewmodel.appWiseDataUsage.collectAsState()
-        val networkUsageState by chartViewmodel.networkDataUsage.collectAsState()
-
-        LaunchedEffect(
-            appWiseUsageState,
-        ) {
-            Log.d("launched effect","model producer 3 run")
-            if (chartViewmodel.selectedAppIndex.value != -1) {
-                modelProducer3.runTransaction {
-                    columnSeries {
-                        series(chartViewmodel.appWiseDataUsage.value)
-                    }
-                }
-            }
-        }
-
-        LaunchedEffect(
-            networkUsageState,
-        ) {
-            Log.d("launched effect", "model producer 2 run")
-            if (chartViewmodel.networkDataUsage.value.isNotEmpty()) {
-                modelProducer2.runTransaction {
-                    columnSeries {
-                        series(chartViewmodel.networkDataUsage.value)
-                    }
-                }
-            }
-        }
-//        LaunchedEffect(
-//            overallUsageState
-//        ) {
-//            Log.d("launched effect", "model producer 1 run")
-//            if (chartViewmodel.thisMonthOverallDatalUsage.value.isNotEmpty()) {
-//                modelProducer.runTransaction {
-//                    lineSeries {
-//                        series(overallUsageState)
-//                    }
-//                }
-//            }
-//        }
-
-//        LaunchedEffect(
-//            lastMonthUsageState
-//        ) {
-//            Log.d("launched effect", "model producer 1.5 run")
-//            if (chartViewmodel.lastMonthOverallDatalUsage.value.isNotEmpty()) {
-//                modelProducer.runTransaction {
-//                    lineSeries {
-//                        series(chartViewmodel.lastMonthOverallDatalUsage.value)
-//                    }
-//                }
-//            }
-//        }
 
         LaunchedEffect(pagerState.currentPage) {
             when(pagerState.currentPage) {
@@ -192,7 +131,6 @@ fun DataUsageChartScreen(
                             when (page) {
                                 0 -> {
                                     // This month chart
-
                                     CartesianChartHost(
                                         chart = rememberCartesianChart(
                                             rememberLineCartesianLayer(
@@ -216,7 +154,11 @@ fun DataUsageChartScreen(
                                                 ),
                                                 valueFormatter = { _, value, _ ->
                                                     when {
-                                                        value >= 1024f -> String.format("%.0f GB", value / 1024f)
+                                                        value >= 1024f -> String.format(
+                                                            "%.0f GB",
+                                                            value / 1024f
+                                                        )
+
                                                         value > 0f -> "${value.toInt()} MB"
                                                         else -> "0"
                                                     }
@@ -227,7 +169,7 @@ fun DataUsageChartScreen(
                                             // ─── Bottom axis ───
                                             bottomAxis = HorizontalAxis.rememberBottom(
                                                 labelRotationDegrees = 0f,
-                                               // itemPlacer = HorizontalAxis.ItemPlacer.step(1),
+                                                // itemPlacer = HorizontalAxis.ItemPlacer.step(1),
                                                 valueFormatter = { _, value, _ ->
                                                     "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                                                 }
@@ -241,53 +183,6 @@ fun DataUsageChartScreen(
                                             .fillMaxWidth()
                                             .height(260.dp)
                                     )
-
-
-//                                        CartesianChartHost(
-//                                            chart = rememberCartesianChart(
-//                                                rememberLineCartesianLayer(
-//                                                    lineProvider = LineCartesianLayer.LineProvider.series(
-//                                                        LineCartesianLayer.Line(
-//                                                            fill = LineCartesianLayer.LineFill.single(
-//                                                                fill(Color.Blue)
-//                                                            ),
-//                                                            pointConnector = LineCartesianLayer.PointConnector.cubic()
-//                                                        )
-//                                                    )
-//                                                ),
-//                                                startAxis = VerticalAxis.rememberStart(),
-//                                                bottomAxis = HorizontalAxis.rememberBottom()
-//                                            ),
-//                                            modelProducer = chartViewmodel.modelProducer,
-//                                            scrollState = rememberVicoScrollState(scrollEnabled = false),
-//                                            modifier = Modifier
-//                                                .fillMaxWidth()
-//                                                .height(260.dp)
-//                                        )
-
-
-
-//                                    CartesianChartHost(
-//                                        chart = rememberCartesianChart(
-//                                            rememberColumnCartesianLayer(),
-//                                            startAxis = VerticalAxis.rememberStart(
-//                                                valueFormatter = { _, value, _ ->
-//                                                    if (value >= 1024)
-//                                                        String.format("%.1f GB", value / 1024f)
-//                                                    else
-//                                                        "${value.toInt()} MB"
-//                                                }
-//                                            ),
-//                                            bottomAxis = HorizontalAxis.rememberBottom(
-//                                                valueFormatter = { _, value, _ ->
-//                                                    "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-//                                                }
-//                                            )
-//                                        ),
-//                                        modelProducer = modelProducer,
-//                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-//                                        modifier = Modifier.fillMaxSize()
-//                                    )
                                 }
 
                                 1 -> {
@@ -351,35 +246,6 @@ fun DataUsageChartScreen(
                                             .fillMaxWidth()
                                             .height(260.dp)
                                     )
-
-//                                    CartesianChartHost(
-//                                        chart = rememberCartesianChart(
-//                                            rememberColumnCartesianLayer(),
-//                                            startAxis = VerticalAxis.rememberStart(
-//                                                valueFormatter = { _, value, _ ->
-//                                                    if (value >= 1024)
-//                                                        String.format("%.1f GB", value / 1024f)
-//                                                    else
-//                                                        "${value.toInt()} MB"
-//                                                }
-//                                            ),
-//                                            bottomAxis = HorizontalAxis.rememberBottom(
-//                                                valueFormatter = { _, value, _ ->
-//                                                    "${chartViewmodel.getCurrentMonthShortName(
-//                                                        ZonedDateTime.now()
-//                                                            .minusMonths(1)
-//                                                            .withDayOfMonth(1)
-//                                                            .toLocalDate()
-//                                                            .atStartOfDay(ZoneId.systemDefault())
-//                                                            .toInstant()
-//                                                            .toEpochMilli())} ${(value.toInt() + 1)}"
-//                                                }
-//                                            )
-//                                        ),
-//                                        modelProducer = modelProducer,
-//                                        scrollState = rememberVicoScrollState(scrollEnabled = false),
-//                                        modifier = Modifier.fillMaxSize()
-//                                    )
                                 }
                             }
                         }
@@ -478,7 +344,7 @@ fun DataUsageChartScreen(
                                     }
                                 )
                             ),
-                            modelProducer = modelProducer2,
+                            modelProducer = chartViewmodel.modelProducer2,
                             scrollState = rememberVicoScrollState(scrollEnabled = false),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -593,7 +459,7 @@ fun DataUsageChartScreen(
                                     }
                                 )
                             ),
-                            modelProducer = modelProducer3,
+                            modelProducer = chartViewmodel.modelProducer3,
                             scrollState = rememberVicoScrollState(scrollEnabled = false),
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -31,7 +31,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 
@@ -40,20 +39,30 @@ class ChartViewmodel @Inject constructor(
     @ApplicationContext val context: Context,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     private val dataUsageHelper: DataUsageHelper,
-): ViewModel() {
+) : ViewModel() {
 
     var dialogState = mutableStateOf(false)
-    var overallUsageDetail = mutableStateOf(MonthlyUsage("",""))
-    var networkUsageDetail = mutableStateOf(MonthlyUsage("",""))
-    var selectedApp = mutableStateOf(Triple(ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!, second = "Select app", third = 0))
+    var overallUsageDetail = mutableStateOf(MonthlyUsage("", ""))
+    var networkUsageDetail = mutableStateOf(MonthlyUsage("", ""))
+    var selectedApp = mutableStateOf(
+        Triple(
+            ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!,
+            second = "Select app",
+            third = 0
+        )
+    )
     var selectedAppIndex = mutableIntStateOf(-1)
     var userAppList: List<AppDataUsage>? = null
     var appWiseTotalUsage = mutableStateOf("0")
+
+    var thisMonthTotalUsage = 0L
+    var lastMonthTotalUsage = 0L
 
     val modelProducer = CartesianChartModelProducer()
     val modelProducer2 = CartesianChartModelProducer()
     val modelProducer3 = CartesianChartModelProducer()
     val lastMonthModelProducer = CartesianChartModelProducer()
+
 
     init {
         loadThisMonthOverallUsage()
@@ -68,7 +77,7 @@ class ChartViewmodel @Inject constructor(
      */
     fun loadThisMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
-                val data = getDailyDataUsageBytes(getDailyTimeRanges())
+            val data = getDailyDataUsageBytes(getDailyRangesForMonth())
             modelProducer.runTransaction {
                 lineSeries {
                     series(data)
@@ -82,7 +91,7 @@ class ChartViewmodel @Inject constructor(
      */
     fun loadLastMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
-            val data =getDailyDataUsageBytes(getLastMonthStartEndMillis())
+            val data = getDailyDataUsageBytes(getDailyRangesForMonth(-1), false)
             lastMonthModelProducer.runTransaction {
                 lineSeries {
                     series(data)
@@ -99,7 +108,7 @@ class ChartViewmodel @Inject constructor(
         networkType: String,
     ) {
         var total = 0L
-        val range = getDailyTimeRanges()
+        val range = getDailyRangesForMonth()
         val usage = mutableListOf<Long>()
         viewModelScope.launch(ioDispatcher) {
             range.forEach {
@@ -129,13 +138,23 @@ class ChartViewmodel @Inject constructor(
     ) {
         var total = 0L
         val dailyDataUsage = mutableListOf<Long>()
-        val range = getDailyTimeRanges()
+        val range = getDailyRangesForMonth()
         viewModelScope.launch(ioDispatcher) {
-            Log.d("dudi","getting app wise data usage: $uid")
+            Log.d("dudi", "getting app wise data usage: $uid")
             range.forEach {
-                Log.d("dudi","range start: ${it.first} , end range: ${it.second}")
-                val simUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_CELLULAR, uid, it.first, it.second)
-                val wifiUsage = dataUsageHelper.getUidDataUsage( NetworkCapabilities.TRANSPORT_WIFI, uid, it.first, it.second)
+                Log.d("dudi", "range start: ${it.first} , end range: ${it.second}")
+                val simUsage = dataUsageHelper.getUidDataUsage(
+                    NetworkCapabilities.TRANSPORT_CELLULAR,
+                    uid,
+                    it.first,
+                    it.second
+                )
+                val wifiUsage = dataUsageHelper.getUidDataUsage(
+                    NetworkCapabilities.TRANSPORT_WIFI,
+                    uid,
+                    it.first,
+                    it.second
+                )
 
                 dailyDataUsage.add(simUsage + wifiUsage)
                 total += (simUsage + wifiUsage)
@@ -157,7 +176,11 @@ class ChartViewmodel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val (startTime, endTime) = getTimeRange(DATA_USAGE_TODAY)
             //get app in descending order of usage
-            userAppList = dataUsageHelper.getAppDataUsage(startTime, endTime, NetworkCapabilities.TRANSPORT_CELLULAR)
+            userAppList = dataUsageHelper.getAppDataUsage(
+                startTime,
+                endTime,
+                NetworkCapabilities.TRANSPORT_CELLULAR
+            )
         }
     }
 
@@ -167,7 +190,11 @@ class ChartViewmodel @Inject constructor(
      */
     fun onConfirmClick(index: Int) {
         selectedApp.value =
-            Triple(userAppList!![index].icon!!, userAppList!![index].appName, userAppList!![index].uid)
+            Triple(
+                userAppList!![index].icon!!,
+                userAppList!![index].appName,
+                userAppList!![index].uid
+            )
         selectedAppIndex.intValue = index
         loadAppWiseUsage(userAppList!![selectedAppIndex.intValue].uid)
         dialogState.value = false
@@ -177,18 +204,28 @@ class ChartViewmodel @Inject constructor(
      * getDailyDataUsageBytes: This method will fetch the daily data usage in bytes for the given range
      * @param range: start time and end time of day and list of days
      */
-    fun getDailyDataUsageBytes(range: List<Pair<Long, Long>>): List<Float> {
+    fun getDailyDataUsageBytes(range: List<Pair<Long, Long>>, isCurrentMonth: Boolean = true): List<Float> {
         var total = 0L
         val dailyDataUsage = mutableListOf<Long>()
         range.forEach {
-            val simUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_CELLULAR)
-            val wifiUsage = dataUsageHelper.getDayWiseDataUsage(it.first, it.second, NetworkCapabilities.TRANSPORT_WIFI)
+            val simUsage = dataUsageHelper.getDayWiseDataUsage(
+                it.first,
+                it.second,
+                NetworkCapabilities.TRANSPORT_CELLULAR
+            )
+            val wifiUsage = dataUsageHelper.getDayWiseDataUsage(
+                it.first,
+                it.second,
+                NetworkCapabilities.TRANSPORT_WIFI
+            )
 
             dailyDataUsage.add(simUsage + wifiUsage)
-            total += (simUsage + wifiUsage)
+            total += simUsage + wifiUsage
         }
-            getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
-            return dailyDataUsage.map { bytesToMb(it) }
+        if (isCurrentMonth) thisMonthTotalUsage = total else lastMonthTotalUsage = total
+
+        getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
+        return dailyDataUsage.map { bytesToMb(it) }
     }
 
     /**
@@ -197,7 +234,7 @@ class ChartViewmodel @Inject constructor(
      */
     fun getMonthYearFromMillis(timeInMillis: Long, total: Long, state: MutableState<MonthlyUsage>) {
         val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
-        val month =  Instant.ofEpochMilli(timeInMillis)
+        val month = Instant.ofEpochMilli(timeInMillis)
             .atZone(ZoneId.systemDefault())
             .format(formatter)
 
@@ -206,74 +243,60 @@ class ChartViewmodel @Inject constructor(
     }
 
     /**
-     * getDailyTimeRanges: This method will return the list of day start & end time in millis for whole month
+     * getDailyRangesForMonth: This method will return the list of day start & end time in millis for whole month
+     * @param monthOffset: 0 = current month, -1 = last month & 1 = next month
      */
-//    fun getDailyTimeRanges(): List<Pair<Long, Long>> {
-//        val ranges = mutableListOf<Pair<Long, Long>>()
-//
-//        val cal = Calendar.getInstance().apply {
-//            set(Calendar.DAY_OF_MONTH, 1)
-//            set(Calendar.HOUR_OF_DAY, 0)
-//            set(Calendar.MINUTE, 0)
-//            set(Calendar.SECOND, 0)
-//            set(Calendar.MILLISECOND, 0)
-//        }
-//
-//        // Today at start of day
-//        val todayStart = Calendar.getInstance().apply {
-//            set(Calendar.HOUR_OF_DAY, 0)
-//            set(Calendar.MINUTE, 0)
-//            set(Calendar.SECOND, 0)
-//            set(Calendar.MILLISECOND, 0)
-//        }.timeInMillis
-//
-//        while (cal.timeInMillis <= todayStart) {
-//            val dayStart = cal.timeInMillis
-//            cal.add(Calendar.DAY_OF_MONTH, 1)
-//            val dayEnd = minOf(cal.timeInMillis, System.currentTimeMillis())
-//            ranges.add(dayStart to dayEnd)
-//        }
-//
-//        return ranges
-//    }
-//
-//    fun getLastMonthStartEndMillis(): List<Pair<Long, Long>> {
-//        val zoneId = ZoneId.systemDefault()
-//        val now = ZonedDateTime.now(zoneId)
-//
-//        // Start of last month
-//        val startOfLastMonth = now
-//            .minusMonths(1)
-//            .withDayOfMonth(1)
-//            .toLocalDate()
-//            .atStartOfDay(zoneId)
-//
-//        // End of last month
-//        val endOfLastMonth = startOfLastMonth
-//            .plusMonths(1)
-//            .minusNanos(1)
-//
-//        val ranges = mutableListOf<Pair<Long, Long>>()
-//
-//        var currentDayStart = startOfLastMonth
-//
-//        while (!currentDayStart.isAfter(endOfLastMonth)) {
-//            val nextDayStart = currentDayStart.plusDays(1)
-//
-//            val dayStartMillis = currentDayStart.toInstant().toEpochMilli()
-//            val dayEndMillis = nextDayStart
-//                .minusNanos(1)
-//                .toInstant()
-//                .toEpochMilli()
-//
-//            ranges.add(dayStartMillis to dayEndMillis)
-//
-//            currentDayStart = nextDayStart
-//        }
-//
-//        return ranges
-//    }
+    fun getDailyRangesForMonth(
+        monthOffset: Long = 0, // 0 = current month, -1 = last month
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): List<Pair<Long, Long>> {
 
+        val now = ZonedDateTime.now(zoneId)
+        val todayStart = now.toLocalDate().atStartOfDay(zoneId)
+
+        val monthStart = now
+            .plusMonths(monthOffset)
+            .withDayOfMonth(1)
+            .toLocalDate()
+            .atStartOfDay(zoneId)
+
+        val monthEnd = monthStart
+            .plusMonths(1)
+            .minusNanos(1)
+
+        val effectiveMonthEnd =
+            if (monthOffset.toInt() == 0) todayStart.plusDays(1).minusNanos(1)
+            else monthEnd
+
+        val ranges = mutableListOf<Pair<Long, Long>>()
+        var currentDayStart = monthStart
+
+        while (!currentDayStart.isAfter(effectiveMonthEnd)) {
+
+            val nextDayStart = currentDayStart.plusDays(1)
+
+            // Stop creating future days for current month
+            if (monthOffset.toInt() == 0 && currentDayStart.isAfter(todayStart)) {
+                break
+            }
+
+            val dayStartMillis = currentDayStart.toInstant().toEpochMilli()
+            val dayEndMillis = minOf(
+                nextDayStart.minusNanos(1).toInstant().toEpochMilli(),
+                now.toInstant().toEpochMilli()
+            )
+
+            ranges.add(dayStartMillis to dayEndMillis)
+            currentDayStart = nextDayStart
+        }
+
+        return ranges
+    }
+
+    /**
+     * getCurrentMonthShortName: This method will return the short name of current month
+     * @param millis: time in millis
+     */
     fun getCurrentMonthShortName(
         millis: Long = System.currentTimeMillis()
     ): String {

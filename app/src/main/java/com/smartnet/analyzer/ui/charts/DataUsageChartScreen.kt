@@ -96,12 +96,22 @@ fun DataUsageChartScreen(
         var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
 
         LaunchedEffect(pagerState.currentPage) {
-            when(pagerState.currentPage) {
+            when (pagerState.currentPage) {
                 0 -> {
-                    chartViewmodel.loadThisMonthOverallUsage()
+                    chartViewmodel.getMonthYearFromMillis(
+                        System.currentTimeMillis(),
+                        chartViewmodel.thisMonthTotalUsage,
+                        chartViewmodel.overallUsageDetail
+                    )
                 }
+
                 1 -> {
-                    chartViewmodel.loadLastMonthOverallUsage()
+                    chartViewmodel.getMonthYearFromMillis(
+                        ZonedDateTime.now().minusMonths(1).withDayOfMonth(1)
+                            .toInstant().toEpochMilli(),
+                        chartViewmodel.lastMonthTotalUsage,
+                        chartViewmodel.overallUsageDetail
+                    )
                 }
             }
         }
@@ -120,7 +130,7 @@ fun DataUsageChartScreen(
 
                     Column {
 
-                        // 🔹 Sliding Charts
+                        //Sliding Charts
                         HorizontalPager(
                             state = pagerState,
                             modifier = Modifier
@@ -163,7 +173,7 @@ fun DataUsageChartScreen(
                                                         else -> "0"
                                                     }
                                                 },
-                                                guideline = null // cleaner look
+                                                guideline = null
                                             ),
 
                                             // ─── Bottom axis ───

@@ -70,4 +70,8 @@ object GlobalFunctions {
             else -> "$bytes B"
         }
     }
+
+    fun bytesToMb(bytes: Long): Float {
+        return bytes / (1024f * 1024f)
+    }
 }

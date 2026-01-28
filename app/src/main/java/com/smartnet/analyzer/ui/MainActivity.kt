@@ -1,12 +1,15 @@
 package com.smartnet.analyzer.ui
 
 import ComposeSpeedTestTheme
+import android.app.Activity
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -44,7 +47,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        hideSystemUI(this)
         setContent {
             ComposeSpeedTestTheme {
                 navController = rememberNavController()
@@ -160,4 +163,18 @@ class MainActivity : ComponentActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
+
+    fun hideSystemUI(activity: Activity) {
+        val window = activity.window
+        val controller = window.insetsController ?: return
+
+        controller.hide(
+            WindowInsets.Type.statusBars() or
+                    WindowInsets.Type.navigationBars()
+        )
+
+        controller.systemBarsBehavior =
+            WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+
 }

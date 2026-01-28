@@ -230,6 +230,7 @@ class ChartViewmodel @Inject constructor(
             dailyDataUsage.add(simUsage + wifiUsage)
             total += simUsage + wifiUsage
         }
+        Log.d("ranges", "total bytes: $total")
         if (isCurrentMonth) thisMonthTotalUsage = total else lastMonthTotalUsage = total
 
         getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
@@ -298,6 +299,7 @@ class ChartViewmodel @Inject constructor(
             currentDayStart = nextDayStart
         }
 
+        Log.d("ranges", "ranges: $ranges")
         return ranges
     }
 

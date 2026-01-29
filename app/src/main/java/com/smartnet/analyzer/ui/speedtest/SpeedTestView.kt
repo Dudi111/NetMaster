@@ -1,5 +1,6 @@
 package com.smartnet.analyzer.ui.speedtest
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -24,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -114,6 +117,7 @@ fun SimpleComposablePreview() {
 }
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SpeedTestScreenMain(
     speedTestViewModel: SpeedTestViewModel = hiltViewModel()
@@ -173,14 +177,17 @@ fun SpeedValue(value: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("DOWNLOAD", style = MaterialTheme.typography.caption)
+        Text("DOWNLOAD", style = MaterialTheme.typography.caption,
+            color = Color.White)
         Text(
             text = value,
             fontSize = 45.sp,
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
-        Text("mbps", style = MaterialTheme.typography.caption)
+        Text("mbps",
+            style = MaterialTheme.typography.caption,
+            color = Color.White)
     }
 }
 
@@ -191,7 +198,12 @@ fun StartButton(isEnabled: Boolean, speedTestViewModel: SpeedTestViewModel) {
         modifier = Modifier.padding(bottom = 24.dp),
         enabled = isEnabled,
         shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(width = 2.dp, color = MaterialTheme.colors.onSurface),
+        border = BorderStroke(width = 2.dp, color = Color.Black),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            disabledContainerColor = Color.White
+        )
         ) {
         Text(
             text = speedTestViewModel.buttonState.value,

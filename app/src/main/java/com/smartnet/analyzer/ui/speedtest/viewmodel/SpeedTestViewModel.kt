@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartnet.analyzer.utils.CoroutineHelper
 import com.smartnet.analyzer.utils.IoDispatcher
 import com.smartnet.analyzer.utils.IoScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -25,6 +27,7 @@ import kotlin.concurrent.timer
 @HiltViewModel
 class SpeedTestViewModel @Inject constructor(
     @IoScope val scope: CoroutineScope,
+    @IoDispatcher val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _maxSpeed = MutableStateFlow("0")
@@ -40,11 +43,12 @@ class SpeedTestViewModel @Inject constructor(
     val floatValue: MutableStateFlow<Float> = _floatValue
 
     var buttonState = mutableStateOf("START")
+    val normalScope = CoroutineHelper.getNormalScope(dispatcher)
 
     fun onStartClick() {
         if (buttonState.value == "START") {
             buttonState.value = "connecting"
-            scope.launch {
+            normalScope.launch {
                 measureSpeedAndPing(
                     speedCallback = { currentSpeedValue ->
                         updateUIState(
@@ -70,7 +74,7 @@ class SpeedTestViewModel @Inject constructor(
             }
         } else {
             buttonState.value = "START"
-            scope.cancel()
+            normalScope.cancel()
         }
     }
 
@@ -84,7 +88,7 @@ class SpeedTestViewModel @Inject constructor(
     ) {
         Log.d("dudi","current speed value: $currentSpeedValue ,max speed: ${maxSpeed.value} , float value: $floatValue")
         if (currentSpeedValue > maxSpeed.value.toDoubleOrNull() ?: 0.0) {
-            maxSpeed.value = currentSpeedValue.toString()
+            maxSpeed.value = String.format("%.1f", currentSpeedValue)
         }
         val formattedSpeed = String.format("%.1f", currentSpeedValue)
         currentSpeed.value = formattedSpeed

@@ -37,7 +37,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -104,6 +107,13 @@ fun Animatable<Float, AnimationVector1D>.toUiState(
 
 )
 
+@Preview
+@Composable
+fun SimpleComposablePreview() {
+    SpeedTestScreenMain()
+}
+
+
 @Composable
 fun SpeedTestScreenMain(
     speedTestViewModel: SpeedTestViewModel = hiltViewModel()
@@ -137,7 +147,8 @@ fun Header() {
     Text(
         text = "SPEEDTEST",
         modifier = Modifier.padding(top = 52.dp, bottom = 16.dp),
-        style = MaterialTheme.typography.h6
+        style = MaterialTheme.typography.h6,
+        color = Color.White
     )
 }
 
@@ -183,8 +194,11 @@ fun StartButton(isEnabled: Boolean, speedTestViewModel: SpeedTestViewModel) {
         border = BorderStroke(width = 2.dp, color = MaterialTheme.colors.onSurface),
         ) {
         Text(
-            text = "START",
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
+            text = speedTestViewModel.buttonState.value,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+            color = Color.Black,
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -197,11 +211,15 @@ fun AdditionalInfo(ping: String, maxSpeed: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
         ) {
-            Text(title)
+            Text(
+                title,
+                color = Color.White
+            )
             Text(
                 value,
                 style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = Color.White
             )
         }
     }

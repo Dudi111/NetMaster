@@ -1,9 +1,15 @@
 package com.smartnet.analyzer.ui.speedtest.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartnet.analyzer.utils.IoDispatcher
+import com.smartnet.analyzer.utils.IoScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.Call
@@ -17,7 +23,9 @@ import javax.inject.Inject
 import kotlin.concurrent.timer
 
 @HiltViewModel
-class SpeedTestViewModel @Inject constructor() : ViewModel() {
+class SpeedTestViewModel @Inject constructor(
+    @IoScope val scope: CoroutineScope,
+) : ViewModel() {
 
     private val _maxSpeed = MutableStateFlow("0")
     val maxSpeed: MutableStateFlow<String> = _maxSpeed
@@ -31,30 +39,38 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
     private val _floatValue = MutableStateFlow(0f)
     val floatValue: MutableStateFlow<Float> = _floatValue
 
+    var buttonState = mutableStateOf("START")
+
     fun onStartClick() {
-        viewModelScope.launch {
-            measureSpeedAndPing(
-                speedCallback = { currentSpeedValue ->
-                    updateUIState(
-                        currentSpeedValue,
-                        0L,
-                        maxSpeed,
-                        currentSpeed,
-                        ping,
-                        floatValue
-                    )
-                },
-                resultCallback = { speed, pingValue ->
-                    updateUIState(
-                        speed,
-                        pingValue,
-                        maxSpeed,
-                        currentSpeed,
-                        ping,
-                        floatValue
-                    )
-                }
-            )
+        if (buttonState.value == "START") {
+            buttonState.value = "connecting"
+            scope.launch {
+                measureSpeedAndPing(
+                    speedCallback = { currentSpeedValue ->
+                        updateUIState(
+                            currentSpeedValue,
+                            0L,
+                            maxSpeed,
+                            currentSpeed,
+                            ping,
+                            floatValue
+                        )
+                    },
+                    resultCallback = { speed, pingValue ->
+                        updateUIState(
+                            speed,
+                            pingValue,
+                            maxSpeed,
+                            currentSpeed,
+                            ping,
+                            floatValue
+                        )
+                    }
+                )
+            }
+        } else {
+            buttonState.value = "START"
+            scope.cancel()
         }
     }
 
@@ -146,6 +162,7 @@ class SpeedTestViewModel @Inject constructor() : ViewModel() {
                                 return
                             }
 
+                            buttonState.value = "STOP"
                             val inputStream = body.byteStream()
                             val buffer = ByteArray(64 * 1024) // 64KB buffer
 

@@ -11,7 +11,6 @@ import androidx.core.content.getSystemService
 import com.smartnet.analyzer.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlin.use
 
 class DataUsageHelper @Inject constructor(
     @ApplicationContext val context: Context

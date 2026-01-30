@@ -79,7 +79,6 @@ class ChartViewmodel @Inject constructor(
         loadAppList()
     }
 
-
     /**
      * loadThisMonthOverallUsage: This method will fetch and load this month data usage to model producer
      */

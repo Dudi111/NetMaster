@@ -68,7 +68,7 @@ fun CustomDialogUI(
         modifier = Modifier
             .height(200.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(10.dp)
     ) {
         Column(
             modifier = Modifier
@@ -102,14 +102,14 @@ fun CustomDialogUI(
                 ) {
                     Text(
                         text = stringResource(btnOKResID).uppercase(),
-                        fontSize =  18.sp,
+                        fontSize =  15.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     )
                 }
                 if (isCancel.value) {
-                    Spacer(modifier = Modifier.width(20.dp))
+                    Spacer(modifier = Modifier.width(15.dp))
                     Button(
                         onClick = onCancelClick,
                         shape = RoundedCornerShape(10.dp),
@@ -123,7 +123,7 @@ fun CustomDialogUI(
                     ) {
                         Text(
                             text = stringResource(btnCancelResID).uppercase(),
-                            fontSize = 18.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             color = Color.Black

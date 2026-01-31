@@ -46,14 +46,14 @@ class DataUsageViewmodel @Inject constructor(
     var totalUsage by mutableStateOf("")
         private set
 
-
-
     fun updateTotalUsage() {
         val totalBytes = dataList.sumOf { it.totalBytes }
         totalUsage = formatBytes(totalBytes)
     }
 
-
+    /**
+     * getDataUsage: This method is used to get data usage
+     */
     fun getDataUsage() {
         val (startTime, endTime) = getTimeRange(dateRanges[2])
         viewModelScope.launch(ioDispatcher) {

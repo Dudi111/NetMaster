@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.sp
 import com.smartnet.analyzer.common.theme.colorAccent
 import com.smartnet.analyzer.common.theme.transparent
 
+/**
+ * MyProgressBar: This method contains view of progress bar
+ */
 @Composable
 fun MyProgressBar(isVisible: MutableState<Boolean>, barText: String = "") {
     val interactionSource = remember { MutableInteractionSource() }

@@ -127,6 +127,9 @@ fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmod
     )
 }
 
+/**
+ * Header: This method contains view of screen header
+ */
 @Composable
 fun Header(
     dataUsageViewmodel: DataUsageViewmodel

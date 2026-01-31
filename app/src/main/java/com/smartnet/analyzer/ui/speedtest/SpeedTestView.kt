@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -128,6 +127,9 @@ fun SpeedTestScreenMain(
     val coroutineScope = rememberCoroutineScope()
     val maximumSpeed by speedTestViewModel.maxSpeed.collectAsState()
     val ping by speedTestViewModel.ping.collectAsState()
+    val currentSpeed by speedTestViewModel.currentSpeed.collectAsState()
+    val animateValue by speedTestViewModel.floatValue.collectAsState()
+
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -199,7 +201,7 @@ fun StartButton(isEnabled: Boolean, speedTestViewModel: SpeedTestViewModel) {
     OutlinedButton(
         onClick = { speedTestViewModel.onStartClick() },
         modifier = Modifier.padding(bottom = 24.dp),
-        enabled = isEnabled,
+        enabled = true,
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(width = 2.dp, color = Color.Black),
         colors = ButtonDefaults.outlinedButtonColors(
@@ -246,7 +248,7 @@ fun AdditionalInfo(ping: String, maxSpeed: String) {
     ) {
         InfoColumn(title = "PING", value = ping)
         VerticalDivider()
-        InfoColumn(title = "MAX SPEED", value = maxSpeed)
+        InfoColumn(title = "AVG SPEED", value = maxSpeed)
     }
 }
 
@@ -261,7 +263,7 @@ fun VerticalDivider() {
 }
 
 @Composable
-fun CircularSpeedIndicator(value: Float, angle: Float) {
+fun CircularSpeedIndicator( angle: Float) {
     Canvas(
         modifier = Modifier
             .fillMaxSize()

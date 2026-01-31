@@ -13,7 +13,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
@@ -34,13 +37,10 @@ class SpeedTestViewModel @Inject constructor(
 
     private val _maxSpeed = MutableStateFlow("0")
     val maxSpeed: MutableStateFlow<String> = _maxSpeed
-
     private val _ping = MutableStateFlow("0")
     val ping: MutableStateFlow<String> = _ping
-
     private val _currentSpeed = MutableStateFlow("0")
     val currentSpeed: MutableStateFlow<String> = _currentSpeed
-
     private val _floatValue = MutableStateFlow(0f)
     val floatValue: MutableStateFlow<Float> = _floatValue
 
@@ -49,30 +49,7 @@ class SpeedTestViewModel @Inject constructor(
     fun onStartClick() {
         if (buttonState.value == "START") {
             buttonState.value = "connecting"
-            viewModelScope.launch(dispatcher) {
-                measureSpeedAndPing(
-                    speedCallback = { currentSpeedValue ->
-                        updateUIState(
-                            currentSpeedValue,
-                            0L,
-                            maxSpeed,
-                            currentSpeed,
-                            ping,
-                            floatValue
-                        )
-                    },
-                    resultCallback = { speed, pingValue ->
-                        updateUIState(
-                            speed,
-                            pingValue,
-                            maxSpeed,
-                            currentSpeed,
-                            ping,
-                            floatValue
-                        )
-                    }
-                )
-            }
+                measureSpeedAndPing()
         } else {
             buttonState.value = "START"
         }
@@ -96,10 +73,7 @@ class SpeedTestViewModel @Inject constructor(
         floatValue.value = (formattedSpeed.toDouble().toLong() / (maxSpeed.value.toDoubleOrNull() ?: 1.0)).toFloat()
     }
 
-    private suspend fun measureSpeedAndPing(
-        speedCallback: (Double) -> Unit,
-        resultCallback: (Double, Long) -> Unit
-    ) {
+    private fun measureSpeedAndPing() = scope.launch {
 
         val api = retrofitHelper.createSpeedApi()
 
@@ -110,43 +84,33 @@ class SpeedTestViewModel @Inject constructor(
         val pingResponse = try {
             api.ping()
         } catch (e: Exception) {
-            println("Ping failed: ${e.message}")
-            resultCallback(-1.0, -1)
-            return
+            Log.e("dudi", "Ping failed", e)
+            _ping.value = "0"
+            return@launch
         }
 
         if (!pingResponse.isSuccessful) {
-            println("Ping error: ${pingResponse.code()}")
-            resultCallback(-1.0, -1)
-            return
+            _ping.value = "0"
+            return@launch
         }
 
         val pingMs = (System.nanoTime() - pingStart) / 1_000_000
-        println("Ping Successful: $pingMs ms")
+        _ping.value = pingMs.toString()
 
         /* -------------------- DOWNLOAD -------------------- */
 
         val downloadStart = System.nanoTime()
 
         val downloadResponse = try {
-            api.download(bytes = 100_000_000L) // ~100MB
+            api.download(bytes = 100_000_000L)
         } catch (e: Exception) {
-            println("Download failed: ${e.message}")
-            resultCallback(-1.0, pingMs)
-            return
+            Log.e("dudi", "Download failed", e)
+            return@launch
         }
 
-        if (!downloadResponse.isSuccessful) {
-            println("Download error: ${downloadResponse.code()}")
-            resultCallback(-1.0, pingMs)
-            return
-        }
+        if (!downloadResponse.isSuccessful) return@launch
 
-        val body = downloadResponse.body() ?: run {
-            println("Response body null")
-            resultCallback(-1.0, pingMs)
-            return
-        }
+        val body = downloadResponse.body() ?: return@launch
 
         val inputStream = body.byteStream()
         val buffer = ByteArray(64 * 1024)
@@ -154,14 +118,24 @@ class SpeedTestViewModel @Inject constructor(
         var totalBytes = 0L
         var lastIntervalBytes = 0L
 
-        val speedTimer = timer(period = 300) {
-            val speedMBps =
-                (lastIntervalBytes / (1024.0 * 1024.0)) * 2 // 500ms → per second
-            speedCallback(speedMBps)
-            lastIntervalBytes = 0L
+        buttonState.value = "STOP"
+
+        /* -------------------- LIVE SPEED JOB -------------------- */
+
+        val speedJob = launch {
+            while (isActive) {
+                delay(300)
+
+                val speedMBps =
+                    (lastIntervalBytes / (1024.0 * 1024.0)) * (1000.0 / 300.0)
+
+                _currentSpeed.value = "%.2f".format(speedMBps)
+                _floatValue.value = speedMBps.toFloat()
+
+                lastIntervalBytes = 0L
+            }
         }
 
-        buttonState.value = "STOP"
         try {
             while (true) {
                 val bytesRead = inputStream.read(buffer)
@@ -171,9 +145,11 @@ class SpeedTestViewModel @Inject constructor(
                 lastIntervalBytes += bytesRead
             }
         } finally {
-            speedTimer.cancel()
+            speedJob.cancel()
             inputStream.close()
         }
+
+        /* -------------------- FINAL SPEED -------------------- */
 
         val elapsedSeconds =
             (System.nanoTime() - downloadStart) / 1_000_000_000.0
@@ -181,7 +157,6 @@ class SpeedTestViewModel @Inject constructor(
         val finalSpeedMBps =
             (totalBytes / (1024.0 * 1024.0)) / elapsedSeconds
 
-        Log.d("dudi","Download Completed: $finalSpeedMBps MB/s")
-        resultCallback(finalSpeedMBps, pingMs)
+        _maxSpeed.value = "%.2f".format(finalSpeedMBps)
     }
 }

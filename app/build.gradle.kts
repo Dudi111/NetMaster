@@ -79,4 +79,10 @@ dependencies {
     implementation("com.patrykandpatrick.vico:core:2.0.2")
     implementation("com.patrykandpatrick.vico:compose:2.0.2")
     implementation("com.patrykandpatrick.vico:compose-m3:2.0.2")
+
+    // Retrofit (stable, production)
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+// OkHttp (Kotlin 1.9 compatible)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

@@ -22,13 +22,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -40,7 +42,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -117,7 +118,7 @@ fun SimpleComposablePreview() {
 }
 
 
-@SuppressLint("StateFlowValueCalledInComposition")
+@SuppressLint("StateFlowValueCalledInComposition", "SuspiciousIndentation")
 @Composable
 fun SpeedTestScreenMain(
     speedTestViewModel: SpeedTestViewModel = hiltViewModel()
@@ -125,6 +126,8 @@ fun SpeedTestScreenMain(
 
     val animation = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
+    val maximumSpeed by speedTestViewModel.maxSpeed.collectAsState()
+    val ping by speedTestViewModel.ping.collectAsState()
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -142,16 +145,16 @@ fun SpeedTestScreenMain(
         ) {
             Header()
             SpeedIndicator(state = uiState, speedTestViewModel = speedTestViewModel)
-            AdditionalInfo(uiState.ping, uiState.maxSpeed)
+            AdditionalInfo("$ping ms", "$maximumSpeed Mbps")
         }
 }
 
 @Composable
 fun Header() {
     Text(
-        text = "SPEEDTEST",
+        text = "SPEED TEST",
         modifier = Modifier.padding(top = 52.dp, bottom = 16.dp),
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.headlineMedium,
         color = Color.White
     )
 }
@@ -177,7 +180,7 @@ fun SpeedValue(value: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("DOWNLOAD", style = MaterialTheme.typography.caption,
+        Text("DOWNLOAD", style = MaterialTheme.typography.bodyLarge,
             color = Color.White)
         Text(
             text = value,
@@ -186,7 +189,7 @@ fun SpeedValue(value: String) {
             fontWeight = FontWeight.Bold
         )
         Text("mbps",
-            style = MaterialTheme.typography.caption,
+            style = MaterialTheme.typography.bodyLarge,
             color = Color.White)
     }
 }
@@ -229,7 +232,7 @@ fun AdditionalInfo(ping: String, maxSpeed: String) {
             )
             Text(
                 value,
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = Color.White
             )

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartnet.analyzer.retrofit.RetrofitHelper
 import com.smartnet.analyzer.utils.CoroutineHelper
 import com.smartnet.analyzer.utils.IoDispatcher
 import com.smartnet.analyzer.utils.IoScope
@@ -27,7 +28,8 @@ import kotlin.concurrent.timer
 @HiltViewModel
 class SpeedTestViewModel @Inject constructor(
     @IoScope val scope: CoroutineScope,
-    @IoDispatcher val dispatcher: CoroutineDispatcher
+    @IoDispatcher val dispatcher: CoroutineDispatcher,
+    private val retrofitHelper: RetrofitHelper
 ) : ViewModel() {
 
     private val _maxSpeed = MutableStateFlow("0")
@@ -43,12 +45,11 @@ class SpeedTestViewModel @Inject constructor(
     val floatValue: MutableStateFlow<Float> = _floatValue
 
     var buttonState = mutableStateOf("START")
-    val normalScope = CoroutineHelper.getNormalScope(dispatcher)
 
     fun onStartClick() {
         if (buttonState.value == "START") {
             buttonState.value = "connecting"
-            normalScope.launch {
+            viewModelScope.launch(dispatcher) {
                 measureSpeedAndPing(
                     speedCallback = { currentSpeedValue ->
                         updateUIState(
@@ -74,7 +75,6 @@ class SpeedTestViewModel @Inject constructor(
             }
         } else {
             buttonState.value = "START"
-            normalScope.cancel()
         }
     }
 
@@ -86,7 +86,7 @@ class SpeedTestViewModel @Inject constructor(
         ping: MutableStateFlow<String>,
         floatValue: MutableStateFlow<Float>
     ) {
-        Log.d("dudi","current speed value: $currentSpeedValue ,max speed: ${maxSpeed.value} , float value: $floatValue")
+        Log.d("dudi","current speed value: $currentSpeedValue ,max speed: ${maxSpeed.value} , float value: ${floatValue.value}")
         if (currentSpeedValue > maxSpeed.value.toDoubleOrNull() ?: 0.0) {
             maxSpeed.value = String.format("%.1f", currentSpeedValue)
         }
@@ -96,112 +96,92 @@ class SpeedTestViewModel @Inject constructor(
         floatValue.value = (formattedSpeed.toDouble().toLong() / (maxSpeed.value.toDoubleOrNull() ?: 1.0)).toFloat()
     }
 
-
-    fun measureSpeedAndPing(
+    private suspend fun measureSpeedAndPing(
         speedCallback: (Double) -> Unit,
         resultCallback: (Double, Long) -> Unit
     ) {
 
-        // Cloudflare endpoints
-        val pingUrl = "https://speed.cloudflare.com/__down?bytes=0"
-        val downloadUrl = "https://speed.cloudflare.com/__down?bytes=100000000" // ~100MB
-
-        val client = OkHttpClient.Builder()
-            .protocols(listOf(Protocol.HTTP_1_1)) // Keep HTTP/1.1
-            .retryOnConnectionFailure(true)
-            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .build()
+        val api = retrofitHelper.createSpeedApi()
 
         /* -------------------- PING -------------------- */
 
         val pingStart = System.nanoTime()
-        val pingRequest = Request.Builder()
-            .url(pingUrl)
-            .addHeader("User-Agent", "Mozilla/5.0")
-            .build()
 
-        client.newCall(pingRequest).enqueue(object : Callback {
+        val pingResponse = try {
+            api.ping()
+        } catch (e: Exception) {
+            println("Ping failed: ${e.message}")
+            resultCallback(-1.0, -1)
+            return
+        }
 
-            override fun onFailure(call: Call, e: IOException) {
-                println("Ping Request Failed: ${e.message}")
-                resultCallback(-1.0, -1)
+        if (!pingResponse.isSuccessful) {
+            println("Ping error: ${pingResponse.code()}")
+            resultCallback(-1.0, -1)
+            return
+        }
+
+        val pingMs = (System.nanoTime() - pingStart) / 1_000_000
+        println("Ping Successful: $pingMs ms")
+
+        /* -------------------- DOWNLOAD -------------------- */
+
+        val downloadStart = System.nanoTime()
+
+        val downloadResponse = try {
+            api.download(bytes = 100_000_000L) // ~100MB
+        } catch (e: Exception) {
+            println("Download failed: ${e.message}")
+            resultCallback(-1.0, pingMs)
+            return
+        }
+
+        if (!downloadResponse.isSuccessful) {
+            println("Download error: ${downloadResponse.code()}")
+            resultCallback(-1.0, pingMs)
+            return
+        }
+
+        val body = downloadResponse.body() ?: run {
+            println("Response body null")
+            resultCallback(-1.0, pingMs)
+            return
+        }
+
+        val inputStream = body.byteStream()
+        val buffer = ByteArray(64 * 1024)
+
+        var totalBytes = 0L
+        var lastIntervalBytes = 0L
+
+        val speedTimer = timer(period = 300) {
+            val speedMBps =
+                (lastIntervalBytes / (1024.0 * 1024.0)) * 2 // 500ms → per second
+            speedCallback(speedMBps)
+            lastIntervalBytes = 0L
+        }
+
+        buttonState.value = "STOP"
+        try {
+            while (true) {
+                val bytesRead = inputStream.read(buffer)
+                if (bytesRead == -1) break
+
+                totalBytes += bytesRead
+                lastIntervalBytes += bytesRead
             }
+        } finally {
+            speedTimer.cancel()
+            inputStream.close()
+        }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.close()
+        val elapsedSeconds =
+            (System.nanoTime() - downloadStart) / 1_000_000_000.0
 
-                val pingEnd = System.nanoTime()
-                val pingMs = (pingEnd - pingStart) / 1_000_000
-                println("Ping Successful: $pingMs ms")
+        val finalSpeedMBps =
+            (totalBytes / (1024.0 * 1024.0)) / elapsedSeconds
 
-                /* -------------------- DOWNLOAD -------------------- */
-
-                val startTime = System.nanoTime()
-                val downloadRequest = Request.Builder()
-                    .url(downloadUrl)
-                    .addHeader("User-Agent", "Mozilla/5.0")
-                    .build()
-
-                client.newCall(downloadRequest).enqueue(object : Callback {
-
-                    override fun onFailure(call: Call, e: IOException) {
-                        println("Download Request Failed: ${e.message}")
-                        resultCallback(-1.0, pingMs)
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-                        response.use {
-
-                            if (!response.isSuccessful) {
-                                println("Server Error: ${response.code}")
-                                resultCallback(-1.0, pingMs)
-                                return
-                            }
-
-                            val body = response.body ?: run {
-                                println("Response Body is Null")
-                                resultCallback(-1.0, pingMs)
-                                return
-                            }
-
-                            buttonState.value = "STOP"
-                            val inputStream = body.byteStream()
-                            val buffer = ByteArray(64 * 1024) // 64KB buffer
-
-                            var bytesRead: Int
-                            var totalBytes = 0L
-                            var lastIntervalBytes = 0L
-
-                            val speedTimer = timer(period = 500) {
-                                val speedMBps =
-                                    (lastIntervalBytes / (1024.0 * 1024.0)) * 2 // 500ms → per second
-                                speedCallback(speedMBps)
-                                lastIntervalBytes = 0L
-                            }
-
-                            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                                totalBytes += bytesRead
-                                lastIntervalBytes += bytesRead
-                            }
-
-                            speedTimer.cancel()
-
-                            val endTime = System.nanoTime()
-                            val elapsedSeconds =
-                                (endTime - startTime) / 1_000_000_000.0
-
-                            val finalSpeedMBps =
-                                (totalBytes / (1024.0 * 1024.0)) / elapsedSeconds
-
-                            println("Download Completed: $finalSpeedMBps MB/s")
-                            resultCallback(finalSpeedMBps, pingMs)
-                        }
-                    }
-                })
-            }
-        })
+        Log.d("dudi","Download Completed: $finalSpeedMBps MB/s")
+        resultCallback(finalSpeedMBps, pingMs)
     }
-
 }

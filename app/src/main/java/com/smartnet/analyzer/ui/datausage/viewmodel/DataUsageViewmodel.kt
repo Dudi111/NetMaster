@@ -2,7 +2,6 @@ package com.smartnet.analyzer.ui.datausage.viewmodel
 
 import android.content.Context
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,10 +16,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 
@@ -30,6 +25,7 @@ class DataUsageViewmodel @Inject constructor(
     private val dataUsageHelper: DataUsageHelper,
     @IoDispatcher var ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(){
+
 
     var progressState = mutableStateOf(false)
     var uiState = mutableStateOf(false)

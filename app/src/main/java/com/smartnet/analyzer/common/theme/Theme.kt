@@ -1,6 +1,6 @@
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 
-import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.smartnet.analyzer.common.theme.DarkColor2
@@ -25,7 +25,7 @@ fun ComposeSpeedTestTheme(
 ) {
 
     MaterialTheme(
-        colors = ColorPalette,
+    //    colors = ColorPalette,
         typography = Typography1,
         shapes = Shapes,
         content = content

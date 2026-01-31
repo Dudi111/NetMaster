@@ -71,7 +71,6 @@ class ChartViewmodel @Inject constructor(
     val appWiseModelProducer = CartesianChartModelProducer()
     val lastMonthModelProducer = CartesianChartModelProducer()
 
-
     init {
         loadThisMonthOverallUsage()
         loadNetworkUsage(NETWORK_TYPE_CELLULAR)

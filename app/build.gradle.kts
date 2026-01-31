@@ -58,7 +58,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3.android)
     implementation(libs.com.squareup.okhttp3)
     // test cases
     androidTestImplementation(libs.androidx.junit)
@@ -82,7 +81,4 @@ dependencies {
 
     // Retrofit (stable, production)
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
-
-// OkHttp (Kotlin 1.9 compatible)
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

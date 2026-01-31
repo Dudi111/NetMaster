@@ -12,6 +12,9 @@ import com.smartnet.analyzer.ui.common.NetMasterScreen
 import com.smartnet.analyzer.ui.datausage.DataUsageScreen
 import com.smartnet.analyzer.ui.speedtest.SpeedTestScreenMain
 
+/**
+ * NetMasterScreenHolder: This method is used to hold the navigation graph
+ */
 @Composable
 fun NetMasterScreenHolder(
     navController : NavHostController

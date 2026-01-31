@@ -111,6 +111,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * dialogInit: This method is used to display dialog
+     */
     @Composable
     fun dialogInit(navController: NavHostController) {
        // LaunchedEffect(key1 = dialogState.value) {}
@@ -141,12 +144,15 @@ class MainActivity : ComponentActivity() {
             Log.d("dudi","data usage perm not granted")
             dialogState.value = true
         } else {
-            Log.d("dudi","data usage perm not granted")
+            Log.d("dudi","data usage perm granted")
             dialogState.value = false
         }
         super.onResume()
     }
 
+    /**
+     * hasUsageAccess: This method is used to check data usage access permission
+     */
     fun hasUsageAccess(context: Context): Boolean {
         val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = appOps.checkOpNoThrow(
@@ -158,12 +164,18 @@ class MainActivity : ComponentActivity() {
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
+    /**
+     * requestUsageAccess: This method is used to request data usage access permission
+     */
     fun requestUsageAccess(context: Context) {
         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
 
+    /**
+     * hideSystemUI: This method is used to hide system UI elements
+     */
     fun hideSystemUI(activity: Activity) {
         val window = activity.window
         val controller = window.insetsController ?: return

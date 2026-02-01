@@ -1,7 +1,6 @@
 package com.smartnet.analyzer.ui.speedtest.viewmodel
 
 import android.annotation.SuppressLint
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartnet.analyzer.data.UIState
@@ -26,8 +25,6 @@ class SpeedTestViewModel @Inject constructor(
     private val retrofitHelper: RetrofitHelper
 ) : ViewModel() {
 
-    var buttonState = mutableStateOf("START")
-
     private val _uiState = MutableStateFlow(UIState())
     val uiState: StateFlow<UIState> = _uiState
 
@@ -35,14 +32,9 @@ class SpeedTestViewModel @Inject constructor(
 
     @SuppressLint("SuspiciousIndentation")
     fun onStartClick() {
-        if (buttonState.value == "START") {
-            buttonState.value = "connecting"
-            peakSpeed = 0f
-            _uiState.value = UIState(isRunning = true)
-            startSpeedTest()
-        } else {
-            buttonState.value = "START"
-        }
+        peakSpeed = 0f
+        _uiState.value = UIState(btnState = "connecting")
+        startSpeedTest()
     }
 
     fun onSpeedUpdate(speedMbps: Float) {
@@ -86,6 +78,7 @@ class SpeedTestViewModel @Inject constructor(
         val input = body.byteStream()
         val buffer = ByteArray(64 * 1024)
 
+        _uiState.update { it.copy(btnState = "STOP") }
         var lastBytes = 0L
 
         val speedJob = launch {
@@ -107,7 +100,10 @@ class SpeedTestViewModel @Inject constructor(
         } finally {
             speedJob.cancel()
             input.close()
-            _uiState.update { it.copy(isRunning = false) }
+            _uiState.update { it.copy(btnState = "START",
+                currentSpeedMbps = 0f,
+                speedometerProgress = 0f
+            )}
         }
     }
 }

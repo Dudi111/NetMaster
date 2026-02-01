@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DataUsageViewmodel @Inject constructor(
     private val dataUsageHelper: DataUsageHelper,
-    @field:IoDispatcher var ioDispatcher: CoroutineDispatcher,
+    @IoDispatcher var ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(){
 
 

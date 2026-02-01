@@ -85,11 +85,12 @@ fun SpeedTestScreenMain(
         SpeedIndicator(
             arcValue = animation.value,
             speed = uiState.currentSpeedMbps,
-            speedTestViewModel = speedTestViewModel
+            speedTestViewModel = speedTestViewModel,
+            btnName = uiState.btnState
         )
         AdditionalInfo(
             ping = "${uiState.pingMs} ms",
-            maxSpeed = "${uiState.maxSpeedMbps} Mbps"
+            maxSpeed = "${"%.2f".format(uiState.maxSpeedMbps)} Mbps"
         )
     }
 }
@@ -108,7 +109,8 @@ fun Header() {
 fun SpeedIndicator(
     arcValue: Float,
     speed: Float,
-    speedTestViewModel: SpeedTestViewModel
+    speedTestViewModel: SpeedTestViewModel,
+    btnName: String
 ) {
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -117,7 +119,7 @@ fun SpeedIndicator(
             .aspectRatio(1f)
     ) {
         CircularSpeedIndicator(arcValue)
-        StartButton(speedTestViewModel)
+        StartButton(speedTestViewModel, btnName)
         SpeedValue("%.1f".format(speed))
     }
 }
@@ -145,21 +147,21 @@ fun SpeedValue(value: String) {
 }
 
 @Composable
-fun StartButton( speedTestViewModel: SpeedTestViewModel) {
+fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
     OutlinedButton(
         onClick = { speedTestViewModel.onStartClick() },
         modifier = Modifier.padding(bottom = 24.dp),
-        enabled = true,
+        enabled =  btnName == "START",
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(width = 2.dp, color = Color.Black),
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = Color.White,
             contentColor = Color.Black,
-            disabledContainerColor = Color.White
+            disabledContainerColor = Color.Gray
         )
         ) {
         Text(
-            text = speedTestViewModel.buttonState.value,
+            text = btnName,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
             color = Color.Black,
             fontStyle = FontStyle.Normal,
@@ -196,7 +198,7 @@ fun AdditionalInfo(ping: String, maxSpeed: String) {
     ) {
         InfoColumn(title = "PING", value = ping)
         VerticalDivider()
-        InfoColumn(title = "AVG SPEED", value = maxSpeed)
+        InfoColumn(title = "MAX SPEED", value = maxSpeed)
     }
 }
 

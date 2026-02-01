@@ -2,7 +2,6 @@ package com.smartnet.analyzer.ui.speedtest
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -28,10 +27,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -52,64 +49,8 @@ import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
 import com.smartnet.analyzer.common.theme.LightColor
-import com.smartnet.analyzer.data.UIState
 import com.smartnet.analyzer.ui.speedtest.viewmodel.SpeedTestViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlin.math.floor
-
-//suspend fun startDynamicAnimation(
-//    animation: Animatable<Float, AnimationVector1D>,
-//    maxSpeed: MutableStateFlow<String>,
-//    ping: MutableStateFlow<String>,
-//    currentSpeed: MutableStateFlow<String>,
-//    floatValue: MutableStateFlow<Float>
-//) {
-//  //  animation.animateTo(1f) // Normalize animation progress
-//    val speedPerLine = 0.5f
-//    val totalBigLines = 9
-//    val maxGaugeSpeed = (totalBigLines - 1) * speedPerLine // 4.0 Mbps
-//
-//    while (true) {
-//
-//        val speedMbps = currentSpeed.value.toFloatOrNull() ?: 0f
-//
-//        // Clamp speed to gauge limit
-//        val clampedSpeed = speedMbps.coerceIn(0f, maxGaugeSpeed)
-//
-//        // Normalize for animation (0f → 1f)
-//        val normalizedProgress =
-//            (clampedSpeed / maxGaugeSpeed).coerceIn(0f, 1f)
-//
-//        // Expose to UI if needed
-//        floatValue.value = normalizedProgress
-//
-//        // Animate smoothly to correct tick
-//        animation.animateTo(
-//            targetValue = normalizedProgress,
-//            animationSpec = tween(
-//                durationMillis = 400,
-//                easing = FastOutSlowInEasing
-//            )
-//        )
-//
-//        delay(300)
-//    }
-//}
-
-//fun Animatable<Float, AnimationVector1D>.toUiState(
-//    maxSpeed: String,
-//    currentSpeed: String,
-//    ping: String
-//) = UIState(
-//    arcValue = value,
-//    speed = currentSpeed,
-//    ping = "$ping ms",
-//    maxSpeed = "$maxSpeed Mbps",
-//    inProgress = false
-//
-//)
 
 @Preview
 @Composable
@@ -117,39 +58,11 @@ fun SimpleComposablePreview() {
     SpeedTestScreenMain()
 }
 
-
 @SuppressLint("StateFlowValueCalledInComposition", "SuspiciousIndentation")
 @Composable
 fun SpeedTestScreenMain(
     speedTestViewModel: SpeedTestViewModel = hiltViewModel()
 ) {
-
-//    val animation = remember { Animatable(0f) }
-//    val coroutineScope = rememberCoroutineScope()
-//    val maximumSpeed by speedTestViewModel.maxSpeed.collectAsState()
-//    val ping by speedTestViewModel.ping.collectAsState()
-//    val currentSpeed by speedTestViewModel.currentSpeed.collectAsState()
-//    val animateValue by speedTestViewModel.floatValue.collectAsState()
-//
-//
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            startDynamicAnimation(animation, speedTestViewModel.maxSpeed, speedTestViewModel.ping, speedTestViewModel.currentSpeed, speedTestViewModel.floatValue)
-//        }
-//    }
-//
-//    val uiState = animation.toUiState(speedTestViewModel.maxSpeed.value, speedTestViewModel.currentSpeed.value, speedTestViewModel.ping.value)
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(DarkGradient),
-//            verticalArrangement = Arrangement.SpaceBetween,
-//        ) {
-//            Header()
-//            SpeedIndicator(state = uiState, speedTestViewModel = speedTestViewModel)
-//            AdditionalInfo("$ping ms", "$maximumSpeed Mbps")
-//        }
 
     val uiState by speedTestViewModel.uiState.collectAsStateWithLifecycle()
     val animation = remember { Animatable(0f) }
@@ -191,20 +104,6 @@ fun Header() {
     )
 }
 
-//@Composable
-//fun SpeedIndicator(state: UIState, speedTestViewModel: SpeedTestViewModel) {
-//    Box(
-//        contentAlignment = Alignment.BottomCenter,
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .aspectRatio(1f)
-//    ) {
-//        CircularSpeedIndicator(state.arcValue)
-//        StartButton( speedTestViewModel)
-//        SpeedValue(state.speed)
-//    }
-//}
-
 @Composable
 fun SpeedIndicator(
     arcValue: Float,
@@ -218,10 +117,6 @@ fun SpeedIndicator(
             .aspectRatio(1f)
     ) {
         CircularSpeedIndicator(arcValue)
-//        OutlinedButton(onClick = onStartClick) {
-//            Text("START")
-//        }
-
         StartButton(speedTestViewModel)
         SpeedValue("%.1f".format(speed))
     }

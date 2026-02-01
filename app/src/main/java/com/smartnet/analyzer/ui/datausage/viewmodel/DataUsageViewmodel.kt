@@ -1,6 +1,6 @@
 package com.smartnet.analyzer.ui.datausage.viewmodel
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.net.NetworkCapabilities
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +13,6 @@ import com.smartnet.analyzer.utils.Constants
 import com.smartnet.analyzer.utils.GlobalFunctions.getTimeRange
 import com.smartnet.analyzer.utils.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,9 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DataUsageViewmodel @Inject constructor(
-    @ApplicationContext context: Context,
     private val dataUsageHelper: DataUsageHelper,
-    @IoDispatcher var ioDispatcher: CoroutineDispatcher,
+    @field:IoDispatcher var ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(){
 
 
@@ -72,6 +70,7 @@ class DataUsageViewmodel @Inject constructor(
         }
     }
 
+    @SuppressLint("DefaultLocale")
     fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
 

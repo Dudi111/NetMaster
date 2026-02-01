@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         NetMasterScreenHolder(navController!!)
                     }
                 }
-                dialogInit(navController!!)
+                DialogInit(navController!!)
             }
         }
     }
@@ -80,22 +80,6 @@ class MainActivity : ComponentActivity() {
             R.drawable.settings
         )
         var selectedItem by rememberSaveable { mutableIntStateOf(2) }
-
-//        BottomNavigation(backgroundColor = DarkColor) {
-//            items.mapIndexed { index, item ->
-//                BottomNavigationItem(selected = index == selectedItem,
-//                    onClick = {
-//                        selectedItem = index
-//                        onIconClick(index)
-//                    },
-//                    selectedContentColor = Pink,
-//                    unselectedContentColor = MaterialTheme.colors.onSurface,
-//                    icon = {
-//                        Icon(painterResource(id = item), null)
-//                    }
-//                )
-//            }
-//        }
 
         NavigationBar(
             containerColor = DarkColor
@@ -144,9 +128,7 @@ class MainActivity : ComponentActivity() {
      */
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun dialogInit(navController: NavHostController) {
-       // LaunchedEffect(key1 = dialogState.value) {}
-
+    fun DialogInit(navController: NavHostController) {
         if (dialogState.value) {
             RoundCornerDialogView(
                 R.string.data_usage_perm,

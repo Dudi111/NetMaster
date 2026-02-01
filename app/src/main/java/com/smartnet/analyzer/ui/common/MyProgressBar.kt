@@ -17,10 +17,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smartnet.analyzer.common.theme.colorAccent
 import com.smartnet.analyzer.common.theme.transparent
 
 /**
@@ -49,7 +49,7 @@ fun MyProgressBar(isVisible: MutableState<Boolean>, barText: String = "") {
                 modifier = Modifier
                     .width(50.dp)
                     .height(50.dp),
-                color = colorAccent,
+                color = Color.Gray,
                 strokeWidth = Dp(value = 4F)
             )
 

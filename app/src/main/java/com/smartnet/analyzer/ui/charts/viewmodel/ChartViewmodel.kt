@@ -74,9 +74,9 @@ class ChartViewmodel @Inject constructor(
 
     init {
         if (GlobalFunctions.hasUsageAccess(context)) {
-            loadThisMonthOverallUsage()
-            loadNetworkUsage(NETWORK_TYPE_CELLULAR)
             loadLastMonthOverallUsage()
+            loadNetworkUsage(NETWORK_TYPE_CELLULAR)
+            loadThisMonthOverallUsage()
             loadAppList()
         }
     }

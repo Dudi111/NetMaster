@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">Net Master</string>
 
-    <string name="setting_btn">Settings</string>
+    <string name="setting_btn">Go To Settings</string>
     <string name="btn_cancel">Cancel</string>
 
     <string name="data_usage_perm">Please provide data usage permission from settings</string>
-
 </resources>

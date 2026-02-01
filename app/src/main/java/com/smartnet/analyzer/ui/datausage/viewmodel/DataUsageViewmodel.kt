@@ -70,6 +70,9 @@ class DataUsageViewmodel @Inject constructor(
         }
     }
 
+    /**
+     * formatBytes: This method is used to format bytes
+     */
     @SuppressLint("DefaultLocale")
     fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
@@ -86,6 +89,9 @@ class DataUsageViewmodel @Inject constructor(
         }
     }
 
+    /**
+     * getNetworkType: This method is used to get network type
+     */
     fun getNetworkType(type: String): Int {
         return when(type) {
             Constants.NETWORK_TYPE_CELLULAR -> NetworkCapabilities.TRANSPORT_CELLULAR

@@ -686,12 +686,14 @@ fun AppSelectionDialog(
 
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color(0xFF1E1E1E),
+            color = Color.Gray,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = 500.dp) // 🔑 makes dialog scrollable
         ) {
-            Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
                 // 🔹 Title
                 Text(
@@ -702,7 +704,7 @@ fun AppSelectionDialog(
                     modifier = Modifier.padding(16.dp)
                 )
 
-                HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f))
+                HorizontalDivider(color = Color.White.copy(alpha = 0.4f))
 
                 // 🔹 Scrollable App List
                 LazyColumn(
@@ -722,8 +724,8 @@ fun AppSelectionDialog(
                                 selected = chartViewmodel.selectedAppIndex.intValue == index,
                                 onClick = { chartViewmodel.selectedAppIndex.intValue = index },
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = Color(0xFF0A66FF),
-                                    unselectedColor = Color.Gray
+                                    selectedColor = Color.Black,
+                                    unselectedColor = Color.White
                                 )
                             )
 
@@ -737,7 +739,7 @@ fun AppSelectionDialog(
                     }
                 }
 
-                HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f))
+                HorizontalDivider(color = Color.White.copy(alpha = 0.4f))
 
                 // 🔹 Buttons
                 Row(
@@ -747,7 +749,7 @@ fun AppSelectionDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel", color = Color.Gray)
+                        Text("Cancel", color = Color.White)
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -756,7 +758,7 @@ fun AppSelectionDialog(
                         onClick = { onConfirm(chartViewmodel.selectedAppIndex.intValue) },
                         enabled = chartViewmodel.selectedAppIndex.intValue != -1
                     ) {
-                        Text("OK", color = Color(0xFF0A66FF))
+                        Text("OK", color = Color.White)
                     }
                 }
             }

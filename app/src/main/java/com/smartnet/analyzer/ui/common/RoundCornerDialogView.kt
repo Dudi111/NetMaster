@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -27,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.smartnet.analyzer.common.theme.colorAccent
 
 @Composable
 fun RoundCornerDialogView(
@@ -65,14 +66,14 @@ fun CustomDialogUI(
 ) {
     Card(
         modifier = Modifier
-            .height(200.dp)
+            .wrapContentHeight()
             .fillMaxWidth(),
         shape = RoundedCornerShape(10.dp)
     ) {
         Column(
             modifier = Modifier
-                .background(color = colorAccent)
-                .padding(15.dp),
+                .background(color = Color.Gray)
+                .padding(13.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -83,7 +84,7 @@ fun CustomDialogUI(
                 textAlign = TextAlign.Center,
                 color = Color.White
             )
-            Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(35.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -98,7 +99,7 @@ fun CustomDialogUI(
                         disabledContentColor = Color.Gray
                     ),
                     modifier = Modifier
-                        .width(110.dp)
+                        .wrapContentWidth()
                         //.semantics { this.contentDescription = btnDialogPositive; this.testTag = btnDialogPositive },
                 ) {
                     Text(
@@ -121,7 +122,7 @@ fun CustomDialogUI(
                             disabledContentColor = Color.Gray
                         ),
                         modifier = Modifier
-                            .width(110.dp)
+                            .wrapContentWidth()
                          //   .semantics { this.contentDescription = btnDialogNegative; this.testTag = btnDialogNegative },
                     ) {
                         Text(

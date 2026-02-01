@@ -148,6 +148,7 @@ fun Header(
             modifier = Modifier.padding(top = 52.dp, bottom = 16.dp)
                 .align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.headlineMedium,
+            color = Color.White
         )
 
         Row(

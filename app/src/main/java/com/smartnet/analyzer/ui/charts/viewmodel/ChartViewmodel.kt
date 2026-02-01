@@ -36,8 +36,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChartViewmodel @Inject constructor(
-    @ApplicationContext val context: Context,
-    @IoDispatcher val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationContext val context: Context,
+    @param:IoDispatcher val ioDispatcher: CoroutineDispatcher,
     private val dataUsageHelper: DataUsageHelper,
 ) : ViewModel() {
 

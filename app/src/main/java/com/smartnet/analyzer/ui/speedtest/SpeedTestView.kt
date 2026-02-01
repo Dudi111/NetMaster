@@ -149,9 +149,9 @@ fun SpeedValue(value: String) {
 @Composable
 fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
     OutlinedButton(
-        onClick = { speedTestViewModel.onStartClick() },
+        onClick = { speedTestViewModel.onStartClick(btnName) },
         modifier = Modifier.padding(bottom = 24.dp),
-        enabled =  btnName == "START",
+        enabled =  btnName != "connecting",
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(width = 2.dp, color = Color.Black),
         colors = ButtonDefaults.outlinedButtonColors(

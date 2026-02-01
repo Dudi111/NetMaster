@@ -1,5 +1,6 @@
 package com.smartnet.analyzer.utils
 
+import android.annotation.SuppressLint
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -61,6 +62,7 @@ object GlobalFunctions {
         )
     }
 
+    @SuppressLint("DefaultLocale")
     fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
 

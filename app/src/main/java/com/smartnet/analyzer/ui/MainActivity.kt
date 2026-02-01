@@ -29,7 +29,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.smartnet.analyzer.R
@@ -74,12 +76,11 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun NavigationView() {
         val items = listOf(
-            R.drawable.wifi,
             R.drawable.person,
             R.drawable.speed,
-            R.drawable.settings
+            R.drawable.wifi
         )
-        var selectedItem by rememberSaveable { mutableIntStateOf(2) }
+        var selectedItem by rememberSaveable { mutableIntStateOf(1) }
 
         NavigationBar(
             containerColor = DarkColor
@@ -94,11 +95,13 @@ class MainActivity : ComponentActivity() {
                     icon = {
                         Icon(
                             painter = painterResource(id = item),
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.padding(vertical = 5.dp)
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Pink,
+                        selectedIconColor = Color.Gray,
                         unselectedIconColor = MaterialTheme.colorScheme.onSurface,
                         indicatorColor = Pink.copy(alpha = 0.12f)
                     )
@@ -109,15 +112,15 @@ class MainActivity : ComponentActivity() {
 
     fun onIconClick(index: Int) {
         when(index) {
-            1 -> {
+            0 -> {
                 navController!!.navigate(NetMasterScreen.DataUsageScreen.route)
             }
 
-            2 -> {
+            1 -> {
                 navController!!.navigate(NetMasterScreen.SpeedTestScreen.route)
             }
 
-            3 -> {
+            2 -> {
                 navController!!.navigate(NetMasterScreen.ChartScreen.route)
             }
         }
@@ -195,9 +198,7 @@ class MainActivity : ComponentActivity() {
             WindowInsets.Type.statusBars() or
                     WindowInsets.Type.navigationBars()
         )
-
         controller.systemBarsBehavior =
             WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
-
 }

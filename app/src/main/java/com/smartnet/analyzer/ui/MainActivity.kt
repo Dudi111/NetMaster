@@ -165,7 +165,7 @@ class MainActivity : ComponentActivity() {
      * hasUsageAccess: This method is used to check data usage access permission
      */
     fun hasUsageAccess(context: Context): Boolean {
-        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val appOps = context.getSystemService(APP_OPS_SERVICE) as AppOpsManager
         val mode = appOps.checkOpNoThrow(
             AppOpsManager.OPSTR_GET_USAGE_STATS,
             android.os.Process.myUid(),

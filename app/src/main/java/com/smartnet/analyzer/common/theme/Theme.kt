@@ -1,5 +1,5 @@
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -9,14 +9,21 @@ import com.smartnet.analyzer.common.theme.Purple700
 import com.smartnet.analyzer.common.theme.Teal200
 import com.smartnet.analyzer.common.theme.Typography1
 
-private val ColorPalette = darkColors(
+private val ColorPalette = darkColorScheme(
     primary = Color.White,
-    primaryVariant = Purple700,
     secondary = Teal200,
+
     background = DarkColor2,
     surface = DarkColor2,
+
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+
+    onBackground = LightColor2,
     onSurface = LightColor2,
-    onBackground = LightColor2
+
+    primaryContainer = Purple700,
+    onPrimaryContainer = Color.White
 )
 
 @Composable
@@ -25,7 +32,7 @@ fun ComposeSpeedTestTheme(
 ) {
 
     MaterialTheme(
-    //    colors = ColorPalette,
+        colorScheme = ColorPalette,
         typography = Typography1,
         shapes = Shapes,
         content = content

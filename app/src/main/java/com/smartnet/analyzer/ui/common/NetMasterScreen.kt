@@ -1,6 +1,5 @@
 package com.smartnet.analyzer.ui.common
 
-import com.smartnet.analyzer.R
 
 /**
  * ScreenId: This object contains all the screen ids

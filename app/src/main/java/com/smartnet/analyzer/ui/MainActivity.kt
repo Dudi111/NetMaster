@@ -1,6 +1,7 @@
 package com.smartnet.analyzer.ui
 
 import ComposeSpeedTestTheme
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AppOpsManager
 import android.content.Context
@@ -14,14 +15,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -76,20 +79,45 @@ class MainActivity : ComponentActivity() {
             R.drawable.speed,
             R.drawable.settings
         )
-        var selectedItem by rememberSaveable { mutableStateOf(2) }
+        var selectedItem by rememberSaveable { mutableIntStateOf(2) }
 
-        BottomNavigation(backgroundColor = DarkColor) {
-            items.mapIndexed { index, item ->
-                BottomNavigationItem(selected = index == selectedItem,
+//        BottomNavigation(backgroundColor = DarkColor) {
+//            items.mapIndexed { index, item ->
+//                BottomNavigationItem(selected = index == selectedItem,
+//                    onClick = {
+//                        selectedItem = index
+//                        onIconClick(index)
+//                    },
+//                    selectedContentColor = Pink,
+//                    unselectedContentColor = MaterialTheme.colors.onSurface,
+//                    icon = {
+//                        Icon(painterResource(id = item), null)
+//                    }
+//                )
+//            }
+//        }
+
+        NavigationBar(
+            containerColor = DarkColor
+        ) {
+            items.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    selected = index == selectedItem,
                     onClick = {
                         selectedItem = index
                         onIconClick(index)
                     },
-                    selectedContentColor = Pink,
-                    unselectedContentColor = MaterialTheme.colors.onSurface,
                     icon = {
-                        Icon(painterResource(id = item), null)
-                    }
+                        Icon(
+                            painter = painterResource(id = item),
+                            contentDescription = null
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Pink,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                        indicatorColor = Pink.copy(alpha = 0.12f)
+                    )
                 )
             }
         }
@@ -114,6 +142,7 @@ class MainActivity : ComponentActivity() {
     /**
      * dialogInit: This method is used to display dialog
      */
+    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun dialogInit(navController: NavHostController) {
        // LaunchedEffect(key1 = dialogState.value) {}

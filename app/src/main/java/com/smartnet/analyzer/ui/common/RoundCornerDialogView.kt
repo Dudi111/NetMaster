@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -64,7 +64,6 @@ fun CustomDialogUI(
     onCancelClick: () -> Unit,
 ) {
     Card(
-        elevation = 10.dp,
         modifier = Modifier
             .height(200.dp)
             .fillMaxWidth(),
@@ -92,9 +91,11 @@ fun CustomDialogUI(
                 Button(
                     onClick = onOkClick,
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.White,
-                        contentColor = Color.Gray
+                    colors = ButtonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Gray,
+                        disabledContainerColor = Color.White,
+                        disabledContentColor = Color.Gray
                     ),
                     modifier = Modifier
                         .width(110.dp)
@@ -113,9 +114,11 @@ fun CustomDialogUI(
                     Button(
                         onClick = onCancelClick,
                         shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.Gray
+                        colors = ButtonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Gray,
+                            disabledContainerColor = Color.White,
+                            disabledContentColor = Color.Gray
                         ),
                         modifier = Modifier
                             .width(110.dp)

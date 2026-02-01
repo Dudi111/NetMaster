@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,9 +72,11 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
 import com.smartnet.analyzer.common.theme.white
+import com.smartnet.analyzer.ui.MainActivity
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
+import com.smartnet.analyzer.utils.GlobalFunctions
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -84,8 +87,14 @@ fun DataUsageChartScreen(
     var expanded by remember { mutableStateOf(false) }
     var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
     val pagerState = rememberPagerState(pageCount = { 2 })
+    val context = LocalContext.current as MainActivity
 
     LaunchedEffect(pagerState.currentPage) {
+
+        if (!GlobalFunctions.hasUsageAccess(context)) {
+            context.dialogState.value = true
+        }
+
         when (pagerState.currentPage) {
             0 -> {
                 chartViewmodel.getMonthYearFromMillis(
@@ -170,6 +179,7 @@ private fun MonthPagerSection(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
     CartesianChartHost(
@@ -220,6 +230,7 @@ fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
 }
 
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun LastMonthChart(chartViewmodel: ChartViewmodel) {
     CartesianChartHost(
@@ -338,6 +349,7 @@ private fun NetworkSwitcherSection(
 }
 
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun NetworkWiseChartSection(
     chartViewmodel: ChartViewmodel,
@@ -471,6 +483,7 @@ private fun SelectedAppSection(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
     if (chartViewmodel.selectedApp.value.third != 0) {

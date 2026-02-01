@@ -1,6 +1,9 @@
 package com.smartnet.analyzer.utils
 
 import android.annotation.SuppressLint
+import android.app.AppOpsManager
+import android.content.Context
+import android.content.Context.APP_OPS_SERVICE
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -76,6 +79,20 @@ object GlobalFunctions {
             bytes >= kb -> String.format("%.2f KB", bytes / kb)
             else -> "$bytes B"
         }
+    }
+
+    /**
+     * hasUsageAccess: This method is used to check data usage access permission
+     */
+    fun hasUsageAccess(context: Context): Boolean {
+        val appOps = context.getSystemService(APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(),
+            context.packageName
+        )
+        Log.d("dudi","mode: $mode")
+        return mode == AppOpsManager.MODE_ALLOWED
     }
 
     fun bytesToMb(bytes: Long): Float {

@@ -3,7 +3,6 @@ package com.smartnet.analyzer.ui
 import ComposeSpeedTestTheme
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -36,10 +35,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkColor
-import com.smartnet.analyzer.common.theme.Pink
 import com.smartnet.analyzer.ui.common.NetMasterScreen
 import com.smartnet.analyzer.ui.common.RoundCornerDialogView
 import com.smartnet.analyzer.ui.navHost.NetMasterScreenHolder
+import com.smartnet.analyzer.utils.GlobalFunctions.hasUsageAccess
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -81,7 +80,6 @@ class MainActivity : ComponentActivity() {
             R.drawable.wifi
         )
         var selectedItem by rememberSaveable { mutableIntStateOf(1) }
-
         NavigationBar(
             containerColor = DarkColor
         ) {
@@ -103,17 +101,20 @@ class MainActivity : ComponentActivity() {
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color.Gray,
                         unselectedIconColor = MaterialTheme.colorScheme.onSurface,
-                        indicatorColor = Pink.copy(alpha = 0.12f)
+                        indicatorColor = Color.Gray
                     )
                 )
             }
         }
     }
 
+    /**
+     * onIconClick: This method is used to navigate to different screens
+     */
     fun onIconClick(index: Int) {
         when(index) {
             0 -> {
-                navController!!.navigate(NetMasterScreen.DataUsageScreen.route)
+                navController!!.navigate(NetMasterScreen.ChartScreen.route)
             }
 
             1 -> {
@@ -121,7 +122,7 @@ class MainActivity : ComponentActivity() {
             }
 
             2 -> {
-                navController!!.navigate(NetMasterScreen.ChartScreen.route)
+                navController!!.navigate(NetMasterScreen.DataUsageScreen.route)
             }
         }
     }
@@ -165,20 +166,6 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * hasUsageAccess: This method is used to check data usage access permission
-     */
-    fun hasUsageAccess(context: Context): Boolean {
-        val appOps = context.getSystemService(APP_OPS_SERVICE) as AppOpsManager
-        val mode = appOps.checkOpNoThrow(
-            AppOpsManager.OPSTR_GET_USAGE_STATS,
-            android.os.Process.myUid(),
-            context.packageName
-        )
-        Log.d("dudi","mode: $mode")
-        return mode == AppOpsManager.MODE_ALLOWED
-    }
-
-    /**
      * requestUsageAccess: This method is used to request data usage access permission
      */
     fun requestUsageAccess(context: Context) {
@@ -193,7 +180,6 @@ class MainActivity : ComponentActivity() {
     fun hideSystemUI(activity: Activity) {
         val window = activity.window
         val controller = window.insetsController ?: return
-
         controller.hide(
             WindowInsets.Type.statusBars() or
                     WindowInsets.Type.navigationBars()

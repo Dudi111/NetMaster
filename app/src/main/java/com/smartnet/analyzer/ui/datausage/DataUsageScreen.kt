@@ -52,6 +52,7 @@ import com.smartnet.analyzer.ui.datausage.viewmodel.DataUsageViewmodel
 import androidx.core.graphics.createBitmap
 import com.smartnet.analyzer.ui.MainActivity
 import com.smartnet.analyzer.ui.common.MyProgressBar
+import com.smartnet.analyzer.utils.GlobalFunctions
 
 @Composable
 fun DataUsageScreen(
@@ -60,7 +61,7 @@ fun DataUsageScreen(
 
     val context = LocalContext.current as MainActivity
     LaunchedEffect(Unit) {
-        if (context.hasUsageAccess(context)) {
+        if (GlobalFunctions.hasUsageAccess(context)) {
             dataUsageViewmodel.progressState.value = true
             dataUsageViewmodel.getDataUsage()
         } else {

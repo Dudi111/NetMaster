@@ -18,6 +18,7 @@ import com.smartnet.analyzer.data.DataUsageHelper
 import com.smartnet.analyzer.data.MonthlyUsage
 import com.smartnet.analyzer.utils.Constants.DATA_USAGE_TODAY
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
+import com.smartnet.analyzer.utils.GlobalFunctions
 import com.smartnet.analyzer.utils.GlobalFunctions.bytesToMb
 import com.smartnet.analyzer.utils.GlobalFunctions.formatBytes
 import com.smartnet.analyzer.utils.GlobalFunctions.getTimeRange
@@ -72,10 +73,12 @@ class ChartViewmodel @Inject constructor(
     val lastMonthModelProducer = CartesianChartModelProducer()
 
     init {
-        loadThisMonthOverallUsage()
-        loadNetworkUsage(NETWORK_TYPE_CELLULAR)
-        loadLastMonthOverallUsage()
-        loadAppList()
+        if (GlobalFunctions.hasUsageAccess(context)) {
+            loadThisMonthOverallUsage()
+            loadNetworkUsage(NETWORK_TYPE_CELLULAR)
+            loadLastMonthOverallUsage()
+            loadAppList()
+        }
     }
 
     /**

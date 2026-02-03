@@ -40,6 +40,9 @@ class DataUsageViewmodel @Inject constructor(
     var totalUsage by mutableStateOf("")
         private set
 
+    /**
+     * updateTotalUsage: This method is used to update total usage
+     */
     fun updateTotalUsage() {
         val totalBytes = dataList.sumOf { it.totalBytes }
         totalUsage = formatBytes(totalBytes)
@@ -58,6 +61,9 @@ class DataUsageViewmodel @Inject constructor(
         }
     }
 
+    /**
+     * onDateNetworkChange: This method is used to get data usage based on date and network
+     */
     fun onDateNetworkChange(dateRange: String, network: String) {
         uiState.value = false
         progressState.value = true

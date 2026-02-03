@@ -42,6 +42,9 @@ class SpeedTestViewModel @Inject constructor(
     private var peakSpeed = 0f
     private var speedTestJob: Job? = null
 
+    /**
+     * onStartClick: This method is used to start the speed test
+     */
     @SuppressLint("SuspiciousIndentation")
     fun onStartClick(btnText: String) {
         if (btnText == "START") {
@@ -68,6 +71,9 @@ class SpeedTestViewModel @Inject constructor(
         }
     }
 
+    /**
+     * onSpeedUpdate: This method is used to update the speed
+     */
     fun onSpeedUpdate(speedMbps: Float) {
         peakSpeed = maxOf(peakSpeed, speedMbps)
 
@@ -82,10 +88,16 @@ class SpeedTestViewModel @Inject constructor(
         }
     }
 
+    /**
+     * onPingMeasured: This method is used to measure the ping
+     */
     fun onPingMeasured(pingMs: Int) {
         _uiState.update { it.copy(pingMs = pingMs) }
     }
 
+    /**
+     * measureSpeedAndPing: This method is used to measure the speed and ping
+     */
     private fun measureSpeedAndPing() {
         speedTestJob?.cancel()
         speedTestJob = scope.launch(dispatcher) {

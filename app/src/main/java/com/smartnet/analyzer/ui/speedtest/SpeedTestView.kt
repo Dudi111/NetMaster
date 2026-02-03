@@ -100,6 +100,9 @@ fun SpeedTestScreenMain(
     }
 }
 
+/**
+ * Header: This method is used to show the header
+ */
 @Composable
 fun Header() {
     Text(
@@ -110,6 +113,9 @@ fun Header() {
     )
 }
 
+/**
+ * SpeedIndicator: This method is used to show the speed indicator
+ */
 @Composable
 fun SpeedIndicator(
     arcValue: Float,
@@ -129,7 +135,9 @@ fun SpeedIndicator(
     }
 }
 
-
+/**
+ * SpeedValue: This method is used to show the speed value
+ */
 @Composable
 fun SpeedValue(value: String) {
     Column(
@@ -151,6 +159,9 @@ fun SpeedValue(value: String) {
     }
 }
 
+/**
+ * StartButton: This method is used to show the start button
+ */
 @Composable
 fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
     OutlinedButton(
@@ -175,6 +186,9 @@ fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
     }
 }
 
+/**
+ * AdditionalInfo: This method is used to show the additional info
+ */
 @Composable
 fun AdditionalInfo(ping: String, maxSpeed: String) {
     @Composable
@@ -207,6 +221,9 @@ fun AdditionalInfo(ping: String, maxSpeed: String) {
     }
 }
 
+/**
+ * VerticalDivider: This method is used to show the vertical divider
+ */
 @Composable
 fun VerticalDivider() {
     Box(

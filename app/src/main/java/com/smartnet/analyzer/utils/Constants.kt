@@ -10,3 +10,11 @@ object Constants {
     const val NETWORK_TYPE_CELLULAR = "Cellular"
     const val NETWORK_TYPE_WIFI = "Wi-Fi"
 }
+
+object SpeedTestConstants {
+    const val SPEED_TEST_START = "Start"
+    const val SPEED_TEST_STOP = "Stop"
+    const val INTERNET_ERROR = 0
+    const val SPEED_TEST_ERROR = 1
+
+}

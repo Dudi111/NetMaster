@@ -1,6 +1,7 @@
 package com.smartnet.analyzer.ui.speedtest
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,10 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
 import com.smartnet.analyzer.common.theme.LightColor
+import com.smartnet.analyzer.ui.common.RoundCornerDialogView
 import com.smartnet.analyzer.ui.speedtest.viewmodel.SpeedTestViewModel
 import kotlin.math.floor
 
@@ -92,6 +96,7 @@ fun SpeedTestScreenMain(
             ping = "${uiState.pingMs} ms",
             maxSpeed = "${"%.2f".format(uiState.maxSpeedMbps)} Mbps"
         )
+        DialogInit(speedTestViewModel)
     }
 }
 
@@ -273,4 +278,24 @@ fun DrawScope.drawLines(progress: Float, numberOfLines: Int = 40) {
             )
         }
     }
+}
+
+@Suppress("UnrememberedMutableState")
+@Composable
+fun DialogInit(speedTestViewModel: SpeedTestViewModel) {
+    LaunchedEffect(speedTestViewModel.dialogState) {
+        Log.d("dudi", "dialog id: ${speedTestViewModel.dialogID}")
+
+    }
+    RoundCornerDialogView(
+        speedTestViewModel.dialogMessage,
+        R.string.ok,
+        R.string.btn_cancel,
+        speedTestViewModel.dialogState,
+        mutableStateOf(false),
+        onOkClick = {
+            Log.d("dudi", "ok clicked")
+            speedTestViewModel.dialogState.value = false
+        }
+    )
 }

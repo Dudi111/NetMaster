@@ -3,6 +3,10 @@
 
     <string name="setting_btn">Go To Settings</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="ok">OK</string>
+
 
     <string name="data_usage_perm">Please provide data usage permission from settings</string>
+
+    <string name="internet_error">Internet not available. Please try again later.</string>
 </resources>

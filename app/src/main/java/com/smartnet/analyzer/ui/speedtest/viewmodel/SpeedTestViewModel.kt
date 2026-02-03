@@ -2,11 +2,15 @@ package com.smartnet.analyzer.ui.speedtest.viewmodel
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.smartnet.analyzer.R
 import com.smartnet.analyzer.data.UIState
 import com.smartnet.analyzer.retrofit.RetrofitHelper
+import com.smartnet.analyzer.utils.GlobalFunctions
 import com.smartnet.analyzer.utils.IoDispatcher
 import com.smartnet.analyzer.utils.IoScope
+import com.smartnet.analyzer.utils.SpeedTestConstants.INTERNET_ERROR
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +30,12 @@ class SpeedTestViewModel @Inject constructor(
     private val retrofitHelper: RetrofitHelper
 ) : ViewModel() {
 
+    var dialogState = mutableStateOf(false)
+
+    var dialogID = 0
+
+    var dialogMessage = 0
+
     private val _uiState = MutableStateFlow(UIState())
     val uiState: StateFlow<UIState> = _uiState
 
@@ -35,6 +45,12 @@ class SpeedTestViewModel @Inject constructor(
     @SuppressLint("SuspiciousIndentation")
     fun onStartClick(btnText: String) {
         if (btnText == "START") {
+            if (!GlobalFunctions.isInternetAvailable()) {
+                dialogID = INTERNET_ERROR
+                dialogMessage = R.string.internet_error
+                dialogState.value = true
+                return
+            }
             Log.d("dudi", "start button clicked")
             peakSpeed = 0f
             _uiState.value = UIState(btnState = "connecting")

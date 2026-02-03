@@ -1,10 +1,16 @@
 package com.smartnet.analyzer.utils
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Context.APP_OPS_SERVICE
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.annotation.RequiresPermission
+import com.smartnet.analyzer.MyApplication.Companion.mApplicationContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
@@ -97,5 +103,17 @@ object GlobalFunctions {
 
     fun bytesToMb(bytes: Long): Float {
         return bytes / (1024f * 1024f)
+    }
+
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+    fun isInternetAvailable(): Boolean {
+        val connectivityManager =
+            mApplicationContext!!.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }

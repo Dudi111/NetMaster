@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,15 +63,14 @@ class SpeedTestViewModel @Inject constructor(
             measureSpeedAndPing()
         } else if (btnText == "STOP") {
             Log.d("dudi", "Stop button clicked")
-//            scope.cancel()
-//            Log.d("dudi", "is job null: ${speedTestJob == null}")
-//            speedTestJob?.cancel()
+
             scope.launch(dispatcher) {   // dispatcher = Dispatchers.IO
                 try {
                     currentInputStream?.close()
                 } catch (e: Exception) {
                     Log.e("dudi", "Error closing stream: $e")
                 } finally {
+                    speedTestJob?.cancel()
                     currentInputStream = null
                 }
             }

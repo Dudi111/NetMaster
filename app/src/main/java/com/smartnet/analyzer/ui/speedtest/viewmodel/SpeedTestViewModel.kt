@@ -15,12 +15,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +34,7 @@ class SpeedTestViewModel @Inject constructor(
 
     var dialogState = mutableStateOf(false)
 
-    var dialogID = 0
+    var dialogID = R.string.empty
 
     var dialogMessage = 0
 
@@ -41,6 +43,8 @@ class SpeedTestViewModel @Inject constructor(
 
     private var peakSpeed = 0f
     private var speedTestJob: Job? = null
+
+    private var currentInputStream: InputStream? = null
 
     /**
      * onStartClick: This method is used to start the speed test
@@ -60,7 +64,18 @@ class SpeedTestViewModel @Inject constructor(
             measureSpeedAndPing()
         } else if (btnText == "STOP") {
             Log.d("dudi", "Stop button clicked")
-            speedTestJob?.cancel()
+//            scope.cancel()
+//            Log.d("dudi", "is job null: ${speedTestJob == null}")
+//            speedTestJob?.cancel()
+            scope.launch(dispatcher) {   // dispatcher = Dispatchers.IO
+                try {
+                    currentInputStream?.close()
+                } catch (e: Exception) {
+                    Log.e("dudi", "Error closing stream: $e")
+                } finally {
+                    currentInputStream = null
+                }
+            }
             _uiState.update {
                 it.copy(
                     btnState = "START",
@@ -105,17 +120,30 @@ class SpeedTestViewModel @Inject constructor(
             val api = retrofitHelper.createSpeedApi()
 
             /* ---- PING ---- */
-            val pingStart = System.nanoTime()
-            val pingResponse = runCatching { api.ping() }.getOrNull() ?: return@launch
-            if (!pingResponse.isSuccessful) return@launch
-
-            val pingMs = ((System.nanoTime() - pingStart) / 1_000_000).toInt()
-            onPingMeasured(pingMs)
+//            val pingStart = System.nanoTime()
+//            val pingResponse = runCatching { api.ping() }.getOrNull() //?: return@launch
+//            if (pingResponse == null) {
+//                Log.d("dudi", "ping failed")
+//                return@launch
+//            }
+//            if (!pingResponse.isSuccessful) return@launch
+//
+//            val pingMs = ((System.nanoTime() - pingStart) / 1_000_000).toInt()
+//            onPingMeasured(pingMs)
 
             /* ---- DOWNLOAD ---- */
-            val response = api.download(100_000_000L)
-            val body = response.body() ?: return@launch
-            val input = body.byteStream()
+            val response = api.downloadFile()
+            Log.d("dudi", "download response: $response")
+            Log.d("dudi", "Is response successful: ${response.isSuccessful}")
+            Log.d("dudi", "Response message is: ${response.message()}")
+            Log.d("dudi", "Response code is: ${response.errorBody()?.string()}")
+
+            val body = response.body() //?: return@launch
+            if (body == null) {
+                Log.d("dudi", "download body is null")
+                return@launch
+            }
+            currentInputStream = body.byteStream()
             val buffer = ByteArray(64 * 1024)
 
             _uiState.update { it.copy(btnState = "STOP") }
@@ -135,17 +163,18 @@ class SpeedTestViewModel @Inject constructor(
 
             try {
                 while (true) {
-                    val read = input.read(buffer)
+                    val read = currentInputStream!!.read(buffer)
                     if (read == -1) break
                     lastBytes += read
                 }
-                speedJob.cancel()
+
             } catch (e: Exception) {
+                speedJob.cancel()
                 Log.e("dudi", "error in last loop: $e")
             } finally {
                 speedJob.cancel()
                 Log.e("dudi", "download completed finally")
-                input.close()
+                currentInputStream?.close()
                 _uiState.update {
                     it.copy(
                         btnState = "START",

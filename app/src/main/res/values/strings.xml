@@ -4,6 +4,7 @@
     <string name="setting_btn">Go To Settings</string>
     <string name="btn_cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="empty"> </string>
 
 
     <string name="data_usage_perm">Please provide data usage permission from settings</string>

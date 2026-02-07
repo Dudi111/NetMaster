@@ -304,15 +304,18 @@ fun DialogInit(speedTestViewModel: SpeedTestViewModel) {
         Log.d("dudi", "dialog id: ${speedTestViewModel.dialogID}")
 
     }
-    RoundCornerDialogView(
-        speedTestViewModel.dialogMessage,
-        R.string.ok,
-        R.string.btn_cancel,
-        speedTestViewModel.dialogState,
-        mutableStateOf(false),
-        onOkClick = {
-            Log.d("dudi", "ok clicked")
-            speedTestViewModel.dialogState.value = false
-        }
-    )
+
+    if (speedTestViewModel.dialogState.value) {
+        RoundCornerDialogView(
+            speedTestViewModel.dialogMessage,
+            R.string.ok,
+            R.string.btn_cancel,
+            speedTestViewModel.dialogState,
+            mutableStateOf(false),
+            onOkClick = {
+                Log.d("dudi", "ok clicked")
+                speedTestViewModel.dialogState.value = false
+            }
+        )
+    }
 }

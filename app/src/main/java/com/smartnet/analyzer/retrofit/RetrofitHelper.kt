@@ -10,16 +10,28 @@ class RetrofitHelper @Inject constructor() {
 
     fun createSpeedApi(): CloudFlareSpeedApi {
 
+//        val okHttpClient = OkHttpClient.Builder()
+//            .protocols(listOf(Protocol.HTTP_1_1))
+//            .retryOnConnectionFailure(true)
+//            .readTimeout(60, TimeUnit.SECONDS)
+//            .writeTimeout(60, TimeUnit.SECONDS)
+//            .connectTimeout(60, TimeUnit.SECONDS)
+//            .build()
+//
+//        return Retrofit.Builder()
+//            .baseUrl("https://speed.cloudflare.com/")
+//            .client(okHttpClient)
+//            .build()
+//            .create(CloudFlareSpeedApi::class.java)
+
         val okHttpClient = OkHttpClient.Builder()
-            .protocols(listOf(Protocol.HTTP_1_1))
+            .readTimeout(120, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .connectTimeout(60, TimeUnit.SECONDS)
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("https://speed.cloudflare.com/")
+            .baseUrl("https://delicate-river-0fac.pd-rajiv-000.workers.dev/") // dummy
             .client(okHttpClient)
             .build()
             .create(CloudFlareSpeedApi::class.java)

@@ -50,6 +50,7 @@ import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.ui.datausage.viewmodel.DataUsageViewmodel
 import androidx.core.graphics.createBitmap
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.ui.MainActivity
 import com.smartnet.analyzer.ui.common.MyProgressBar
 import com.smartnet.analyzer.utils.GlobalFunctions
@@ -61,6 +62,7 @@ fun DataUsageScreen(
 
     val context = LocalContext.current as MainActivity
     LaunchedEffect(Unit) {
+        LogFeast.debug("Data usage screen compose")
         if (GlobalFunctions.hasUsageAccess(context)) {
             dataUsageViewmodel.progressState.value = true
             dataUsageViewmodel.getDataUsage()

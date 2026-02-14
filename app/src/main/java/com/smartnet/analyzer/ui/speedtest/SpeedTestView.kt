@@ -1,7 +1,6 @@
 package com.smartnet.analyzer.ui.speedtest
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.Green500
@@ -301,8 +301,7 @@ fun DrawScope.drawLines(progress: Float, numberOfLines: Int = 40) {
 @Composable
 fun DialogInit(speedTestViewModel: SpeedTestViewModel) {
     LaunchedEffect(speedTestViewModel.dialogState) {
-        Log.d("dudi", "dialog id: ${speedTestViewModel.dialogID}")
-
+        LogFeast.debug("Display dialog with ID:  ${speedTestViewModel.dialogID}")
     }
 
     if (speedTestViewModel.dialogState.value) {
@@ -313,7 +312,7 @@ fun DialogInit(speedTestViewModel: SpeedTestViewModel) {
             speedTestViewModel.dialogState,
             mutableStateOf(false),
             onOkClick = {
-                Log.d("dudi", "ok clicked")
+                LogFeast.debug("Ok button clicked")
                 speedTestViewModel.dialogState.value = false
             }
         )

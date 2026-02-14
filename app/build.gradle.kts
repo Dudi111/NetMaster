@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias (libs.plugins.hiltPlugin)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -45,6 +46,7 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
+    implementation(libs.firebase.storage)
     ksp(libs.hilt.compiler)
     //navigation
     implementation(libs.androidx.navigation.compose)
@@ -81,4 +83,9 @@ dependencies {
 
     // Retrofit (stable, production)
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+    implementation(libs.logfeast)
+
+    implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }

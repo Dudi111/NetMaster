@@ -1,9 +1,9 @@
 package com.smartnet.analyzer.ui.speedtest.viewmodel
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.data.UIState
 import com.smartnet.analyzer.retrofit.RetrofitHelper
@@ -57,18 +57,18 @@ class SpeedTestViewModel @Inject constructor(
                 dialogState.value = true
                 return
             }
-            Log.d("dudi", "start button clicked")
+            LogFeast.info("Start button clicked")
             peakSpeed = 0f
             _uiState.value = UIState(btnState = "connecting")
             measureSpeedAndPing()
         } else if (btnText == "STOP") {
-            Log.d("dudi", "Stop button clicked")
+            LogFeast.info("Stop button clicked")
 
             scope.launch(dispatcher) {   // dispatcher = Dispatchers.IO
                 try {
                     currentInputStream?.close()
                 } catch (e: Exception) {
-                    Log.e("dudi", "Error closing stream: $e")
+                    LogFeast.error("Exception in closing input stream:", e)
                 } finally {
                     speedTestJob?.cancel()
                     currentInputStream = null
@@ -131,14 +131,10 @@ class SpeedTestViewModel @Inject constructor(
 
             /* ---- DOWNLOAD ---- */
             val response = api.downloadFile()
-            Log.d("dudi", "download response: $response")
-            Log.d("dudi", "Is response successful: ${response.isSuccessful}")
-            Log.d("dudi", "Response message is: ${response.message()}")
-            Log.d("dudi", "Response code is: ${response.errorBody()?.string()}")
 
             val body = response.body() //?: return@launch
             if (body == null) {
-                Log.d("dudi", "download body is null")
+                LogFeast.debug("Download body is null")
                 return@launch
             }
             currentInputStream = body.byteStream()
@@ -150,11 +146,11 @@ class SpeedTestViewModel @Inject constructor(
             val speedJob = launch {
                 while (isActive) {
                     delay(300)
-                    Log.d("dudi", "last byte: $lastBytes")
+                    LogFeast.debug("Last byte: $lastBytes")
                     val speed =
                         (lastBytes / (1024f * 1024f)) * (1000f / 300f)
                     lastBytes = 0
-                    Log.d("dudi", "speed: $speed")
+                    LogFeast.debug("speed: $speed")
                     onSpeedUpdate(speed)
                 }
             }
@@ -168,10 +164,10 @@ class SpeedTestViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 speedJob.cancel()
-                Log.e("dudi", "error in last loop: $e")
+                LogFeast.error("Exception in download:", e)
             } finally {
                 speedJob.cancel()
-                Log.e("dudi", "download completed finally")
+                LogFeast.debug("Download finished")
                 currentInputStream?.close()
                 _uiState.update {
                     it.copy(

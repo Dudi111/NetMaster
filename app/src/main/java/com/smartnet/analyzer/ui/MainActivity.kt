@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkColor
 import com.smartnet.analyzer.ui.common.NetMasterScreen
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LogFeast.debug("MainActivity: onCreate")
         enableEdgeToEdge()
         hideSystemUI(this)
         setContent {
@@ -114,14 +116,17 @@ class MainActivity : ComponentActivity() {
     fun onIconClick(index: Int) {
         when(index) {
             0 -> {
+                LogFeast.debug("Navigate to chart Screen")
                 navController!!.navigate(NetMasterScreen.ChartScreen.route)
             }
 
             1 -> {
+                LogFeast.debug("Navigate to speed test Screen")
                 navController!!.navigate(NetMasterScreen.SpeedTestScreen.route)
             }
 
             2 -> {
+                LogFeast.debug("Navigate to data usage Screen")
                 navController!!.navigate(NetMasterScreen.DataUsageScreen.route)
             }
         }
@@ -134,6 +139,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun DialogInit(navController: NavHostController) {
         if (dialogState.value) {
+            LogFeast.debug("Show data usage perm dialog")
             RoundCornerDialogView(
                 R.string.data_usage_perm,
                 R.string.setting_btn,
@@ -141,12 +147,12 @@ class MainActivity : ComponentActivity() {
                 dialogState,
                 mutableStateOf(true),
                 onOkClick = {
-                    Log.d("dudi", "ok clicked")
+                    LogFeast.debug("Data usage perm dialog ok pressed")
                     requestUsageAccess(this)
                     dialogState.value = false
                 },
                 onCancelClick = {
-                    Log.d("dudi", "cancel clicked")
+                    LogFeast.debug("Data usage dialog cancel pressed")
                     navController.navigate(NetMasterScreen.SpeedTestScreen.route)
                     dialogState.value = false
                 }
@@ -156,10 +162,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         if (!hasUsageAccess(this)) {
-            Log.d("dudi","data usage perm not granted")
+            LogFeast.debug("Data usage perm not granted")
             dialogState.value = true
         } else {
-            Log.d("dudi","data usage perm granted")
+            LogFeast.debug("Data usage perm granted")
             dialogState.value = false
         }
         super.onResume()

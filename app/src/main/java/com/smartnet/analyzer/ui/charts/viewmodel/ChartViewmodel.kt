@@ -2,13 +2,13 @@ package com.smartnet.analyzer.ui.charts.viewmodel
 
 import android.content.Context
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
@@ -86,6 +86,7 @@ class ChartViewmodel @Inject constructor(
      */
     fun loadThisMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
+            LogFeast.debug("Load this month data usage")
             val data = getDailyDataUsageBytes(getDailyRangesForMonth())
             thisMonthModelProducer.runTransaction {
                 lineSeries {
@@ -100,6 +101,7 @@ class ChartViewmodel @Inject constructor(
      */
     fun loadLastMonthOverallUsage() {
         viewModelScope.launch(ioDispatcher) {
+            LogFeast.debug("Load last month data usage")
             val data = getDailyDataUsageBytes(getDailyRangesForMonth(-1), false)
             lastMonthModelProducer.runTransaction {
                 lineSeries {
@@ -149,9 +151,9 @@ class ChartViewmodel @Inject constructor(
         val dailyDataUsage = mutableListOf<Long>()
         val range = getDailyRangesForMonth()
         viewModelScope.launch(ioDispatcher) {
-            Log.d("dudi", "getting app wise data usage: $uid")
+            LogFeast.debug("Get app data usage UID: $uid")
             range.forEach {
-                Log.d("dudi", "range start: ${it.first} , end range: ${it.second}")
+                LogFeast.debug("Get app data usage for start time: ${it.first} , end time: ${it.second}")
                 val simUsage = dataUsageHelper.getUidDataUsage(
                     NetworkCapabilities.TRANSPORT_CELLULAR,
                     uid,
@@ -231,7 +233,6 @@ class ChartViewmodel @Inject constructor(
             dailyDataUsage.add(simUsage + wifiUsage)
             total += simUsage + wifiUsage
         }
-        Log.d("ranges", "total bytes: $total")
         if (isCurrentMonth) thisMonthTotalUsage = total else lastMonthTotalUsage = total
 
         getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
@@ -300,7 +301,7 @@ class ChartViewmodel @Inject constructor(
             currentDayStart = nextDayStart
         }
 
-        Log.d("ranges", "ranges: $ranges")
+        LogFeast.debug("Time ranges: $ranges")
         return ranges
     }
 

@@ -10,4 +10,6 @@
     <string name="data_usage_perm">Please provide data usage permission from settings</string>
 
     <string name="internet_error">Internet not available. Please try again later.</string>
+    <string name="speed_test_error">Speed test failed. Please try again later.</string>
+
 </resources>

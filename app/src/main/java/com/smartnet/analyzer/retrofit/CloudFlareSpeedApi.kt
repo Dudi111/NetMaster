@@ -4,19 +4,15 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Query
 import retrofit2.http.Streaming
 
 interface CloudFlareSpeedApi {
-
-    @GET("__down")
-    suspend fun ping(
-        @Query("bytes") bytes: Int = 0,
-        @Header("User-Agent") userAgent: String = "Mozilla/5.0"
-    ): Response<ResponseBody>
 
     @Streaming
     @GET("100MB.bin")
     suspend fun downloadFile(): Response<ResponseBody>
 
+    // Ping endpoint (downloads only 1 byte)
+    @GET("100MB.bin")
+    suspend fun ping(@Header("Range") range: String = "bytes=0-0"): Response<ResponseBody>
 }

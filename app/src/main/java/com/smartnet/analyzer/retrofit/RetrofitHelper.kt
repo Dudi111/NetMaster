@@ -23,7 +23,7 @@ class RetrofitHelper @Inject constructor() {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("https://delicate-river-0fac.pd-rajiv-000.workers.dev/") // dummy
+            .baseUrl("https://delicate-river-0fac.pd-rajiv-000.workers.dev/")
             .client(okHttpClient)
             .build()
             .create(CloudFlareSpeedApi::class.java)

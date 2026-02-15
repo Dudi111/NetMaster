@@ -11,6 +11,7 @@ import com.smartnet.analyzer.utils.GlobalFunctions
 import com.smartnet.analyzer.utils.IoDispatcher
 import com.smartnet.analyzer.utils.IoScope
 import com.smartnet.analyzer.utils.SpeedTestConstants.INTERNET_ERROR
+import com.smartnet.analyzer.utils.SpeedTestConstants.SPEED_TEST_ERROR
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -41,9 +42,9 @@ class SpeedTestViewModel @Inject constructor(
     val uiState: StateFlow<UIState> = _uiState
 
     private var peakSpeed = 0f
-    private var speedTestJob: Job? = null
+    var speedTestJob: Job? = null
 
-    private var currentInputStream: InputStream? = null
+    var currentInputStream: InputStream? = null
 
     /**
      * onStartClick: This method is used to start the speed test
@@ -64,7 +65,7 @@ class SpeedTestViewModel @Inject constructor(
         } else if (btnText == "STOP") {
             LogFeast.info("Stop button clicked")
 
-            scope.launch(dispatcher) {   // dispatcher = Dispatchers.IO
+            scope.launch(dispatcher) {
                 try {
                     currentInputStream?.close()
                 } catch (e: Exception) {
@@ -117,24 +118,36 @@ class SpeedTestViewModel @Inject constructor(
 
             val api = retrofitHelper.createSpeedApi()
 
-            /* ---- PING ---- */
-//            val pingStart = System.nanoTime()
-//            val pingResponse = runCatching { api.ping() }.getOrNull() //?: return@launch
-//            if (pingResponse == null) {
+//            /* ---- PING ---- */
+//            val pingMs = runCatching {
+//                val pingStart = System.nanoTime()
+//
+//                val pingResponse = api.ping() // Range: bytes=0-0
+//
+//                // Always close body (important)
+//                pingResponse.body()?.close()
+//
+//                if (!pingResponse.isSuccessful) {
+//                    Log.d("dudi", "ping failed: ${pingResponse.code()}")
+//                }
+//
+//                ((System.nanoTime() - pingStart) / 1_000_000).toInt()
+//            }.getOrNull()
+//
+//            if (pingMs == null) {
 //                Log.d("dudi", "ping failed")
 //                return@launch
 //            }
-//            if (!pingResponse.isSuccessful) return@launch
 //
-//            val pingMs = ((System.nanoTime() - pingStart) / 1_000_000).toInt()
 //            onPingMeasured(pingMs)
 
             /* ---- DOWNLOAD ---- */
             val response = api.downloadFile()
 
-            val body = response.body() //?: return@launch
+            val body = response.body()
             if (body == null) {
                 LogFeast.debug("Download body is null")
+                showErrorDialog()
                 return@launch
             }
             currentInputStream = body.byteStream()
@@ -145,7 +158,7 @@ class SpeedTestViewModel @Inject constructor(
 
             val speedJob = launch {
                 while (isActive) {
-                    delay(300)
+                    delay(500)
                     LogFeast.debug("Last byte: $lastBytes")
                     val speed =
                         (lastBytes / (1024f * 1024f)) * (1000f / 300f)
@@ -178,5 +191,11 @@ class SpeedTestViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun showErrorDialog() {
+        dialogID = SPEED_TEST_ERROR
+        dialogMessage = R.string.speed_test_error
+        dialogState.value = true
     }
 }

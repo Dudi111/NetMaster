@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,12 +51,14 @@ import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.dimen_1dp
 import com.smartnet.analyzer.common.dimen_40dp
+import com.smartnet.analyzer.common.dimen_7dp
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
 import com.smartnet.analyzer.common.theme.LightColor
 import com.smartnet.analyzer.ui.common.RoundCornerDialogView
 import com.smartnet.analyzer.ui.speedtest.viewmodel.SpeedTestViewModel
+import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 @Preview
@@ -79,6 +82,23 @@ fun SpeedTestScreenMain(
             animationSpec = tween(400, easing = FastOutSlowInEasing)
         )
     }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speedTestViewModel.scope.launch(speedTestViewModel.dispatcher) {
+                try {
+                    speedTestViewModel.currentInputStream?.close()
+                    speedTestViewModel.currentInputStream = null
+                } catch (e: Exception) {
+                    LogFeast.error("Exception in closing input stream:", e)
+                } finally {
+                    speedTestViewModel.speedTestJob?.cancel()
+                    speedTestViewModel.currentInputStream = null
+                }
+            }
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -208,7 +228,7 @@ fun AdditionalInfo(ping: String, maxSpeed: String) {
             Text(
                 value,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = dimen_7dp),
                 color = Color.White
             )
         }
@@ -307,16 +327,15 @@ fun DialogInit(speedTestViewModel: SpeedTestViewModel) {
     LaunchedEffect(speedTestViewModel.dialogState) {
         LogFeast.debug("Display dialog with ID:  ${speedTestViewModel.dialogID}")
     }
-
     if (speedTestViewModel.dialogState.value) {
         RoundCornerDialogView(
             speedTestViewModel.dialogMessage,
             R.string.ok,
-            R.string.btn_cancel,
+            R.string.empty,
             speedTestViewModel.dialogState,
             mutableStateOf(false),
             onOkClick = {
-                LogFeast.debug("Ok button clicked")
+                LogFeast.debug("Dialog ok button clicked, ID: {}", speedTestViewModel.dialogID)
                 speedTestViewModel.dialogState.value = false
             }
         )

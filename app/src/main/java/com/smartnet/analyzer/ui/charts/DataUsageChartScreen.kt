@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -42,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -96,6 +99,7 @@ import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
 import com.smartnet.analyzer.utils.GlobalFunctions
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -107,6 +111,7 @@ fun DataUsageChartScreen(
     var selectedNetwork by remember { mutableStateOf(NETWORK_TYPE_CELLULAR) }
     val pagerState = rememberPagerState(pageCount = { 2 })
     val context = LocalContext.current as MainActivity
+    val scrollState = rememberLazyListState()
 
     LaunchedEffect(pagerState.currentPage) {
 
@@ -139,12 +144,13 @@ fun DataUsageChartScreen(
             .background(DarkGradient),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LazyColumn {
+        LazyColumn(state = scrollState) {
             item {
                 Header(chartViewmodel)
 
                 MonthPagerSection(chartViewmodel, pagerState)
-
+            }
+            item {
                 NetworkSwitcherSection(
                     selectedNetwork = selectedNetwork,
                     onNetworkChange = {
@@ -154,13 +160,16 @@ fun DataUsageChartScreen(
                 )
 
                 NetworkWiseChartSection(chartViewmodel, selectedNetwork)
+            }
 
+            item {
                 AppUsageHeader()
 
                 SelectedAppSection(chartViewmodel, expanded)
 
-                AppWiseChartSection(chartViewmodel)
+                AppWiseChartSection(chartViewmodel, scrollState)
             }
+
         }
         DialogInit(chartViewmodel)
     }
@@ -508,9 +517,10 @@ private fun SelectedAppSection(
     }
 }
 
-@SuppressLint("DefaultLocale")
+@SuppressLint("DefaultLocale", "CoroutineCreationDuringComposition")
 @Composable
-private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
+private fun AppWiseChartSection(chartViewmodel: ChartViewmodel, scrollState: LazyListState) {
+    val scope = rememberCoroutineScope()
     if (chartViewmodel.selectedApp.value.third != 0) {
         Box(
             modifier = Modifier
@@ -544,6 +554,10 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
                     .height(dimen_280dp)
                     .padding(vertical = dimen_10dp)
             )
+        }
+
+        scope.launch {
+            scrollState.scrollToItem(2)
         }
     }
 }

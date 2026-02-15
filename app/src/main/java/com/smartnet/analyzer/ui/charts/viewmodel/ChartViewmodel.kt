@@ -74,9 +74,9 @@ class ChartViewmodel @Inject constructor(
 
     init {
         if (GlobalFunctions.hasUsageAccess(context)) {
+            loadThisMonthOverallUsage()
             loadLastMonthOverallUsage()
             loadNetworkUsage(NETWORK_TYPE_CELLULAR)
-            loadThisMonthOverallUsage()
             loadAppList()
         }
     }
@@ -233,9 +233,13 @@ class ChartViewmodel @Inject constructor(
             dailyDataUsage.add(simUsage + wifiUsage)
             total += simUsage + wifiUsage
         }
-        if (isCurrentMonth) thisMonthTotalUsage = total else lastMonthTotalUsage = total
 
-        getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
+        if (isCurrentMonth) {
+            thisMonthTotalUsage = total
+            getMonthYearFromMillis(range.first().first, total, overallUsageDetail)
+        } else {
+            lastMonthTotalUsage = total
+        }
         return dailyDataUsage.map { bytesToMb(it) }
     }
 

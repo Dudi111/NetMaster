@@ -60,6 +60,7 @@ import com.smartnet.analyzer.common.dimen_40dp
 import com.smartnet.analyzer.common.dimen_50dp
 import com.smartnet.analyzer.common.dimen_90dp
 import com.smartnet.analyzer.common.dimen_5dp
+import com.smartnet.analyzer.common.dimen_7dp
 import com.smartnet.analyzer.ui.MainActivity
 import com.smartnet.analyzer.ui.common.MyProgressBar
 import com.smartnet.analyzer.utils.GlobalFunctions
@@ -172,7 +173,7 @@ fun Header(
                     modifier = Modifier
                         .clip(RoundedCornerShape(dimen_20dp))
                         .clickable { expanded = true }
-                        .padding(horizontal = dimen_5dp, vertical = dimen_5dp)
+                        .padding(start = dimen_12dp, end = dimen_7dp, top = dimen_5dp, bottom = dimen_5dp)
                         .width(dimen_100dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

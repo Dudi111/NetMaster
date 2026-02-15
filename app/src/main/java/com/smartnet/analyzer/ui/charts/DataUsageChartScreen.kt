@@ -69,6 +69,7 @@ import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.smartnet.analyzer.common.dimen_10dp
 import com.smartnet.analyzer.common.dimen_10sp
 import com.smartnet.analyzer.common.dimen_12dp
@@ -227,14 +228,16 @@ fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
                         else -> "0"
                     }
                 },
-                guideline = null
+                guideline = null,
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
             ),
 
             bottomAxis = HorizontalAxis.rememberBottom(
                 labelRotationDegrees = 0f,
                 valueFormatter = { _, value, _ ->
                     "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-                }
+                },
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
             )
         ),
 
@@ -278,7 +281,8 @@ fun LastMonthChart(chartViewmodel: ChartViewmodel) {
                         else -> "0"
                     }
                 },
-                guideline = null
+                guideline = null,
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
             ),
 
             bottomAxis = HorizontalAxis.rememberBottom(
@@ -295,7 +299,8 @@ fun LastMonthChart(chartViewmodel: ChartViewmodel) {
                                 .toEpochMilli()
                         )
                     } ${(value.toInt() + 1)}"
-                }
+                },
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
             )
         ),
 
@@ -400,12 +405,14 @@ private fun NetworkWiseChartSection(
                         valueFormatter = { _, value, _ ->
                             if (value >= 1024) String.format("%.1f GB", value / 1024f)
                             else "${value.toInt()} MB"
-                        }
+                        },
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         valueFormatter = { _, value, _ ->
                             "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-                        }
+                        },
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
                     )
                 ),
                 modelProducer = chartViewmodel.networkWiseModelProducer,
@@ -520,12 +527,14 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
                         valueFormatter = { _, value, _ ->
                             if (value >= 1024) String.format("%.1f GB", value / 1024f)
                             else "${value.toInt()} MB"
-                        }
+                        },
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         valueFormatter = { _, value, _ ->
                             "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
-                        }
+                        },
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
                     )
                 ),
                 modelProducer = chartViewmodel.appWiseModelProducer,

@@ -48,6 +48,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
+import com.smartnet.analyzer.common.dimen_1dp
+import com.smartnet.analyzer.common.dimen_40dp
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
@@ -187,7 +189,9 @@ fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
 }
 
 /**
- * AdditionalInfo: This method is used to show the additional info
+ * AdditionalInfo: This method is used to show the ping and max speed value
+ * @param ping: ping value
+ * @param maxSpeed: max speed value
  */
 @Composable
 fun AdditionalInfo(ping: String, maxSpeed: String) {
@@ -230,7 +234,7 @@ fun VerticalDivider() {
         modifier = Modifier
             .fillMaxHeight()
             .background(Color(0xFF414D66))
-            .width(1.dp)
+            .width(dimen_1dp)
     )
 }
 
@@ -239,7 +243,7 @@ fun CircularSpeedIndicator(arcValue: Float) {
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .padding(40.dp)
+            .padding(dimen_40dp)
     ) {
         drawLines(arcValue)
         drawArcs(arcValue)

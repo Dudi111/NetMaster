@@ -16,7 +16,7 @@ import com.smartnet.analyzer.R
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.data.DataUsageHelper
 import com.smartnet.analyzer.data.MonthlyUsage
-import com.smartnet.analyzer.utils.Constants.DATA_USAGE_TODAY
+import com.smartnet.analyzer.utils.Constants.DATA_USAGE_THIS_MONTH
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.GlobalFunctions
 import com.smartnet.analyzer.utils.GlobalFunctions.bytesToMb
@@ -185,7 +185,7 @@ class ChartViewmodel @Inject constructor(
      */
     fun loadAppList() {
         viewModelScope.launch(ioDispatcher) {
-            val (startTime, endTime) = getTimeRange(DATA_USAGE_TODAY)
+            val (startTime, endTime) = getTimeRange(DATA_USAGE_THIS_MONTH)
             //get app in descending order of usage
             userAppList = dataUsageHelper.getAppDataUsage(
                 startTime,
@@ -301,7 +301,7 @@ class ChartViewmodel @Inject constructor(
             currentDayStart = nextDayStart
         }
 
-        LogFeast.debug("Time ranges: $ranges")
+        LogFeast.debug("Time ranges: {}", ranges)
         return ranges
     }
 

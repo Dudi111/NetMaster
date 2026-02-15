@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
@@ -161,6 +160,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onResume() {
+        super.onResume()
         if (!hasUsageAccess(this)) {
             LogFeast.debug("Data usage perm not granted")
             dialogState.value = true
@@ -168,7 +168,6 @@ class MainActivity : ComponentActivity() {
             LogFeast.debug("Data usage perm granted")
             dialogState.value = false
         }
-        super.onResume()
     }
 
     /**

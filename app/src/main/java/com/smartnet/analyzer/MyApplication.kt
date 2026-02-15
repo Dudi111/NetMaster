@@ -3,10 +3,10 @@ package com.smartnet.analyzer
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import ch.qos.logback.classic.LoggerContext
 import com.dude.logfeast.logs.CustomLogUtils
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.google.firebase.FirebaseApp
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -20,7 +20,6 @@ class MyApplication() : Application() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
         super.onCreate()
-        Log.d("dudi","My application started")
         mApplicationContext = applicationContext
 
         //Logging Initialization
@@ -38,8 +37,11 @@ class MyApplication() : Application() {
             true
         )
 
+        LogFeast.info("Logging initialized")
+
         //Register DateChangeBroadCast receiver
         val dateChangedBroadcastReceiver = DateChangedBroadcastReceiver()
+        LogFeast.info("DateChangedBroadcastReceiver registered")
         applicationContext.registerReceiver(
             dateChangedBroadcastReceiver,
             DateChangedBroadcastReceiver.getIntentFilter(),

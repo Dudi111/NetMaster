@@ -69,6 +69,24 @@ import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.smartnet.analyzer.common.dimen_10dp
+import com.smartnet.analyzer.common.dimen_10sp
+import com.smartnet.analyzer.common.dimen_12dp
+import com.smartnet.analyzer.common.dimen_12sp
+import com.smartnet.analyzer.common.dimen_14sp
+import com.smartnet.analyzer.common.dimen_150dp
+import com.smartnet.analyzer.common.dimen_15dp
+import com.smartnet.analyzer.common.dimen_18sp
+import com.smartnet.analyzer.common.dimen_1dp
+import com.smartnet.analyzer.common.dimen_20dp
+import com.smartnet.analyzer.common.dimen_20sp
+import com.smartnet.analyzer.common.dimen_24sp
+import com.smartnet.analyzer.common.dimen_260dp
+import com.smartnet.analyzer.common.dimen_280dp
+import com.smartnet.analyzer.common.dimen_40dp
+import com.smartnet.analyzer.common.dimen_50dp
+import com.smartnet.analyzer.common.dimen_5dp
+import com.smartnet.analyzer.common.dimen_7dp
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
 import com.smartnet.analyzer.common.theme.white
@@ -156,16 +174,16 @@ private fun MonthPagerSection(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(7.dp)
-            .background(LightDarkColor, RoundedCornerShape(10.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+            .padding(dimen_7dp)
+            .background(LightDarkColor, RoundedCornerShape(dimen_10dp))
+            .border(dimen_1dp, Color.Gray, RoundedCornerShape(dimen_10dp))
     ) {
         Column {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
+                    .height(dimen_280dp)
             ) { page ->
                 if (page == 0) {
                     ThisMonthChart(chartViewmodel)
@@ -225,7 +243,7 @@ fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
 
         modifier = Modifier
             .fillMaxWidth()
-            .height(260.dp)
+            .height(dimen_260dp)
     )
 }
 
@@ -286,7 +304,7 @@ fun LastMonthChart(chartViewmodel: ChartViewmodel) {
 
         modifier = Modifier
             .fillMaxWidth()
-            .height(260.dp)
+            .height(dimen_260dp)
     )
 }
 
@@ -296,14 +314,14 @@ private fun PagerIndicator(pagerState: PagerState) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 8.dp),
+            .padding(top = dimen_10dp, bottom = dimen_7dp),
         horizontalArrangement = Arrangement.Center
     ) {
         repeat(2) { index ->
             Box(
                 modifier = Modifier
-                    .padding(4.dp)
-                    .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
+                    .padding(dimen_5dp)
+                    .size(if (pagerState.currentPage == index) dimen_7dp else dimen_5dp)
                     .background(
                         if (pagerState.currentPage == index) Color.White else Color.Gray,
                         CircleShape
@@ -321,28 +339,28 @@ private fun NetworkSwitcherSection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(dimen_10dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         HorizontalDivider(
             modifier = Modifier.weight(1f),
-            thickness = 1.dp,
+            thickness = dimen_1dp,
             color = Color.White.copy(alpha = 0.3f)
         )
 
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(dimen_10dp))
 
         NetworkSwitcher(
             selected = selectedNetwork,
             onSelectedChange = onNetworkChange,
-            modifier = Modifier.width(150.dp)
+            modifier = Modifier.width(dimen_150dp)
         )
 
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(dimen_10dp))
 
         HorizontalDivider(
             modifier = Modifier.weight(1f),
-            thickness = 1.dp,
+            thickness = dimen_1dp,
             color = Color.White.copy(alpha = 0.3f)
         )
     }
@@ -359,9 +377,9 @@ private fun NetworkWiseChartSection(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(7.dp)
-            .background(LightDarkColor, RoundedCornerShape(10.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+            .padding(dimen_7dp)
+            .background(LightDarkColor, RoundedCornerShape(dimen_10dp))
+            .border(dimen_1dp, Color.Gray, RoundedCornerShape(dimen_10dp))
     ) {
         Column {
             Text(
@@ -394,8 +412,8 @@ private fun NetworkWiseChartSection(
                 scrollState = rememberVicoScrollState(scrollEnabled = false),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
-                    .padding(top = 10.dp)
+                    .height(dimen_280dp)
+                    .padding(top = dimen_10dp)
             )
         }
     }
@@ -406,20 +424,20 @@ private fun AppUsageHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(dimen_10dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "App data usage",
             color = Color.White,
-            fontSize = 12.sp,
+            fontSize = dimen_12sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(end = 10.dp)
+            modifier = Modifier.padding(end = dimen_10dp)
         )
 
         HorizontalDivider(
             modifier = Modifier.weight(1f),
-            thickness = 1.dp,
+            thickness = dimen_1dp,
             color = Color.White.copy(alpha = 0.3f)
         )
     }
@@ -434,9 +452,9 @@ private fun SelectedAppSection(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(7.dp)
-            .background(LightDarkColor, RoundedCornerShape(10.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+            .padding(dimen_7dp)
+            .background(LightDarkColor, RoundedCornerShape(dimen_10dp))
+            .border(dimen_1dp, Color.Gray, RoundedCornerShape(dimen_10dp))
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -447,15 +465,15 @@ private fun SelectedAppSection(
                     chartViewmodel.selectedApp.value.first.toBitmap().asImageBitmap()
                 ),
                 contentDescription = null,
-                modifier = Modifier.size(40.dp).padding(5.dp)
+                modifier = Modifier.size(dimen_40dp).padding(dimen_5dp)
             )
 
             Text(
                 text = chartViewmodel.selectedApp.value.second,
-                fontSize = 14.sp,
+                fontSize = dimen_14sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier.padding(start = dimen_5dp)
             )
 
             Icon(
@@ -466,7 +484,7 @@ private fun SelectedAppSection(
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier
-                    .padding(3.dp)
+                    .padding(dimen_5dp)
                     .clickable { chartViewmodel.dialogState.value = true }
             )
 
@@ -474,10 +492,10 @@ private fun SelectedAppSection(
 
             Text(
                 text = "Total: ${chartViewmodel.appWiseTotalUsage.value}",
-                fontSize = 14.sp,
+                fontSize = dimen_14sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier.padding(end = dimen_10dp)
             )
         }
     }
@@ -491,9 +509,9 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(7.dp)
-                .background(LightDarkColor, RoundedCornerShape(10.dp))
-                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+                .padding(dimen_7dp)
+                .background(LightDarkColor, RoundedCornerShape(dimen_10dp))
+                .border(dimen_1dp, Color.Gray, RoundedCornerShape(dimen_10dp))
         ) {
             CartesianChartHost(
                 chart = rememberCartesianChart(
@@ -514,8 +532,8 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
                 scrollState = rememberVicoScrollState(scrollEnabled = false),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
-                    .padding(vertical = 10.dp)
+                    .height(dimen_280dp)
+                    .padding(vertical = dimen_10dp)
             )
         }
     }
@@ -535,7 +553,7 @@ fun Header(
     ) {
         Text(
             text = chartViewmodel.overallUsageDetail.value.month,
-            modifier = Modifier.padding(top = 50.dp, bottom = 5.dp),
+            modifier = Modifier.padding(top = dimen_50dp, bottom = dimen_5dp),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White
         )
@@ -544,9 +562,9 @@ fun Header(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(vertical = 7.dp, horizontal = 7.dp)
-                .background(color = LightDarkColor, shape = RoundedCornerShape(10.dp))
-                .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(10.dp))
+                .padding(dimen_7dp)
+                .background(color = LightDarkColor, shape = RoundedCornerShape(dimen_10dp))
+                .border(dimen_1dp, color = Color.Gray, shape = RoundedCornerShape(dimen_10dp))
         ) {
             Column(
                 modifier = Modifier
@@ -557,11 +575,11 @@ fun Header(
             ) {
                 Text(
                     text = chartViewmodel.overallUsageDetail.value.total,
-                    modifier = Modifier.padding(top= 10.dp),
+                    modifier = Modifier.padding(top= dimen_10dp),
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        lineHeight = 24.sp,
+                        fontSize = dimen_20sp,
+                        lineHeight = dimen_24sp,
                         letterSpacing = 0.15.sp,
                         color = white
                     )
@@ -569,11 +587,10 @@ fun Header(
 
                 Text(
                     text = "Total Data Used",
-                    modifier = Modifier.padding(5.dp),
+                    modifier = Modifier.padding(dimen_5dp),
                     style =  TextStyle(
                         fontWeight = FontWeight.Normal,
-                        fontSize = 10.sp,
-                     //   lineHeight = 24.sp,
+                        fontSize = dimen_10sp,
                         letterSpacing = 0.15.sp,
                         color = white
                     )
@@ -581,11 +598,10 @@ fun Header(
 
                 Text(
                     text = "WIFI + CELLULAR",
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    modifier = Modifier.padding(bottom = dimen_10dp),
                     style = TextStyle(
                         fontWeight = FontWeight.Normal,
-                        fontSize = 10.sp,
-                       // lineHeight = 24.sp,
+                        fontSize = dimen_10sp,
                         letterSpacing = 0.15.sp,
                         color = white
                     )
@@ -603,10 +619,10 @@ fun NetworkSwitcher(
 ) {
     Box(
         modifier = modifier
-            .height(40.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .height(dimen_40dp)
+            .clip(RoundedCornerShape(dimen_20dp))
             .background(Color(0xFF2A2A2A))
-            .padding(4.dp)
+            .padding(dimen_5dp)
     ) {
         Row {
             NetworkOption(
@@ -645,7 +661,7 @@ private fun NetworkOption(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(dimen_15dp))
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -685,39 +701,39 @@ fun AppSelectionDialog(
     Dialog(onDismissRequest = onDismiss) {
 
         Surface(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(dimen_12dp),
             color = Color.Gray,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 500.dp) // 🔑 makes dialog scrollable
+                .heightIn(max = 500.dp) // makes dialog scrollable
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // 🔹 Title
+                // Title
                 Text(
                     text = "Select App",
-                    fontSize = 18.sp,
+                    fontSize = dimen_18sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(dimen_15dp)
                 )
 
                 HorizontalDivider(color = Color.White.copy(alpha = 0.4f))
 
-                // 🔹 Scrollable App List
+                // Scrollable App List
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = dimen_7dp)
                 ) {
                     items(chartViewmodel.userAppList!!.size) { index ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { chartViewmodel.selectedAppIndex.intValue = index }
-                                .padding(vertical = 10.dp, horizontal = 8.dp),
+                                .padding(vertical = dimen_10dp, horizontal = dimen_7dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -733,7 +749,7 @@ fun AppSelectionDialog(
                                 text = chartViewmodel.userAppList!![index].appName,
                                 color = Color.White,
                                 fontSize = 14.sp,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.padding(start = dimen_7dp)
                             )
                         }
                     }
@@ -745,14 +761,14 @@ fun AppSelectionDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(dimen_12dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text("Cancel", color = Color.White)
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(dimen_7dp))
 
                     TextButton(
                         onClick = { onConfirm(chartViewmodel.selectedAppIndex.intValue) },

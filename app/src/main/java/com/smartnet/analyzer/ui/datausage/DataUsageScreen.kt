@@ -44,13 +44,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.ui.datausage.viewmodel.DataUsageViewmodel
 import androidx.core.graphics.createBitmap
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
+import com.smartnet.analyzer.common.dimen_100dp
+import com.smartnet.analyzer.common.dimen_10dp
+import com.smartnet.analyzer.common.dimen_12dp
+import com.smartnet.analyzer.common.dimen_14sp
+import com.smartnet.analyzer.common.dimen_15dp
+import com.smartnet.analyzer.common.dimen_20dp
+import com.smartnet.analyzer.common.dimen_40dp
+import com.smartnet.analyzer.common.dimen_50dp
+import com.smartnet.analyzer.common.dimen_90dp
+import com.smartnet.analyzer.common.dimen_5dp
 import com.smartnet.analyzer.ui.MainActivity
 import com.smartnet.analyzer.ui.common.MyProgressBar
 import com.smartnet.analyzer.utils.GlobalFunctions
@@ -93,32 +102,32 @@ fun DataUsageScreen(
 
 @Composable
 fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmodel) {
-    Spacer(Modifier.height(15.dp))
+    Spacer(Modifier.height(dimen_15dp))
     Row(
         modifier = Modifier.fillMaxSize()
-    .padding(12.dp),
+    .padding(dimen_12dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             bitmap = dataUsage.icon!!.toImageBitmap(),
             contentDescription = null,
-            modifier = Modifier.size(40.dp)
-                .padding(5.dp)
+            modifier = Modifier.size(dimen_40dp)
+                .padding(dimen_5dp)
         )
 
         Text(
             text = dataUsage.appName,
-            fontSize = 14.sp,
+            fontSize = dimen_14sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
         Spacer(modifier = Modifier.weight(1f))
 
-        Spacer(Modifier.size(15.dp))
+        Spacer(Modifier.size(dimen_15dp))
         Text(
             text = dataUsageViewmodel.formatBytes(dataUsage.totalBytes),
-            fontSize = 13.sp,
+            fontSize = dimen_14sp,
             textAlign = TextAlign.End,
             color = Color.White
         )
@@ -126,7 +135,7 @@ fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmod
     HorizontalDivider(
         thickness = 0.5.dp,
         color = Color.Gray.copy(alpha = 0.4f),
-        modifier = Modifier.padding(horizontal = 20.dp)
+        modifier = Modifier.padding(horizontal = dimen_20dp)
     )
 }
 
@@ -148,7 +157,7 @@ fun Header(
     ) {
         Text(
             text = "DATA USAGE",
-            modifier = Modifier.padding(top = 52.dp, bottom = 16.dp)
+            modifier = Modifier.padding(top = dimen_50dp, bottom = dimen_15dp)
                 .align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.headlineMedium,
             color = Color.White
@@ -156,22 +165,21 @@ fun Header(
 
         Row(
             modifier = Modifier.fillMaxWidth()
-                .padding(start = 6.dp),
+                .padding(start = dimen_5dp),
         ) {
             Box {
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(dimen_20dp))
                         .clickable { expanded = true }
-                        .padding(horizontal = 6.dp, vertical = 6.dp)
-                        .width(100.dp),
+                        .padding(horizontal = dimen_5dp, vertical = dimen_5dp)
+                        .width(dimen_100dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = selectedRange,
                         color = Color.White,
-                        fontSize = 13.sp
-                        //style = MaterialTheme.typography.bodyMedium
+                        fontSize = dimen_14sp
                     )
                     Icon(
                         imageVector = if (expanded)
@@ -213,22 +221,22 @@ fun Header(
                 }
             }
 
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(dimen_5dp))
 
             /* ---------- Network Type Dropdown ---------- */
             Box {
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(dimen_20dp))
                         .clickable { networkExpanded = true }
-                        .padding(horizontal = 6.dp, vertical = 6.dp)
-                        .width(90.dp),
+                        .padding(horizontal = dimen_5dp, vertical = dimen_5dp)
+                        .width(dimen_90dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = selectedNetwork,
                         color = Color.White,
-                        fontSize = 13.sp
+                        fontSize = dimen_14sp
                     )
                     Icon(
                         imageVector = if (networkExpanded)
@@ -269,8 +277,8 @@ fun Header(
             Text(
                 "Total: ${dataUsageViewmodel.totalUsage}",
                 color = Color.White,
-                modifier = Modifier.padding(start = 12.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
-                fontSize = 13.sp
+                modifier = Modifier.padding(start = dimen_12dp, top = dimen_10dp, bottom = dimen_10dp, end = dimen_5dp),
+                fontSize = dimen_14sp
             )
         }
     }

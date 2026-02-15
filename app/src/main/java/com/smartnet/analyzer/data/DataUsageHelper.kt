@@ -5,9 +5,9 @@ import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.os.Process
 import android.os.RemoteException
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -45,7 +45,7 @@ class DataUsageHelper @Inject constructor(
                         )
 
                     } catch (e: Exception) {
-                        Log.d("dudi", "Error while getting buckets: $e")
+                        LogFeast.error("Exception while getting data usage:", e)
                     }
                 }
                 it.close()
@@ -106,10 +106,7 @@ class DataUsageHelper @Inject constructor(
                             }
 
                             else -> {
-                                Log.d(
-                                    "dudi",
-                                    "Blank UID: $uid , total bytes: ${bytes.first + bytes.second}"
-                                )
+                                LogFeast.warn("Blank UID: $uid , total bytes: ${bytes.first + bytes.second}")
                                 return@forEach
                             }
                         }
@@ -131,12 +128,12 @@ class DataUsageHelper @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
-                    Log.d("dudi", "Error while getting names: $e")
+                    LogFeast.error("Exception while getting package info:",e)
                 }
             }
             return appList.sortedByDescending { it.totalBytes }
         } catch (e: RemoteException) {
-            Log.d("dudi", "Error while getting data usage: $e")
+            LogFeast.error("Error while getting data usage: $e")
             emptyList()
         }
     }
@@ -165,7 +162,7 @@ class DataUsageHelper @Inject constructor(
             }
             return totalUsage
         } catch (e: RemoteException) {
-            Log.d("dudi", "Error while getting data usage: $e")
+            LogFeast.error("Error while getting day wise data usage:", e)
             return totalUsage
         }
     }

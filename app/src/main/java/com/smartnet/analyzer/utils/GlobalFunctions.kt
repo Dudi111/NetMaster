@@ -8,8 +8,8 @@ import android.content.Context.APP_OPS_SERVICE
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.annotation.RequiresPermission
+import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.MyApplication.Companion.mApplicationContext
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -30,7 +30,7 @@ object GlobalFunctions {
             Constants.DATA_USAGE_TODAY -> {
                 val start = now.atStartOfDay(zoneId)
                 val end = now.plusDays(1).atStartOfDay(zoneId).minusNanos(1)
-                Log.d("dudi", "Aajka start end time: $start , $end")
+                LogFeast.debug("Today start end time: {} , {}", start, end)
                 start to end
             }
 
@@ -38,7 +38,7 @@ object GlobalFunctions {
                 val yesterday = now.minusDays(1)
                 val start = yesterday.atStartOfDay(zoneId)
                 val end = now.atStartOfDay(zoneId).minusNanos(1)
-                Log.d("dudi", "Kalka start end time: $start , $end")
+                LogFeast.debug("Yesterday start end time: {} , {}", start, end)
                 start to end
             }
 
@@ -46,7 +46,7 @@ object GlobalFunctions {
                 val startOfWeek = now.with(DayOfWeek.MONDAY)
                 val start = startOfWeek.atStartOfDay(zoneId)
                 val end = start.plusWeeks(1).minusNanos(1)
-                Log.d("dudi", "Week start end time: $start , $end")
+                LogFeast.debug("This week start end time: {} , {}", start, end)
                 start to end
             }
 
@@ -54,7 +54,7 @@ object GlobalFunctions {
                 val startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth())
                 val start = startOfMonth.atStartOfDay(zoneId)
                 val end = start.plusMonths(1).minusNanos(1)
-                Log.d("dudi", "Month start end time: $start , $end")
+                LogFeast.debug("This month start time: {} ,end time {}", start, end)
                 start to end
             }
 
@@ -97,7 +97,7 @@ object GlobalFunctions {
             android.os.Process.myUid(),
             context.packageName
         )
-        Log.d("dudi","mode: $mode")
+        LogFeast.debug("Usage access mode: $mode")
         return mode == AppOpsManager.MODE_ALLOWED
     }
 

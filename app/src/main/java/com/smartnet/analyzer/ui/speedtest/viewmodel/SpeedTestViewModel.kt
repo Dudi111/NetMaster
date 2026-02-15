@@ -1,6 +1,7 @@
 package com.smartnet.analyzer.ui.speedtest.viewmodel
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
@@ -118,28 +119,24 @@ class SpeedTestViewModel @Inject constructor(
 
             val api = retrofitHelper.createSpeedApi()
 
-//            /* ---- PING ---- */
-//            val pingMs = runCatching {
-//                val pingStart = System.nanoTime()
-//
-//                val pingResponse = api.ping() // Range: bytes=0-0
-//
-//                // Always close body (important)
-//                pingResponse.body()?.close()
-//
-//                if (!pingResponse.isSuccessful) {
-//                    Log.d("dudi", "ping failed: ${pingResponse.code()}")
-//                }
-//
-//                ((System.nanoTime() - pingStart) / 1_000_000).toInt()
-//            }.getOrNull()
-//
-//            if (pingMs == null) {
-//                Log.d("dudi", "ping failed")
-//                return@launch
-//            }
-//
-//            onPingMeasured(pingMs)
+            /* ---- PING ---- */
+            val pingMs = runCatching {
+                val pingStart = System.nanoTime()
+
+                val pingResponse = api.ping()
+
+                // Always close body
+                pingResponse.body()?.close()
+
+                if (!pingResponse.isSuccessful) {
+                    LogFeast.warn("ping failed: ${pingResponse.code()}")
+                    return@launch
+                }
+
+                ((System.nanoTime() - pingStart) / 1_000_000).toInt()
+            }.getOrNull()
+
+            if (pingMs != null) onPingMeasured(pingMs)
 
             /* ---- DOWNLOAD ---- */
             val response = api.downloadFile()
@@ -193,6 +190,9 @@ class SpeedTestViewModel @Inject constructor(
         }
     }
 
+    /**
+     * showErrorDialog: This method is used to show the error dialog
+     */
     private fun showErrorDialog() {
         dialogID = SPEED_TEST_ERROR
         dialogMessage = R.string.speed_test_error

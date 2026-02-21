@@ -19,6 +19,11 @@ import java.time.temporal.TemporalAdjusters
 
 object GlobalFunctions {
 
+    /**
+     * getTimeRange: This method is used to get day/week/month start and end millis
+     * @param type: Type of time range i.e today/yesterday/this week/this month
+     * @param zoneId: Time zone
+     */
     fun getTimeRange(
         type: String,
         zoneId: ZoneId = ZoneId.systemDefault()
@@ -72,6 +77,10 @@ object GlobalFunctions {
         )
     }
 
+    /**
+     * formatBytes: This method is used to format bytes to KB, MB, GB
+     * @param bytes: Bytes to be formatted
+     */
     @SuppressLint("DefaultLocale")
     fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
@@ -106,6 +115,9 @@ object GlobalFunctions {
         return bytes / (1024f * 1024f)
     }
 
+    /**
+     * isInternetAvailable: This method is used to check internet connectivity
+     */
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     fun isInternetAvailable(): Boolean {
         val connectivityManager =
@@ -118,13 +130,14 @@ object GlobalFunctions {
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 
+    /**
+     * navigateToScreen: This method is used to navigate to a screen
+     * @param route: Screen route
+     */
     fun NavController.navigateToScreen(route: String) {
         this.navigate(route) {
-            popUpTo(this@navigateToScreen.graph.startDestinationId) {
-                saveState = true
-            }
+            popUpTo(this@navigateToScreen.graph.startDestinationId)
             launchSingleTop = true
-            restoreState = true
         }
     }
 }

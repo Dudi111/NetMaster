@@ -97,6 +97,7 @@ import com.smartnet.analyzer.common.theme.white
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_WIFI
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -160,11 +161,11 @@ fun DataUsageChartScreen(
 
                 SelectedAppSection(chartViewmodel, expanded)
 
-                AppWiseChartSection(chartViewmodel, scrollState)
+                AppWiseChartSection(chartViewmodel)
             }
 
         }
-        DialogInit(chartViewmodel)
+        DialogInit(chartViewmodel, scrollState)
     }
 }
 
@@ -514,8 +515,7 @@ private fun SelectedAppSection(
 
 @SuppressLint("DefaultLocale", "CoroutineCreationDuringComposition")
 @Composable
-private fun AppWiseChartSection(chartViewmodel: ChartViewmodel, scrollState: LazyListState) {
-    val scope = rememberCoroutineScope()
+private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
     if (chartViewmodel.selectedApp.value.third != 0) {
         Box(
             modifier = Modifier
@@ -549,10 +549,6 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel, scrollState: Laz
                     .height(dimen_280dp)
                     .padding(vertical = dimen_10dp)
             )
-        }
-
-        scope.launch {
-            scrollState.scrollToItem(2)
         }
     }
 }
@@ -696,12 +692,19 @@ private fun NetworkOption(
 @Composable
 fun DialogInit(
     chartViewmodel: ChartViewmodel,
+    scrollState: LazyListState
 ) {
+    val scope = rememberCoroutineScope()
+
     if (chartViewmodel.dialogState.value) {
         AppSelectionDialog(
             chartViewmodel = chartViewmodel,
             onConfirm = {
                 chartViewmodel.onConfirmClick(chartViewmodel.selectedAppIndex.intValue)
+                scope.launch {
+                    delay(250)
+                    scrollState.scrollToItem(2)
+                }
             },
             onDismiss = {
                 chartViewmodel.dialogState.value = false
@@ -714,7 +717,7 @@ fun DialogInit(
 fun AppSelectionDialog(
     chartViewmodel: ChartViewmodel,
     onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit
+    onConfirm: (Int) -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(

@@ -1,7 +1,6 @@
 package com.smartnet.analyzer.ui.speedtest.viewmodel
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
@@ -130,7 +129,6 @@ class SpeedTestViewModel @Inject constructor(
 
                 if (!pingResponse.isSuccessful) {
                     LogFeast.warn("ping failed: ${pingResponse.code()}")
-                    return@launch
                 }
 
                 ((System.nanoTime() - pingStart) / 1_000_000).toInt()
@@ -144,6 +142,13 @@ class SpeedTestViewModel @Inject constructor(
             val body = response.body()
             if (body == null) {
                 LogFeast.debug("Download body is null")
+                _uiState.update {
+                    it.copy(
+                        btnState = "START",
+                        currentSpeedMbps = 0f,
+                        speedometerProgress = 0f
+                    )
+                }
                 showErrorDialog()
                 return@launch
             }

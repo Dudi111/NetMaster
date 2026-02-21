@@ -7,7 +7,9 @@
     <string name="empty"> </string>
 
 
-    <string name="data_usage_perm">Please provide data usage permission from settings</string>
+    <string name="data_usage_perm">To show accurate app-wise data usage, this app needs permission to access usage statistics./n
+We respect your privacy — no personal data is collected, stored, or shared./n
+Please enable Data Usage access in Settings.</string>
 
     <string name="internet_error">Internet not available. Please try again later.</string>
     <string name="speed_test_error">Speed test failed. Please try again later.</string>

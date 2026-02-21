@@ -52,9 +52,9 @@ class MainActivity : ComponentActivity() {
     var dialogState = mutableStateOf(false)
 
     val items = listOf(
-        BottomNavItem(R.drawable.person, CHART_SCREEN),
+        BottomNavItem(R.drawable.chart, CHART_SCREEN),
         BottomNavItem(R.drawable.speed, SPEED_TEST),
-        BottomNavItem(R.drawable.wifi, DATA_USAGE)
+        BottomNavItem(R.drawable.app_data, DATA_USAGE)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

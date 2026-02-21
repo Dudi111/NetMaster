@@ -9,6 +9,7 @@ import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.annotation.RequiresPermission
+import androidx.navigation.NavController
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.MyApplication.Companion.mApplicationContext
 import java.time.DayOfWeek
@@ -115,5 +116,15 @@ object GlobalFunctions {
 
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
+
+    fun NavController.navigateToScreen(route: String) {
+        this.navigate(route) {
+            popUpTo(this@navigateToScreen.graph.startDestinationId) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 }

@@ -22,23 +22,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.theme.DarkColor
+import com.smartnet.analyzer.data.BottomNavItem
 import com.smartnet.analyzer.ui.common.NetMasterScreen
 import com.smartnet.analyzer.ui.common.RoundCornerDialogView
+import com.smartnet.analyzer.ui.common.ScreenId.CHART_SCREEN
+import com.smartnet.analyzer.ui.common.ScreenId.DATA_USAGE
+import com.smartnet.analyzer.ui.common.ScreenId.SPEED_TEST
 import com.smartnet.analyzer.ui.navHost.NetMasterScreenHolder
 import com.smartnet.analyzer.utils.GlobalFunctions.hasUsageAccess
+import com.smartnet.analyzer.utils.GlobalFunctions.navigateToScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,6 +50,12 @@ class MainActivity : ComponentActivity() {
     private var navController: NavHostController? = null
 
     var dialogState = mutableStateOf(false)
+
+    val items = listOf(
+        BottomNavItem(R.drawable.person, CHART_SCREEN),
+        BottomNavItem(R.drawable.speed, SPEED_TEST),
+        BottomNavItem(R.drawable.wifi, DATA_USAGE)
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,25 +84,22 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NavigationView() {
-        val items = listOf(
-            R.drawable.person,
-            R.drawable.speed,
-            R.drawable.wifi
-        )
-        var selectedItem by rememberSaveable { mutableIntStateOf(1) }
+        val navBackStackEntry by navController!!.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
         NavigationBar(
             containerColor = DarkColor
         ) {
             items.forEachIndexed { index, item ->
+                val selected = currentRoute == item.route
+                LogFeast.debug("Current route: $currentRoute, selected: $selected")
                 NavigationBarItem(
-                    selected = index == selectedItem,
+                    selected = selected,
                     onClick = {
-                        selectedItem = index
                         onIconClick(index)
                     },
                     icon = {
                         Icon(
-                            painter = painterResource(id = item),
+                            painter = painterResource(id = item.icon),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.padding(vertical = 5.dp)
@@ -116,17 +122,17 @@ class MainActivity : ComponentActivity() {
         when(index) {
             0 -> {
                 LogFeast.debug("Navigate to chart Screen")
-                navController!!.navigate(NetMasterScreen.ChartScreen.route)
+                navController!!.navigateToScreen(NetMasterScreen.ChartScreen.route)
             }
 
             1 -> {
                 LogFeast.debug("Navigate to speed test Screen")
-                navController!!.navigate(NetMasterScreen.SpeedTestScreen.route)
+                navController!!.navigateToScreen(NetMasterScreen.SpeedTestScreen.route)
             }
 
             2 -> {
                 LogFeast.debug("Navigate to data usage Screen")
-                navController!!.navigate(NetMasterScreen.DataUsageScreen.route)
+                navController!!.navigateToScreen(NetMasterScreen.DataUsageScreen.route)
             }
         }
     }
@@ -152,7 +158,7 @@ class MainActivity : ComponentActivity() {
                 },
                 onCancelClick = {
                     LogFeast.debug("Data usage dialog cancel pressed")
-                    navController.navigate(NetMasterScreen.SpeedTestScreen.route)
+                    navController.navigateToScreen(NetMasterScreen.SpeedTestScreen.route)
                     dialogState.value = false
                 }
             )

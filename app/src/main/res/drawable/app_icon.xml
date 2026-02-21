@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- White full square background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,0h108v108h-108z"/>
+
+    <!-- Bigger Speed Arc -->
+    <path
+        android:fillColor="#F8840E"
+        android:pathData="M16,70a38,38 0 1,1 76,0h-14a24,24 0 1,0 -48,0z"/>
+
+    <!-- Bigger Needle -->
+    <path
+        android:fillColor="#F8840E"
+        android:pathData="M54,48l26,16 -6,6z"/>
+
+    <!-- Larger Data Bars -->
+    <path
+        android:fillColor="#F8840E"
+        android:pathData="
+            M30,72h10v22h-10z
+            M49,64h10v30h-10z
+            M68,56h10v38h-10z"/>
+</vector>

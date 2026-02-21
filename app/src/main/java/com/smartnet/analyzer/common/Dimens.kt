@@ -11,6 +11,7 @@ val dimen_10dp = 10.dp
 val dimen_12dp = 12.dp
 val dimen_15dp = 15.dp
 val dimen_20dp = 20.dp
+val dimen_35dp = 35.dp
 val dimen_40dp = 40.dp
 val dimen_50dp = 50.dp
 val dimen_90dp = 90.dp

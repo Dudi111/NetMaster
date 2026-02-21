@@ -31,12 +31,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -92,6 +92,7 @@ import com.smartnet.analyzer.common.dimen_5dp
 import com.smartnet.analyzer.common.dimen_7dp
 import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.LightDarkColor
+import com.smartnet.analyzer.common.theme.colorAccent
 import com.smartnet.analyzer.common.theme.white
 import com.smartnet.analyzer.ui.charts.viewmodel.ChartViewmodel
 import com.smartnet.analyzer.utils.Constants.NETWORK_TYPE_CELLULAR
@@ -715,15 +716,25 @@ fun AppSelectionDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
 
-        Surface(
-            shape = RoundedCornerShape(dimen_12dp),
-            color = Color.Gray,
+//        Surface(
+//            shape = RoundedCornerShape(dimen_12dp),
+//            color = colorAccent,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .heightIn(max = 500.dp) // makes dialog scrollable
+//        ) {
+
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 500.dp) // makes dialog scrollable
+                .wrapContentHeight()
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(dimen_10dp)
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+                    .heightIn(max = 500.dp)
+                    .background(color = colorAccent, shape = RoundedCornerShape(dimen_12dp))
             ) {
 
                 // Title
@@ -755,7 +766,7 @@ fun AppSelectionDialog(
                                 selected = chartViewmodel.selectedAppIndex.intValue == index,
                                 onClick = { chartViewmodel.selectedAppIndex.intValue = index },
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = Color.Black,
+                                    selectedColor = Color.LightGray,
                                     unselectedColor = Color.White
                                 )
                             )

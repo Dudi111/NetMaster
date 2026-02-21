@@ -25,10 +25,14 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.smartnet.analyzer.common.dimen_10dp
+import com.smartnet.analyzer.common.dimen_14sp
+import com.smartnet.analyzer.common.dimen_15dp
+import com.smartnet.analyzer.common.dimen_18sp
+import com.smartnet.analyzer.common.dimen_35dp
+import com.smartnet.analyzer.common.theme.colorAccent
 
 @Composable
 fun RoundCornerDialogView(
@@ -68,30 +72,30 @@ fun CustomDialogUI(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(dimen_10dp)
     ) {
         Column(
             modifier = Modifier
-                .background(color = Color.Gray)
-                .padding(13.dp),
+                .background(color = colorAccent)
+                .padding(dimen_15dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 stringResource(message),
-                fontSize = 18.sp,
+                fontSize = dimen_18sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = Color.White
             )
-            Spacer(modifier = Modifier.height(35.dp))
+            Spacer(modifier = Modifier.height(dimen_35dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
                     onClick = onOkClick,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(dimen_10dp),
                     colors = ButtonColors(
                         containerColor = Color.White,
                         contentColor = Color.Gray,
@@ -104,17 +108,17 @@ fun CustomDialogUI(
                 ) {
                     Text(
                         text = stringResource(btnOKResID).uppercase(),
-                        fontSize =  15.sp,
+                        fontSize =  dimen_14sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     )
                 }
                 if (isCancel.value) {
-                    Spacer(modifier = Modifier.width(15.dp))
+                    Spacer(modifier = Modifier.width(dimen_15dp))
                     Button(
                         onClick = onCancelClick,
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(dimen_10dp),
                         colors = ButtonColors(
                             containerColor = Color.White,
                             contentColor = Color.Gray,
@@ -127,7 +131,7 @@ fun CustomDialogUI(
                     ) {
                         Text(
                             text = stringResource(btnCancelResID).uppercase(),
-                            fontSize = 15.sp,
+                            fontSize = dimen_14sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             color = Color.Black

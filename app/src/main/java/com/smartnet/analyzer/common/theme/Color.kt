@@ -16,7 +16,7 @@ val DarkColor2 = Color(0xFF202532)
 val LightDarkColor = Color(0xFF242833)
 val LightColor = Color(0xFF8A92A2)
 val LightColor2 = Color(0xFF626F88)
-val colorAccent = Color(0xFF56347E)
+val colorAccent = Color(0x9210181C)
 val transparent = Color(0x00000000)
 val white = Color(0xFFDEDCDC)
 

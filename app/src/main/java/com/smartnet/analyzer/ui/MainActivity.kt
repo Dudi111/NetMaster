@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                         NetMasterScreenHolder(navController!!)
                     }
                 }
-                DialogInit(navController!!)
+                DialogInit()
             }
         }
     }
@@ -121,8 +121,12 @@ class MainActivity : ComponentActivity() {
     fun onIconClick(index: Int) {
         when(index) {
             0 -> {
-                LogFeast.debug("Navigate to chart Screen")
-                navController!!.navigateToScreen(NetMasterScreen.ChartScreen.route)
+                if (!hasUsageAccess(this)) {
+                    dialogState.value = true
+                } else {
+                    LogFeast.debug("Navigate to chart Screen")
+                    navController!!.navigateToScreen(NetMasterScreen.ChartScreen.route)
+                }
             }
 
             1 -> {
@@ -131,8 +135,12 @@ class MainActivity : ComponentActivity() {
             }
 
             2 -> {
-                LogFeast.debug("Navigate to data usage Screen")
-                navController!!.navigateToScreen(NetMasterScreen.DataUsageScreen.route)
+                if (!hasUsageAccess(this)) {
+                    dialogState.value = true
+                } else {
+                    LogFeast.debug("Navigate to data usage Screen")
+                    navController!!.navigateToScreen(NetMasterScreen.DataUsageScreen.route)
+                }
             }
         }
     }
@@ -142,7 +150,7 @@ class MainActivity : ComponentActivity() {
      */
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun DialogInit(navController: NavHostController) {
+    fun DialogInit() {
         if (dialogState.value) {
             LogFeast.debug("Show data usage perm dialog")
             RoundCornerDialogView(
@@ -158,7 +166,6 @@ class MainActivity : ComponentActivity() {
                 },
                 onCancelClick = {
                     LogFeast.debug("Data usage dialog cancel pressed")
-                    navController.navigateToScreen(NetMasterScreen.SpeedTestScreen.route)
                     dialogState.value = false
                 }
             )

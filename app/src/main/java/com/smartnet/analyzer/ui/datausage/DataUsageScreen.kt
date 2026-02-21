@@ -40,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -61,24 +60,15 @@ import com.smartnet.analyzer.common.dimen_50dp
 import com.smartnet.analyzer.common.dimen_90dp
 import com.smartnet.analyzer.common.dimen_5dp
 import com.smartnet.analyzer.common.dimen_7dp
-import com.smartnet.analyzer.ui.MainActivity
 import com.smartnet.analyzer.ui.common.MyProgressBar
-import com.smartnet.analyzer.utils.GlobalFunctions
 
 @Composable
 fun DataUsageScreen(
      dataUsageViewmodel: DataUsageViewmodel = hiltViewModel()
 ) {
 
-    val context = LocalContext.current as MainActivity
     LaunchedEffect(Unit) {
         LogFeast.debug("Data usage screen compose")
-        if (GlobalFunctions.hasUsageAccess(context)) {
-            dataUsageViewmodel.progressState.value = true
-            dataUsageViewmodel.getDataUsage()
-        } else {
-            context.dialogState.value = true
-        }
     }
 
     Column(

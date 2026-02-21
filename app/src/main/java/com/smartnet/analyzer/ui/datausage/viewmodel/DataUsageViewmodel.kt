@@ -1,6 +1,7 @@
 package com.smartnet.analyzer.ui.datausage.viewmodel
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.NetworkCapabilities
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,9 +11,11 @@ import androidx.lifecycle.viewModelScope
 import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.data.DataUsageHelper
 import com.smartnet.analyzer.utils.Constants
+import com.smartnet.analyzer.utils.GlobalFunctions
 import com.smartnet.analyzer.utils.GlobalFunctions.getTimeRange
 import com.smartnet.analyzer.utils.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,8 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DataUsageViewmodel @Inject constructor(
+    @param:ApplicationContext val context: Context,
     private val dataUsageHelper: DataUsageHelper,
-    @IoDispatcher var ioDispatcher: CoroutineDispatcher,
+    @param:IoDispatcher var ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(){
 
 
@@ -39,6 +43,13 @@ class DataUsageViewmodel @Inject constructor(
 
     var totalUsage by mutableStateOf("")
         private set
+
+    init {
+        if (GlobalFunctions.hasUsageAccess(context)) {
+            progressState.value = true
+            getDataUsage()
+        }
+    }
 
     /**
      * updateTotalUsage: This method is used to update total usage

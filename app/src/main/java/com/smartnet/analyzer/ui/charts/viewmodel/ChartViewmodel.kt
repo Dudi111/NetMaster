@@ -74,11 +74,16 @@ class ChartViewmodel @Inject constructor(
 
     init {
         if (GlobalFunctions.hasUsageAccess(context)) {
-            loadThisMonthOverallUsage()
-            loadLastMonthOverallUsage()
-            loadNetworkUsage(NETWORK_TYPE_CELLULAR)
-            loadAppList()
+            LogFeast.debug("Start loading data")
+            fetchCartData()
         }
+    }
+
+    fun fetchCartData() {
+        loadThisMonthOverallUsage()
+        loadLastMonthOverallUsage()
+        loadNetworkUsage(NETWORK_TYPE_CELLULAR)
+        loadAppList()
     }
 
     /**

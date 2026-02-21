@@ -474,7 +474,9 @@ private fun SelectedAppSection(
                     chartViewmodel.selectedApp.value.first.toBitmap().asImageBitmap()
                 ),
                 contentDescription = null,
-                modifier = Modifier.size(dimen_40dp).padding(dimen_5dp)
+                modifier = Modifier
+                    .size(dimen_40dp)
+                    .padding(dimen_5dp)
             )
 
             Text(
@@ -715,15 +717,6 @@ fun AppSelectionDialog(
     onConfirm: (Int) -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
-
-//        Surface(
-//            shape = RoundedCornerShape(dimen_12dp),
-//            color = colorAccent,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .heightIn(max = 500.dp) // makes dialog scrollable
-//        ) {
-
         Card(
             modifier = Modifier
                 .wrapContentHeight()
@@ -732,7 +725,8 @@ fun AppSelectionDialog(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .heightIn(max = 500.dp)
                     .background(color = colorAccent, shape = RoundedCornerShape(dimen_12dp))
             ) {

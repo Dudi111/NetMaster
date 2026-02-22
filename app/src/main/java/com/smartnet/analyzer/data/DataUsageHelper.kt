@@ -18,6 +18,12 @@ class DataUsageHelper @Inject constructor(
 
     private val networkStatsManager = context.getSystemService<NetworkStatsManager>()
 
+    /**
+     * getAppDataUsage: This method is used to get data usage of all apps
+     * @param startTime: Start time in millis
+     * @param endTime: End time in millis
+     * @param networkType: Network type i.e. wifi/cellular
+     */
     fun getAppDataUsage(
         startTime: Long,
         endTime: Long,
@@ -55,21 +61,31 @@ class DataUsageHelper @Inject constructor(
 
             usageMap.forEach { (uid, bytes) ->
                 try {
-                    if (packageManager.getPackagesForUid(uid).isNullOrEmpty()) {
+                    val packageInfo = packageManager.getPackagesForUid(uid)
+                    if (packageInfo.isNullOrEmpty()) {
                         when (uid) {
-                            Process.SYSTEM_UID -> {
-                                appList.add(
-                                    AppDataUsage(
-                                        uid = uid,
-                                        appName = "System and Root",
-                                        icon = ContextCompat.getDrawable(
-                                            context,
-                                            R.drawable.ic_setting
-                                        ),
-                                        rxBytes = bytes.first,
-                                        txBytes = bytes.second
+                            in Process.SYSTEM_UID..1099 -> {
+                                val existingSystemApp = appList.find { it.appName == "System and Root" }
+
+                                if (existingSystemApp != null) {
+                                    // Update existing entry
+                                    existingSystemApp.rxBytes += bytes.first
+                                    existingSystemApp.txBytes += bytes.second
+                                } else {
+                                    // Create new entry
+                                    appList.add(
+                                        AppDataUsage(
+                                            uid = uid,
+                                            appName = "System and Root",
+                                            icon = ContextCompat.getDrawable(
+                                                context,
+                                                R.drawable.ic_setting
+                                            ),
+                                            rxBytes = bytes.first,
+                                            txBytes = bytes.second
+                                        )
                                     )
-                                )
+                                }
                                 return@forEach
                             }
 
@@ -105,14 +121,38 @@ class DataUsageHelper @Inject constructor(
                                 return@forEach
                             }
 
+                            in 10000..Int.MAX_VALUE -> {
+                                val existingUserApp = appList.find { it.appName == "Background User Apps" }
+
+                                if (existingUserApp != null) {
+                                    // Update existing entry
+                                    existingUserApp.rxBytes += bytes.first
+                                    existingUserApp.txBytes += bytes.second
+                                } else {
+                                    // Create new entry
+                                    appList.add(
+                                        AppDataUsage(
+                                            uid = uid,
+                                            appName = "Background User Apps",
+                                            icon = ContextCompat.getDrawable(
+                                                context,
+                                                R.drawable.background_apps
+                                            ),
+                                            rxBytes = bytes.first,
+                                            txBytes = bytes.second
+                                        )
+                                    )
+                                }
+                                return@forEach
+                            }
+
                             else -> {
                                 LogFeast.warn("Blank UID: $uid , total bytes: ${bytes.first + bytes.second}")
                                 return@forEach
                             }
                         }
                     }
-                    val packages = packageManager.getPackagesForUid(uid) ?: return@forEach
-                    for (pkg in packages) {
+                    for (pkg in packageInfo) {
                         val appInfo = packageManager.getApplicationInfo(pkg, 0)
                         val appName = packageManager.getApplicationLabel(appInfo).toString()
                         val icon = packageManager.getApplicationIcon(appInfo)
@@ -167,6 +207,13 @@ class DataUsageHelper @Inject constructor(
         }
     }
 
+    /**
+     * getUidDataUsage: This method is used to get data usage of a particular app
+     * @param networkType: Network type
+     * @param uid: UID of the app
+     * @param startTime: Start time
+     * @param endTime: End time
+     */
     fun getUidDataUsage(
         networkType: Int,
         uid: Int,

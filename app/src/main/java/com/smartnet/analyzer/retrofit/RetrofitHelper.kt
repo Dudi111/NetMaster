@@ -1,5 +1,6 @@
 package com.smartnet.analyzer.retrofit
 
+import com.smartnet.analyzer.utils.Constants.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
@@ -23,7 +24,7 @@ class RetrofitHelper @Inject constructor() {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("https://delicate-river-0fac.pd-rajiv-000.workers.dev/")
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .build()
             .create(CloudFlareSpeedApi::class.java)

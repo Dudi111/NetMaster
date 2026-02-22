@@ -1,6 +1,7 @@
 package com.smartnet.analyzer.utils
 
 object Constants {
+    const val BASE_URL = "https://delicate-river-0fac.pd-rajiv-000.workers.dev/"
     const val DATA_USAGE_THIS_MONTH = "This month"
     const val DATA_USAGE_THIS_WEEK = "This week"
     const val DATA_USAGE_TODAY = "Today"

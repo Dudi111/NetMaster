@@ -234,7 +234,10 @@ fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
                     }
                 },
                 guideline = null,
-                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                label = TextComponent(
+                    color = android.graphics.Color.WHITE
+                )
             ),
 
             bottomAxis = HorizontalAxis.rememberBottom(
@@ -242,7 +245,10 @@ fun ThisMonthChart(chartViewmodel: ChartViewmodel) {
                 valueFormatter = { _, value, _ ->
                     "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                 },
-                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                label = TextComponent(
+                    color = android.graphics.Color.WHITE
+                )
             )
         ),
 
@@ -287,7 +293,10 @@ fun LastMonthChart(chartViewmodel: ChartViewmodel) {
                     }
                 },
                 guideline = null,
-                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                label = TextComponent(
+                    color = android.graphics.Color.WHITE
+                )
             ),
 
             bottomAxis = HorizontalAxis.rememberBottom(
@@ -305,7 +314,10 @@ fun LastMonthChart(chartViewmodel: ChartViewmodel) {
                         )
                     } ${(value.toInt() + 1)}"
                 },
-                titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                label = TextComponent(
+                    color = android.graphics.Color.WHITE
+                )
             )
         ),
 
@@ -411,13 +423,20 @@ private fun NetworkWiseChartSection(
                             if (value >= 1024) String.format("%.1f GB", value / 1024f)
                             else "${value.toInt()} MB"
                         },
-                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                        label = TextComponent(
+                            color = android.graphics.Color.WHITE
+                        )
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         valueFormatter = { _, value, _ ->
                             "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                         },
-                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                        guideline = null,
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                        label = TextComponent(
+                            color = android.graphics.Color.WHITE
+                        )
                     )
                 ),
                 modelProducer = chartViewmodel.networkWiseModelProducer,
@@ -425,7 +444,7 @@ private fun NetworkWiseChartSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimen_280dp)
-                    .padding(top = dimen_10dp)
+                    .padding(dimen_10dp)
             )
         }
     }
@@ -535,13 +554,20 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
                             if (value >= 1024) String.format("%.1f GB", value / 1024f)
                             else "${value.toInt()} MB"
                         },
-                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                        label = TextComponent(
+                            color = android.graphics.Color.WHITE
+                        )
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         valueFormatter = { _, value, _ ->
                             "${chartViewmodel.getCurrentMonthShortName()} ${(value.toInt() + 1)}"
                         },
-                        titleComponent = TextComponent(color = android.graphics.Color.WHITE)
+                        guideline = null,
+                        titleComponent = TextComponent(color = android.graphics.Color.WHITE),
+                        label = TextComponent(
+                            color = android.graphics.Color.WHITE
+                        )
                     )
                 ),
                 modelProducer = chartViewmodel.appWiseModelProducer,
@@ -549,7 +575,7 @@ private fun AppWiseChartSection(chartViewmodel: ChartViewmodel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimen_280dp)
-                    .padding(vertical = dimen_10dp)
+                    .padding(dimen_10dp)
             )
         }
     }

@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.1"
-kotlin = "2.0.0"
+kotlin = "2.1.10"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -14,8 +14,7 @@ okHTTPClient = "4.12.0"
 composeNavigation = "2.9.5"
 hiltNavigation = "1.3.0"
 vico = "2.0.2"
-ksp = "2.0.0-1.0.22"
-libLogfeast = "1.1.0"
+ksp = "2.1.10-1.0.29"
 firebaseStorage = "22.0.1"
 accompanist = "0.25.1"
 retrofit = "2.11.0"
@@ -52,9 +51,6 @@ vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", ve
 #Dipendency Injection: Helt depencencis
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltversion"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltversion"}
-
-#custom logs
-logfeast = { group = "dude.logFeast", name = "logger", version.ref = "libLogfeast" }
 
 #firebase
 google-firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}

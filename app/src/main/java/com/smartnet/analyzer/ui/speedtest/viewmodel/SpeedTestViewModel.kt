@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
+import com.smartnet.analyzer.data.SpeedTestState
 import com.smartnet.analyzer.data.UIState
 import com.smartnet.analyzer.retrofit.RetrofitHelper
 import com.smartnet.analyzer.utils.GlobalFunctions
@@ -50,37 +51,46 @@ class SpeedTestViewModel @Inject constructor(
      * onStartClick: This method is used to start the speed test
      */
     @SuppressLint("SuspiciousIndentation")
-    fun onStartClick(btnText: String) {
-        if (btnText == "START") {
-            if (!GlobalFunctions.isInternetAvailable()) {
-                dialogID = INTERNET_ERROR
-                dialogMessage = R.string.internet_error
-                dialogState.value = true
-                return
-            }
-            LogFeast.info("Start button clicked")
-            peakSpeed = 0f
-            _uiState.value = UIState(btnState = "connecting")
-            measureSpeedAndPing()
-        } else if (btnText == "STOP") {
-            LogFeast.info("Stop button clicked")
+    fun onStartClick() {
+        when (_uiState.value.btnState) {
 
-            scope.launch(dispatcher) {
-                try {
-                    currentInputStream?.close()
-                } catch (e: Exception) {
-                    LogFeast.error("Exception in closing input stream:", e)
-                } finally {
-                    speedTestJob?.cancel()
-                    currentInputStream = null
+            SpeedTestState.IDLE -> {
+                if (!GlobalFunctions.isInternetAvailable()) {
+                    dialogID = INTERNET_ERROR
+                    dialogMessage = R.string.internet_error
+                    dialogState.value = true
+                    return
+                }
+                LogFeast.info("Start button clicked")
+                peakSpeed = 0f
+                _uiState.value = UIState(btnState = SpeedTestState.CONNECTING)
+                measureSpeedAndPing()
+            }
+
+            SpeedTestState.RUNNING -> {
+                LogFeast.info("Stop button clicked")
+
+                scope.launch(dispatcher) {
+                    try {
+                        currentInputStream?.close()
+                    } catch (e: Exception) {
+                        LogFeast.error("Exception in closing input stream:", e)
+                    } finally {
+                        speedTestJob?.cancel()
+                        currentInputStream = null
+                    }
+                }
+                _uiState.update {
+                    it.copy(
+                        btnState = SpeedTestState.IDLE,
+                        currentSpeedMbps = 0f,
+                        speedometerProgress = 0f
+                    )
                 }
             }
-            _uiState.update {
-                it.copy(
-                    btnState = "START",
-                    currentSpeedMbps = 0f,
-                    speedometerProgress = 0f
-                )
+
+            else -> {
+                LogFeast.warn("Start button clicked with invalid state: ${_uiState.value.btnState}")
             }
         }
     }
@@ -144,7 +154,7 @@ class SpeedTestViewModel @Inject constructor(
                 LogFeast.debug("Download body is null")
                 _uiState.update {
                     it.copy(
-                        btnState = "START",
+                        btnState = SpeedTestState.IDLE,
                         currentSpeedMbps = 0f,
                         speedometerProgress = 0f
                     )
@@ -155,7 +165,7 @@ class SpeedTestViewModel @Inject constructor(
             currentInputStream = body.byteStream()
             val buffer = ByteArray(64 * 1024)
 
-            _uiState.update { it.copy(btnState = "STOP") }
+            _uiState.update { it.copy(btnState = SpeedTestState.RUNNING) }
             var lastBytes = 0L
 
             val speedJob = launch {
@@ -186,7 +196,7 @@ class SpeedTestViewModel @Inject constructor(
                 currentInputStream?.close()
                 _uiState.update {
                     it.copy(
-                        btnState = "START",
+                        btnState = SpeedTestState.IDLE,
                         currentSpeedMbps = 0f,
                         speedometerProgress = 0f
                     )

@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +57,7 @@ import com.smartnet.analyzer.common.theme.DarkGradient
 import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
 import com.smartnet.analyzer.common.theme.LightColor
+import com.smartnet.analyzer.data.SpeedTestState
 import com.smartnet.analyzer.ui.common.RoundCornerDialogView
 import com.smartnet.analyzer.ui.speedtest.viewmodel.SpeedTestViewModel
 import kotlinx.coroutines.launch
@@ -112,11 +114,10 @@ fun SpeedTestScreenMain(
             arcValue = animation.value,
             speed = uiState.currentSpeedMbps,
             speedTestViewModel = speedTestViewModel,
-            btnName = uiState.btnState
         )
         AdditionalInfo(
             ping = "${uiState.pingMs} ms",
-            maxSpeed = "${"%.2f".format(uiState.maxSpeedMbps)} Mbps"
+            maxSpeed = "${"%.2f".format(uiState.maxSpeedMbps)} ${stringResource(R.string.mbps_text)}"
         )
         DialogInit(speedTestViewModel)
     }
@@ -128,7 +129,7 @@ fun SpeedTestScreenMain(
 @Composable
 fun Header() {
     Text(
-        text = "SPEED TEST",
+        text = stringResource(R.string.speed_test_header),
         modifier = Modifier.padding(top = 52.dp, bottom = 16.dp),
         style = MaterialTheme.typography.headlineMedium,
         color = Color.White
@@ -143,7 +144,6 @@ fun SpeedIndicator(
     arcValue: Float,
     speed: Float,
     speedTestViewModel: SpeedTestViewModel,
-    btnName: String
 ) {
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -152,7 +152,7 @@ fun SpeedIndicator(
             .aspectRatio(1f)
     ) {
         CircularSpeedIndicator(arcValue)
-        StartButton(speedTestViewModel, btnName)
+        StartButton(speedTestViewModel)
         SpeedValue("%.1f".format(speed))
     }
 }
@@ -167,7 +167,7 @@ fun SpeedValue(value: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("DOWNLOAD", style = MaterialTheme.typography.bodyLarge,
+        Text(stringResource(R.string.download_text), style = MaterialTheme.typography.bodyLarge,
             color = Color.White)
         Text(
             text = value,
@@ -175,7 +175,7 @@ fun SpeedValue(value: String) {
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
-        Text("mbps",
+        Text(stringResource(R.string.mbps_text),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White)
     }
@@ -184,12 +184,13 @@ fun SpeedValue(value: String) {
 /**
  * StartButton: This method is used to show the start button
  */
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
+fun StartButton( speedTestViewModel: SpeedTestViewModel) {
     OutlinedButton(
-        onClick = { speedTestViewModel.onStartClick(btnName) },
+        onClick = { speedTestViewModel.onStartClick() },
         modifier = Modifier.padding(bottom = 24.dp),
-        enabled =  btnName != "connecting",
+        enabled =  speedTestViewModel.uiState.value.btnState != SpeedTestState.CONNECTING,
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(width = 2.dp, color = Color.Black),
         colors = ButtonDefaults.outlinedButtonColors(
@@ -199,7 +200,7 @@ fun StartButton( speedTestViewModel: SpeedTestViewModel, btnName: String) {
         )
         ) {
         Text(
-            text = btnName,
+            text = speedTestViewModel.uiState.value.btnState.buttonText,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
             color = Color.Black,
             fontStyle = FontStyle.Normal,

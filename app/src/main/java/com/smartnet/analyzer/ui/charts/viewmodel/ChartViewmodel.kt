@@ -53,7 +53,7 @@ class ChartViewmodel @Inject constructor(
     var selectedApp = mutableStateOf(
         Triple(
             ContextCompat.getDrawable(context, R.drawable.ic_default_app)!!,
-            second = "Select app",
+            second = context.getString(R.string.select_app_title) ,
             third = 0
         )
     )

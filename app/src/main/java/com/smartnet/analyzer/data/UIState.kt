@@ -5,5 +5,5 @@ data class UIState(
     val maxSpeedMbps: Float = 0f,
     val pingMs: Int = 0,
     val speedometerProgress: Float = 0f,
-    val btnState: String = "START"
+    val btnState: SpeedTestState = SpeedTestState.IDLE
 )

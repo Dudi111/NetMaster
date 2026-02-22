@@ -1,12 +1,31 @@
 <resources>
     <string name="app_name">Net Master</string>
 
+    //common
     <string name="setting_btn">Go To Settings</string>
     <string name="btn_cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="empty"> </string>
+    <string name="progress_bar_loading">Loading....</string>
 
+    //chart screen
+    <string name="select_app_title">Select App</string>
+    <string name="text_cellular">Cellular</string>
+    <string name="text_wifi">Wi-Fi</string>
+    <string name="wifi_cellular">WIFI + CELLULAR</string>
+    <string name="total_data_usage">Total Data Used</string>
+    <string name="total_text">Total:</string>
+    <string name="app_data_usage">App data usage</string>
+    <string name="monthly_cellular_usage">Total Cellular usage for</string>
+    <string name="monthly_wifi_usage">Total Wifi usage for</string>
 
+    // Data usage
+    <string name="data_usage_header">DATA USAGE</string>
+
+    //speed test
+    <string name="speed_test_header">SPEED TEST</string>
+    <string name="download_text">DOWNLOAD</string>
+    <string name="mbps_text">Mbps</string>
     <string name="data_usage_perm">To show accurate app-wise data usage, this app needs permission to access usage statistics.\n\n
 We respect your privacy — no personal data is collected, stored, or shared.\n\nPlease enable Data Usage access in Settings.</string>
 

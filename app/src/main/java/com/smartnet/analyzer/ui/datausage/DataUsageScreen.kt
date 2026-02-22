@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,7 @@ import com.smartnet.analyzer.data.AppDataUsage
 import com.smartnet.analyzer.ui.datausage.viewmodel.DataUsageViewmodel
 import androidx.core.graphics.createBitmap
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
+import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.dimen_100dp
 import com.smartnet.analyzer.common.dimen_10dp
 import com.smartnet.analyzer.common.dimen_12dp
@@ -85,7 +87,7 @@ fun DataUsageScreen(
                 }
             }
         }
-        MyProgressBar(dataUsageViewmodel.progressState, "Loading...")
+        MyProgressBar(dataUsageViewmodel.progressState, stringResource(R.string.progress_bar_loading))
     }
 }
 
@@ -137,7 +139,6 @@ fun AppDetailsView(dataUsage: AppDataUsage, dataUsageViewmodel: DataUsageViewmod
 fun Header(
     dataUsageViewmodel: DataUsageViewmodel
 ) {
-
     var expanded by remember { mutableStateOf(false) }
     var selectedRange by remember { mutableStateOf(dataUsageViewmodel.dateRanges[2]) }
     var networkExpanded by remember { mutableStateOf(false) }
@@ -147,7 +148,7 @@ fun Header(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "DATA USAGE",
+            text = stringResource(R.string.data_usage_header),
             modifier = Modifier.padding(top = dimen_50dp, bottom = dimen_15dp)
                 .align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.headlineMedium,
@@ -266,7 +267,7 @@ fun Header(
             }
 
             Text(
-                "Total: ${dataUsageViewmodel.totalUsage}",
+                "${stringResource(R.string.total_text)} ${dataUsageViewmodel.totalUsage}",
                 color = Color.White,
                 modifier = Modifier.padding(start = dimen_12dp, top = dimen_10dp, bottom = dimen_10dp, end = dimen_5dp),
                 fontSize = dimen_14sp

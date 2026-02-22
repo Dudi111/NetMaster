@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +73,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.common.component.TextComponent
+import com.smartnet.analyzer.R
 import com.smartnet.analyzer.common.dimen_10dp
 import com.smartnet.analyzer.common.dimen_10sp
 import com.smartnet.analyzer.common.dimen_12dp
@@ -392,9 +394,9 @@ private fun NetworkWiseChartSection(
         Column {
             Text(
                 text = if (selectedNetwork == NETWORK_TYPE_CELLULAR)
-                    "Total Cellular usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}"
+                    "${stringResource(R.string.monthly_cellular_usage)} ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}"
                 else
-                    "Total Wifi usage for ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}",
+                    "${stringResource(R.string.monthly_wifi_usage)} ${chartViewmodel.networkUsageDetail.value.month}: ${chartViewmodel.networkUsageDetail.value.total}",
                 modifier = Modifier.padding(7.dp),
                 color = white,
                 fontSize = 10.sp,
@@ -438,7 +440,7 @@ private fun AppUsageHeader() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "App data usage",
+            text = stringResource(R.string.app_data_usage),
             color = Color.White,
             fontSize = dimen_12sp,
             fontWeight = FontWeight.Bold,
@@ -503,7 +505,7 @@ private fun SelectedAppSection(
             Spacer(Modifier.weight(1f))
 
             Text(
-                text = "Total: ${chartViewmodel.appWiseTotalUsage.value}",
+                text = "${stringResource(R.string.total_text)} ${chartViewmodel.appWiseTotalUsage.value}",
                 fontSize = dimen_14sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -600,7 +602,7 @@ fun Header(
                 )
 
                 Text(
-                    text = "Total Data Used",
+                    text = stringResource(R.string.total_data_usage),
                     modifier = Modifier.padding(dimen_5dp),
                     style =  TextStyle(
                         fontWeight = FontWeight.Normal,
@@ -611,7 +613,7 @@ fun Header(
                 )
 
                 Text(
-                    text = "WIFI + CELLULAR",
+                    text = stringResource(R.string.wifi_cellular),
                     modifier = Modifier.padding(bottom = dimen_10dp),
                     style = TextStyle(
                         fontWeight = FontWeight.Normal,
@@ -640,13 +642,13 @@ fun NetworkSwitcher(
     ) {
         Row {
             NetworkOption(
-                text = "Cellular",
+                text = stringResource(R.string.text_cellular),
                 selected = selected == NETWORK_TYPE_CELLULAR,
                 onClick = { onSelectedChange(NETWORK_TYPE_CELLULAR) },
                 modifier = Modifier.weight(1f)
             )
             NetworkOption(
-                text = "Wi-Fi",
+                text = stringResource(R.string.text_wifi),
                 selected = selected == NETWORK_TYPE_WIFI,
                 onClick = { onSelectedChange(NETWORK_TYPE_WIFI) },
                modifier = Modifier.weight(1f)
@@ -736,7 +738,7 @@ fun AppSelectionDialog(
 
                 // Title
                 Text(
-                    text = "Select App",
+                    text = stringResource(R.string.select_app_title),
                     fontSize = dimen_18sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -788,7 +790,7 @@ fun AppSelectionDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel", color = Color.White)
+                        Text(stringResource(R.string.btn_cancel), color = Color.White)
                     }
 
                     Spacer(modifier = Modifier.width(dimen_7dp))
@@ -797,7 +799,7 @@ fun AppSelectionDialog(
                         onClick = { onConfirm(chartViewmodel.selectedAppIndex.intValue) },
                         enabled = chartViewmodel.selectedAppIndex.intValue != -1
                     ) {
-                        Text("OK", color = Color.White)
+                        Text(stringResource(R.string.ok), color = Color.White)
                     }
                 }
             }

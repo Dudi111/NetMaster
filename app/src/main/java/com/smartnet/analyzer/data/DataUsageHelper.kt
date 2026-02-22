@@ -9,6 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.dude.logfeast.logs.CustomLogUtils.LogFeast
 import com.smartnet.analyzer.R
+import com.smartnet.analyzer.utils.DataUsageInvalidPkg.BACKGROUND_USER_UID
+import com.smartnet.analyzer.utils.DataUsageInvalidPkg.HOTSPOT_UID
+import com.smartnet.analyzer.utils.DataUsageInvalidPkg.REMOVED_UID
+import com.smartnet.analyzer.utils.DataUsageInvalidPkg.SYSTEM_UID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -65,7 +69,7 @@ class DataUsageHelper @Inject constructor(
                     if (packageInfo.isNullOrEmpty()) {
                         when (uid) {
                             in Process.SYSTEM_UID..1099 -> {
-                                val existingSystemApp = appList.find { it.appName == "System and Root" }
+                                val existingSystemApp = appList.find { it.appName == SYSTEM_UID }
 
                                 if (existingSystemApp != null) {
                                     // Update existing entry
@@ -76,7 +80,7 @@ class DataUsageHelper @Inject constructor(
                                     appList.add(
                                         AppDataUsage(
                                             uid = uid,
-                                            appName = "System and Root",
+                                            appName = SYSTEM_UID,
                                             icon = ContextCompat.getDrawable(
                                                 context,
                                                 R.drawable.ic_setting
@@ -93,7 +97,7 @@ class DataUsageHelper @Inject constructor(
                                 appList.add(
                                     AppDataUsage(
                                         uid = uid,
-                                        appName = "Tethering & Hotspot",
+                                        appName = HOTSPOT_UID,
                                         icon = ContextCompat.getDrawable(
                                             context,
                                             R.drawable.ic_hotspot
@@ -109,7 +113,7 @@ class DataUsageHelper @Inject constructor(
                                 appList.add(
                                     AppDataUsage(
                                         uid = uid,
-                                        appName = "Removed UID usage",
+                                        appName = REMOVED_UID,
                                         icon = ContextCompat.getDrawable(
                                             context,
                                             R.drawable.ic_delete
@@ -122,7 +126,7 @@ class DataUsageHelper @Inject constructor(
                             }
 
                             in 10000..Int.MAX_VALUE -> {
-                                val existingUserApp = appList.find { it.appName == "Background User Apps" }
+                                val existingUserApp = appList.find { it.appName == BACKGROUND_USER_UID }
 
                                 if (existingUserApp != null) {
                                     // Update existing entry
@@ -133,7 +137,7 @@ class DataUsageHelper @Inject constructor(
                                     appList.add(
                                         AppDataUsage(
                                             uid = uid,
-                                            appName = "Background User Apps",
+                                            appName = BACKGROUND_USER_UID,
                                             icon = ContextCompat.getDrawable(
                                                 context,
                                                 R.drawable.background_apps

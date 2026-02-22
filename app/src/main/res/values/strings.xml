@@ -26,8 +26,9 @@
     <string name="speed_test_header">SPEED TEST</string>
     <string name="download_text">DOWNLOAD</string>
     <string name="mbps_text">Mbps</string>
-    <string name="data_usage_perm">To show accurate app-wise data usage, this app needs permission to access usage statistics.\n\n
-We respect your privacy — no personal data is collected, stored, or shared.\n\nPlease enable Data Usage access in Settings.</string>
+    <string name="data_usage_perm">To display per-app and monthly mobile/Wi-Fi data usage statistics, this app requires access to App Usage Data.\n\n
+        This permission allows the app to calculate how much internet each installed app uses and generate usage charts.\n\n
+        All information is processed locally on your device. We do not collect, store, or share any personal data.\n\nPlease enable “App Usage Access” in Settings.</string>
 
     <string name="internet_error">Internet not available. Please try again later.</string>
     <string name="speed_test_error">Speed test failed. Please try again later.</string>

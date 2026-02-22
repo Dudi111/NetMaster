@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias (libs.plugins.hiltPlugin)
     alias(libs.plugins.ksp)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -44,15 +44,19 @@ android {
 
 dependencies {
 
+    implementation(libs.google.accompanist)
     //dagger hilt
     implementation(libs.hilt.android)
-    implementation(libs.firebase.storage)
     ksp(libs.hilt.compiler)
     //navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation)
 
-    
+    //material
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
+
+    //core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -60,7 +64,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.com.squareup.okhttp3)
     // test cases
     androidTestImplementation(libs.androidx.junit)
     testImplementation(libs.junit)
@@ -69,23 +72,19 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(libs.androidx.ui.tooling)
 
+    // vico charts
+    implementation(libs.vico.compose)
+    implementation(libs.vico.core)
+    implementation(libs.vico.compose.m3)
     //firebase
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.google.firebase))
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.analytics)
 
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
+    // Retrofit
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.com.squareup.okhttp3)
 
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.1")
-
-    implementation("com.patrykandpatrick.vico:core:2.0.2")
-    implementation("com.patrykandpatrick.vico:compose:2.0.2")
-    implementation("com.patrykandpatrick.vico:compose-m3:2.0.2")
-
-    // Retrofit (stable, production)
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-
+    //Custom log
     implementation(libs.logfeast)
-
-    implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
-    implementation("com.google.firebase:firebase-analytics")
 }

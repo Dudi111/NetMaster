@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.smartnet.analyzer"
-        minSdk = 31
+        minSdk = 33
         targetSdk = 36
         versionCode = 2
         versionName = appVersion
@@ -93,4 +93,5 @@ dependencies {
 
     //Custom log
     implementation(libs.logfeast)
+    implementation(libs.keyboard.lib)
 }

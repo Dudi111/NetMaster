@@ -17,6 +17,8 @@ vico = "2.0.2"
 ksp = "2.1.10-1.0.29"
 firebaseStorage = "22.0.1"
 accompanist = "0.25.1"
+libLogfeast = "1.1.0"
+keyboard = "1.0.1"
 retrofit = "2.11.0"
 firebase-bom = "34.9.0"
 
@@ -51,6 +53,10 @@ vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", ve
 #Dipendency Injection: Helt depencencis
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltversion"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltversion"}
+
+#custom logs
+logfeast = { group = "com.github.Dudi111", name = "Log-Feast", version.ref = "libLogfeast" }
+keyboard-lib = { group = "com.github.Dudi111", name = "CustomKeyboard", version.ref = "keyboard" }
 
 #firebase
 google-firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}

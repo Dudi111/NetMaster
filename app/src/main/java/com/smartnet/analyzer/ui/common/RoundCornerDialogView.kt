@@ -28,6 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.smartnet.analyzer.common.dimen_10dp
+import com.smartnet.analyzer.common.dimen_12sp
+import com.smartnet.analyzer.common.dimen_13sp
 import com.smartnet.analyzer.common.dimen_14sp
 import com.smartnet.analyzer.common.dimen_15dp
 import com.smartnet.analyzer.common.dimen_18sp
@@ -48,7 +50,7 @@ fun RoundCornerDialogView(
         onDismissRequest = { !openDialogCustom.value },
         content = {
             val systemUiController = rememberSystemUiController()
-            systemUiController.isNavigationBarVisible = false // Navigation bar
+            systemUiController.isNavigationBarVisible = false
             systemUiController.navigationBarDarkContentEnabled =false
             CustomDialogUI(message, btnOKResID, btnCancelResID, isCancel, onOkClick, onCancelClick)
         }, properties =
@@ -108,14 +110,14 @@ fun CustomDialogUI(
                 ) {
                     Text(
                         text = stringResource(btnOKResID).uppercase(),
-                        fontSize =  dimen_14sp,
+                        fontSize =  dimen_13sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     )
                 }
                 if (isCancel.value) {
-                    Spacer(modifier = Modifier.width(dimen_15dp))
+                    Spacer(modifier = Modifier.width(dimen_10dp))
                     Button(
                         onClick = onCancelClick,
                         shape = RoundedCornerShape(dimen_10dp),
@@ -131,7 +133,7 @@ fun CustomDialogUI(
                     ) {
                         Text(
                             text = stringResource(btnCancelResID).uppercase(),
-                            fontSize = dimen_14sp,
+                            fontSize = dimen_13sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             color = Color.Black

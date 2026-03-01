@@ -58,6 +58,7 @@ import com.smartnet.analyzer.common.theme.Green500
 import com.smartnet.analyzer.common.theme.GreenGradient
 import com.smartnet.analyzer.common.theme.LightColor
 import com.smartnet.analyzer.data.SpeedTestState
+import com.smartnet.analyzer.data.UIState
 import com.smartnet.analyzer.ui.common.RoundCornerDialogView
 import com.smartnet.analyzer.ui.speedtest.viewmodel.SpeedTestViewModel
 import kotlinx.coroutines.launch
@@ -114,6 +115,7 @@ fun SpeedTestScreenMain(
             arcValue = animation.value,
             speed = uiState.currentSpeedMbps,
             speedTestViewModel = speedTestViewModel,
+            uiState
         )
         AdditionalInfo(
             ping = "${uiState.pingMs} ms",
@@ -144,6 +146,7 @@ fun SpeedIndicator(
     arcValue: Float,
     speed: Float,
     speedTestViewModel: SpeedTestViewModel,
+    uiState: UIState
 ) {
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -152,7 +155,7 @@ fun SpeedIndicator(
             .aspectRatio(1f)
     ) {
         CircularSpeedIndicator(arcValue)
-        StartButton(speedTestViewModel)
+        StartButton(speedTestViewModel, uiState)
         SpeedValue("%.1f".format(speed))
     }
 }
@@ -186,11 +189,11 @@ fun SpeedValue(value: String) {
  */
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun StartButton( speedTestViewModel: SpeedTestViewModel) {
+fun StartButton( speedTestViewModel: SpeedTestViewModel, uiState: UIState) {
     OutlinedButton(
         onClick = { speedTestViewModel.onStartClick() },
         modifier = Modifier.padding(bottom = 24.dp),
-        enabled =  speedTestViewModel.uiState.value.btnState != SpeedTestState.CONNECTING,
+        enabled =  uiState.btnState != SpeedTestState.CONNECTING,
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(width = 2.dp, color = Color.Black),
         colors = ButtonDefaults.outlinedButtonColors(
@@ -200,7 +203,7 @@ fun StartButton( speedTestViewModel: SpeedTestViewModel) {
         )
         ) {
         Text(
-            text = speedTestViewModel.uiState.value.btnState.buttonText,
+            text = uiState.btnState.buttonText,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
             color = Color.Black,
             fontStyle = FontStyle.Normal,

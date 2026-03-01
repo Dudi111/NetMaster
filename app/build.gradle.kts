@@ -17,7 +17,7 @@ android {
         applicationId = "com.smartnet.analyzer"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = appVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -24,6 +24,7 @@ val dimen_280dp = 280.dp
 // Text/Font sizes
 val dimen_10sp = 10.sp
 val dimen_12sp = 12.sp
+val dimen_13sp = 13.sp
 val dimen_14sp = 14.sp
 val dimen_16sp = 16.sp
 val dimen_18sp = 18.sp

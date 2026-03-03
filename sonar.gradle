@@ -1,0 +1,13 @@
+apply plugin: "org.sonarqube"
+
+sonarqube {
+    properties {
+        property "sonar.projectVersion","$libVersion"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.junit.reportPaths", "${layout.getProjectDirectory()}/app/build/test-results/testDebugUnitTest/, ${layout.getProjectDirectory()}/app/build/outputs/androidTest-results/connected/"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${layout.getProjectDirectory()}/app/build/reports/jacoco/jacocoTestReport/*"
+        property "sonar.coverage.exclusions", ""
+    }
+}
+
+

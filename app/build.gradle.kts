@@ -5,7 +5,14 @@ plugins {
     alias (libs.plugins.hiltPlugin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
+    jacoco
 }
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+apply(from = "${project.rootDir}/jacoco.gradle.kts")
 
 val appVersion: String by project
 
@@ -77,6 +84,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(libs.androidx.ui.tooling)
+    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.androidx.rules)
 
     // vico charts
     implementation(libs.vico.compose)

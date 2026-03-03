@@ -21,6 +21,10 @@ libLogfeast = "1.1.0"
 keyboard = "1.0.1"
 retrofit = "2.11.0"
 firebase-bom = "34.9.0"
+sonarQube = "5.1.0.4882"
+jacoco = "0.8.12"
+androidXRules = "1.6.1"
+uiautomator = "2.3.0"
 
 [libraries]
 # core
@@ -40,6 +44,8 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator"}
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "androidXRules" }
 
 #Retrofit
 com-squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHTTPClient"}
@@ -62,6 +68,9 @@ keyboard-lib = { group = "com.github.Dudi111", name = "CustomKeyboard", version.
 google-firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics"}
 
+##jacoco
+org-jacoco-ant = { group = "org.jacoco",name = "org.jacoco.ant", version.ref = "jacoco"}
+
 #material
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -77,6 +86,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hiltPlugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltversion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+sonarqube = { id = "org.sonarqube",version.ref = "sonarQube"}
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 
 

@@ -6,4 +6,13 @@ plugins {
     alias(libs.plugins.hiltPlugin) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.sonarqube) apply false
+    jacoco
 }
+
+buildscript {
+    dependencies {
+        classpath(libs.org.jacoco.ant)
+    }
+}
+apply(from = "${project.rootDir}/sonar.gradle")
